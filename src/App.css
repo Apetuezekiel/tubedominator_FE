@@ -1,4 +1,4 @@
-@import url('https://cdn.syncfusion.com/ej2/material.css');
+@import url("https://cdn.syncfusion.com/ej2/material.css");
 
 .sidebar {
   box-shadow: rgb(113 122 131 / 11%) 0px 7px 30px 0px;
@@ -7,13 +7,14 @@
 .navbar {
   z-index: 10000;
 }
-@media  screen and (max-width:800px) {
-  .sidebar{
+@media screen and (max-width: 800px) {
+  .sidebar {
     z-index: 10000000;
   }
 }
 
-.e-dlg-center-center, .e-quick-popup-wrapper.e-device{
+.e-dlg-center-center,
+.e-quick-popup-wrapper.e-device {
   z-index: 1000000 !important;
 }
 
@@ -30,9 +31,9 @@
 
 /* color-picker style  */
 
- #preview {
+#preview {
   background: transparent
-    url('https://ej2.syncfusion.com/react/demos/src/color-picker/images/pen.png')
+    url("https://ej2.syncfusion.com/react/demos/src/color-picker/images/pen.png")
     no-repeat;
   display: inline-block;
   height: 80px;
@@ -42,10 +43,183 @@
   background-color: #008000;
 }
 
-.e-input-group:not(.e-float-icon-left), .e-input-group.e-success:not(.e-float-icon-left), .e-input-group.e-warning:not(.e-float-icon-left), .e-input-group.e-error:not(.e-float-icon-left), .e-input-group.e-control-wrapper:not(.e-float-icon-left), .e-input-group.e-control-wrapper.e-success:not(.e-float-icon-left), .e-input-group.e-control-wrapper.e-warning:not(.e-float-icon-left), .e-input-group.e-control-wrapper.e-error:not(.e-float-icon-left){
+.e-input-group:not(.e-float-icon-left),
+.e-input-group.e-success:not(.e-float-icon-left),
+.e-input-group.e-warning:not(.e-float-icon-left),
+.e-input-group.e-error:not(.e-float-icon-left),
+.e-input-group.e-control-wrapper:not(.e-float-icon-left),
+.e-input-group.e-control-wrapper.e-success:not(.e-float-icon-left),
+.e-input-group.e-control-wrapper.e-warning:not(.e-float-icon-left),
+.e-input-group.e-control-wrapper.e-error:not(.e-float-icon-left) {
   border: none;
 }
 
-/* .width-sidebar {
-  width: 20% !important;
-} */
+.mainLogo {
+  height: 30px !important;
+  width: 30px !important ;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 5vh;
+}
+
+/* Add tooltip style to the column header */
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+.KwDiffButtonSize {
+  width: 100px !important;
+}
+
+.showChannel {
+  display: block;
+}
+
+.hideChannel {
+  display: none;
+}
+
+.channelImageSm {
+  height: 20px;
+  width: auto;
+  border-radius: 50%;
+}
+
+.channelCapsule {
+  min-width: 130px;
+}
+
+.flexIt {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.selectedChannel {
+  color: #4f3791;
+  font-weight: 800;
+}
+
+.selectedMenuKwPg {
+  border-bottom: #7352FF solid 3px;
+}
+
+.homeHeader {
+  padding-right: 20px;
+  padding-left: 20px;
+  /* width: 100vw !important; */
+}
+
+.pageStyling {
+  padding-right: 140px;
+  padding-left: 140px;
+}
+
+.heroMainText {
+  font-size: 3em !important;
+  font-weight: bold;
+}
+
+.heroImage {
+  height: auto;
+  width: 55em !important;
+  position: absolute;
+  right: -170px;
+  /* display: none; */
+}
+
+.hero > .col-2 {
+  position: relative;
+}
+
+.brandLogos {
+  width: 100px;
+  height: auto;
+  margin-right: 45px !important;
+}
+
+.brandLogoBox {
+  margin-top: 250px;
+}
+
+.reportingPie {
+  height: auto;
+  width: 300px !important;
+}
+
+.reportingSelected {
+  background-color: #FFFFFF;
+  border-top: 5px solid #7438FF;
+}
+
+.reportingSelectedView {
+  display: block;
+}
+
+.google-login-button {
+  background-color: #4285f4; /* Change the background color as needed */
+  color: white; /* Change the text color as needed */
+  border: none;
+  padding: 10px 20px; /* Adjust the padding as needed */
+  border-radius: 5px; /* Adjust the border radius as needed */
+  cursor: pointer;
+  font-size: 16px; /* Adjust the font size as needed */
+}
+
+/* Add hover and focus styles for better user interaction */
+.google-login-button:hover,
+.google-login-button:focus {
+  background-color: #357ae8; /* Change the hover/focus background color */
+  outline: none; /* Remove the default focus outline if it's not needed */
+}
+
+
+.thumbnail-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.upload-button label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  justify-content: left;
+}
+
+.camera-icon {
+  font-size: 24px;
+}
+
+.chosenView {
+  border-bottom: #7F48FF solid 2px;
+}
