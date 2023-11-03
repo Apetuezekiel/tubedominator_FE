@@ -18,6 +18,7 @@ import {
 import { HiOutlineChevronDown, HiSearch } from "react-icons/hi";
 import { Header } from "../components";
 import { HiOutlineRefresh } from "react-icons/hi";
+import IdeasCategoryView from "../components/IdeasCategoryView";
 import {
   useUserYoutubeInfo,
   useKeywordStore,
@@ -27,19 +28,30 @@ import {
   useAllUserDeets,
 } from "../state/state";
 import { AiOutlineStar, AiFillStar } from "react-icons/ai";
-import { FaYoutube, FaGoogle, FaPlus, FaVideo } from "react-icons/fa";
+import {
+  FaYoutube,
+  FaGoogle,
+  FaPlus,
+  FaVideo,
+  FaFolderPlus,
+} from "react-icons/fa";
 import Spinner from "../components/Spinner";
-import { BiSearch, BiWorld, BiStar } from "react-icons/bi";
+import { BiSearch, BiWorld, BiStar, BiLoaderCircle } from "react-icons/bi";
 import { useStateContext } from "../contexts/ContextProvider";
 import { useUser } from "@clerk/clerk-react";
 import showToast from "../utils/toastUtils";
 // import { getUserEncryptedData } from "../data/api/calls";
 import CryptoJS from "crypto-js";
-import { userFullDataDecrypted } from "../data/api/calls";
+import { getSavedIdeas, userFullDataDecrypted } from "../data/api/calls";
+import countriesWithLanguages from "../data/countries";
+import { FiTrendingUp } from "react-icons/fi";
+import { BsArrowDownShort, BsArrowUpShort, BsDot } from "react-icons/bs";
 
 const Ideation = () => {
+  const apiUrl = process.env.REACT_APP_BASE_URL;
+  console.log(apiUrl, apiUrl, apiUrl, apiUrl, apiUrl, apiUrl);
   const decryptAndRetrieveData = (data) => {
-    const secretKey = "+)()^77---<@#$>";
+    const secretKey = process.env.REACT_APP_JWT_SECRET;  
 
     if (data) {
       const decryptedBytes = CryptoJS.AES.decrypt(data, secretKey);
@@ -74,6 +86,9 @@ const Ideation = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(null);
   const [loadedLocalStorage, setLoadedLocalStorage] = useState(false);
+  const [showSavedIdeaCategoryPanel, setShowSavedIdeaCategoryPanel] =
+    useState(false);
+  const [savingKeywordIdea, setSavingKeywordIdea] = useState(false);
   const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
   const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
   const allUserDeets = useAllUserDeets((state) => state.allUserDeets);
@@ -81,6 +96,12 @@ const Ideation = () => {
   const encryptedGData = localStorage.getItem("encryptedGData");
   const decryptedFullData = decryptAndRetrieveData(encryptedGData);
   const [keywordSuggestionRemark, setKeywordSuggestionRemark] = useState("");
+  const initialCountry = {
+    countryCode: "GLB",
+    languageCode: "en",
+  };
+  const [selectedCountry, setSelectedCountry] = useState(initialCountry);
+
   let savedData;
   // !userLoggedIn && setUserLoggedIn(true);
   // console.log("getUserEncryptedData", getUserEncryptedData());
@@ -111,11 +132,11 @@ const Ideation = () => {
   //     const grabUserToken = async () => {
   //       try {
   //         const response = await axios.get(
-  //           `http://localhost:8080/api/getSavedUserToken?user_id=${user_id}`,
+  //           `  /getSavedUserToken?user_id=${user_id}`,
   //           {
   //             headers: {
   //               "Content-Type": "application/json",
-  //               "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+  //               "x-api-key": process.env.REACT_APP_X_API_KEY,
   //             },
   //           },
   //         );
@@ -133,11 +154,25 @@ const Ideation = () => {
 
   // setUserLoggedIn(true);
 
+  const handleCountryChange = (event) => {
+    const selectedValue = event.target.value;
+    const [selectedCountryCode, selectedLanguageCode] =
+      selectedValue.split(":");
+
+    // if (selectedCountryData) {
+    setSelectedCountry({
+      countryCode: selectedCountryCode,
+      languageCode: selectedLanguageCode,
+    });
+    // }
+  };
+
   function removeUndefinedOrNull(arr) {
     return arr.filter((item) => item !== undefined && item !== null);
   }
 
   const toggleSave = async (keyword, save) => {
+    setSavingKeywordIdea(true);
     // fetchSavedIdeasData()
     console.log("relatedKeywordData", keyword, relatedKeywordData);
     console.log("exactKeywordData", exactKeywordData);
@@ -163,7 +198,7 @@ const Ideation = () => {
 
       if (save) {
         const response = await axios.post(
-          "http://localhost:8080/api/addToSavedIdeas",
+          `${process.env.REACT_APP_BASE_URL}/addToSavedIdeas`,
           {
             video_ideas: foundObject.keyword,
             search_volume: foundObject.monthlysearch,
@@ -174,7 +209,7 @@ const Ideation = () => {
           {
             headers: {
               "Content-Type": "application/json",
-              "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+              "x-api-key": process.env.REACT_APP_X_API_KEY,
               Authorization: `Bearer ${decryptedFullData.token}`,
             },
           },
@@ -183,18 +218,20 @@ const Ideation = () => {
 
         console.log("Data saved successfully and response:", foundObject);
         if (response.data.success) {
+          setSavingKeywordIdea(false);
           showToast("success", "Idea saved successfully", 2000);
         } else {
+          setSavingKeywordIdea(false);
           showToast("error", "Idea wasn't saved. Try again", 2000);
         }
       } else {
         try {
           const response = await axios.get(
-            "http://localhost:8080/api/getAllSavedIdeas",
+            `${process.env.REACT_APP_BASE_URL}/getAllSavedIdeas`,
             {
               headers: {
                 "Content-Type": "application/json",
-                "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+                "x-api-key": process.env.REACT_APP_X_API_KEY,
                 Authorization: `Bearer ${decryptedFullData.token}`,
               },
             },
@@ -210,11 +247,11 @@ const Ideation = () => {
           console.log("decryptedFullData.email", decryptedFullData.email);
 
           const responseDelete = await axios.delete(
-            `http://localhost:8080/api/deleteSavedIdea/${findFoundObjectInSaved.id}`,
+            `${process.env.REACT_APP_BASE_URL}/deleteSavedIdea/${findFoundObjectInSaved.id}`,
             {
               headers: {
                 "Content-Type": "application/json",
-                "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+                "x-api-key": process.env.REACT_APP_X_API_KEY,
                 Authorization: `Bearer ${decryptedFullData.token}`,
               },
               params: {
@@ -224,16 +261,19 @@ const Ideation = () => {
           );
           console.log("Data removed successfully", findFoundObjectInSaved);
           if (responseDelete.data.success) {
+            setSavingKeywordIdea(false);
             showToast("success", "Idea removed from Saved Ideas", 2000);
           } else {
             showToast("error", "Idea wasn't removed. Try again", 2000);
           }
         } catch (error) {
+          setSavingKeywordIdea(false);
           console.error("Error fetching data:", error);
           throw error; // Rethrow the error to handle it in the component if needed
         }
       }
     } catch (error) {
+      setSavingKeywordIdea(false);
       console.error("Error saving/removing data:", error);
       showToast("error", "Error saving/removing data", 2000);
     }
@@ -253,7 +293,7 @@ const Ideation = () => {
       console.log("saved");
       // Use selectedRowData here instead of selectedRows
       await axios.post(
-        "http://localhost:8080/api/addToSavedIdeas",
+        `${process.env.REACT_APP_BASE_URL}/addToSavedIdeas`,
         {
           video_ideas: args.data.keyword,
           search_volume: args.data.monthlysearch,
@@ -263,7 +303,7 @@ const Ideation = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
             Authorization: `Bearer ${userAuthToken}`,
           },
         },
@@ -316,23 +356,41 @@ const Ideation = () => {
   }
 
   const gridOrderStars = (props) => {
-    const keyword = props.keyword;
-    // if (!rowData || typeof rowData.isFavorite === 'undefined') {
-    //   return null; // Handle cases where rowData is missing or isFavorite is undefined
-    // }
+    // const { keyword, toggleSave, savingKeywordIdea } = props;
+    const { keyword } = props;
     const [isFavorite, setIsFavorite] = useState(false);
-    const makeFavorite = () => {
-      setIsFavorite(!isFavorite);
-      isFavorite ? toggleSave(keyword, false) : toggleSave(keyword, true);
+
+    const toggleFavorite = () => {
+      setIsFavorite((prevIsFavorite) => !prevIsFavorite);
+      toggleSave(keyword, !isFavorite);
     };
 
-    const starIcon = isFavorite ? (
-      <AiFillStar color="#7352FF" />
+    const starIcon = savingKeywordIdea ? (
+      <BiLoaderCircle color="#7352FF" size={20} />
+    ) : isFavorite ? (
+      <AiFillStar className="cursor-pointer" color="#7352FF" />
     ) : (
-      <AiOutlineStar color="#7352FF" />
+      <AiOutlineStar className="cursor-pointer" color="#7352FF" />
     );
 
-    return <div onClick={makeFavorite}>{starIcon}</div>;
+    return (
+      <div
+        className="flex items-center justify-center"
+        onClick={toggleFavorite}
+      >
+        {starIcon}
+      </div>
+    );
+  };
+
+  // const chooseSavedIdeaCategory = (props) => {
+  //   setShowSavedIdeaCategoryPanel(true)
+  // }
+
+  const IdeaCategoryPanel = async (props) => {
+    setShowSavedIdeaCategoryPanel(true);
+    console.log("props", props);
+    return <IdeasCategoryView dataSet={props} />;
   };
 
   function formatNumberToKPlus(number) {
@@ -375,6 +433,43 @@ const Ideation = () => {
     );
   };
 
+  const TrendsDataRowTemplate = (props) => {
+    const renderTrend = () => {
+      const trend = Math.ceil(parseFloat(props.trend));
+
+      if (trend > 0) {
+        return (
+          <span className="flex items-center justify-center">
+            <span className="mr-1">
+              <BsArrowUpShort color="green" size={20} />
+            </span>{" "}
+            {trend}% {/* Up arrow */}
+          </span>
+        );
+      } else if (trend < 0) {
+        return (
+          <span className="flex items-center justify-center">
+            <span className="mr-1">
+              <BsArrowDownShort color="red" size={20} />
+            </span>{" "}
+            {trend}% {/* Down arrow */}
+          </span>
+        );
+      } else {
+        return (
+          <span className="flex items-center justify-center">
+            <span className="mr-1">
+              <BsDot size={20} />
+            </span>{" "}
+            {props.trend}% {/* Circle or Zero */}
+          </span>
+        );
+      }
+    };
+
+    return <div>{renderTrend()}</div>;
+  };
+
   const youtubeGooglePlusIcons = [FaYoutube, FaGoogle, FaPlus];
   const videoIcon = [FaYoutube];
 
@@ -398,6 +493,16 @@ const Ideation = () => {
           title={props.headerText}
           icons={youtubeGooglePlusIcons}
         />
+      </div>
+    );
+  };
+
+  const TrendsTitleTemplate = (props) => {
+    const trendIcon = <FiTrendingUp size={20} />;
+    return (
+      <div className="flex items-center justify-center">
+        {props.headerText}
+        <div className="ml-2">{trendIcon}</div>
       </div>
     );
   };
@@ -430,16 +535,25 @@ const Ideation = () => {
       return;
     }
 
+    const postData = {
+      keyword: searchQuery,
+      countryCode: selectedCountry.countryCode,
+      languageCode: selectedCountry.languageCode,
+    };
+
+    console.log("postData", postData);
+
     try {
       setIsLoading(true);
-      console.log("handleGetIdeas   ", decryptedFullData.token);
+      console.log("handleGetIdeas", decryptedFullData.token);
 
-      const response = await axios.get(
-        `http://localhost:8080/api/fetchKeywordStat?keyword=${searchQuery}`,
+      const response = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/fetchKeywordStat`,
+        postData,
         {
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
             Authorization: `Bearer ${decryptedFullData.token}`,
           },
         },
@@ -447,6 +561,7 @@ const Ideation = () => {
 
       const data = response.data;
       console.log("response.data", response.data);
+      console.log("response", response);
       setIsLoading(false);
 
       // Update state with the API response
@@ -455,7 +570,7 @@ const Ideation = () => {
       localStorage.setItem("lastVideoIdeas", JSON.stringify(data.response));
       setLoadedLocalStorage(false);
 
-      // console.log(keywordData);
+      console.log(keywordData);
     } catch (error) {
       console.error("Error fetching data:", error);
       showToast(
@@ -562,12 +677,31 @@ const Ideation = () => {
           </div>
         </div>
 
-        <div className="relative ml-4">
+        {/* <div className="relative ml-4">
           <select className="rounded-full py-2 pl-4 pr-8 border border-gray-300 bg-white text-xs">
             <option value="en">Global (English)</option>
             <option value="es">Español </option>
             <option value="fr">Français</option>
             <option value="de">Deutsch</option>
+          </select>
+        </div> */}
+
+        <div className="relative ml-4">
+          <select
+            id="countrySelect"
+            className="rounded-full py-2 pl-4 pr-8 border border-gray-300 bg-white text-xs"
+            value={`${selectedCountry.countryCode}:${selectedCountry.languageCode}`}
+            onChange={handleCountryChange}
+          >
+            <option value="GLB:en">Global (English)</option>
+            {countriesWithLanguages.map((item, index) => (
+              <option
+                key={index}
+                value={`${item.countryCode}:${item.languageCode}`}
+              >
+                {`${item.country} (${item.language})`}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -584,15 +718,20 @@ const Ideation = () => {
         </button>
       </div>
       {isLoading ? (
-        <div className="loading-container">
-          <Spinner />
+        <div className="flex flex-col justify-center items-center w-full mt-20">
+          <BiLoaderCircle
+            className="animate-spin text-center"
+            color="#7352FF"
+            size={30}
+          />
+          <div>Gathering Insights for your Keyword.</div>
         </div>
       ) : (
         <div className=""></div>
       )}
       <div>
         <div className="flex justify-start items-center">
-          <Header title="Keywords you provided" size="text-1xl" />
+          <Header title="Keyword you provided" size="text-1xl" />
           <span className="mt-5 ml-4 text-xs">
             {loadedLocalStorage && "(Results loaded from your last query)"}
           </span>
@@ -625,6 +764,12 @@ const Ideation = () => {
               headerText="Search Volume on youtube"
               headerTemplate={VolumeTitleTemplate}
               template={searchVolumeDataRowTemplate}
+            />
+            <ColumnDirective
+              field="trend"
+              headerText="Trends"
+              headerTemplate={TrendsTitleTemplate}
+              template={TrendsDataRowTemplate}
             />
             <ColumnDirective
               field="difficulty"
@@ -717,6 +862,12 @@ const Ideation = () => {
               template={searchVolumeDataRowTemplate}
             />
             <ColumnDirective
+              field="trend"
+              headerText="Trends"
+              headerTemplate={TrendsTitleTemplate}
+              template={TrendsDataRowTemplate}
+            />
+            <ColumnDirective
               field="difficulty"
               headerText="Keyword Difficulty"
               template={keywordDiffTemplate}
@@ -741,6 +892,7 @@ const Ideation = () => {
             ]}
           />
         </GridComponent>
+        {showSavedIdeaCategoryPanel && IdeaCategoryPanel()}
       </div>
     </div>
   );

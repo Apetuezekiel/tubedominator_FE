@@ -1,7 +1,7 @@
 /* eslint-disable */
 
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { BsCurrencyDollar } from "react-icons/bs";
 import { GoPrimitiveDot } from "react-icons/go";
@@ -10,8 +10,20 @@ import { AiOutlineInfoCircle } from "react-icons/ai";
 import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
 import { pieChartData } from "../data/dummy";
 import { ChartsHeader, LineChart, Pie as PieChart } from "../components";
-// Import ChartComponent from ''
-// import { Stacked, Pie} from "../components";
+import {
+  GridComponent,
+  ColumnsDirective,
+  ColumnDirective,
+  Resize,
+  Sort,
+  ContextMenu,
+  Filter,
+  Page,
+  ExcelExport,
+  PdfExport,
+  Edit,
+  Inject,
+} from "@syncfusion/ej2-react-grids";
 import {
   earningData,
   medicalproBranding,
@@ -31,18 +43,11 @@ import {
   FaAngleDown,
 } from "react-icons/fa";
 import tubicsLogo from "../data/tubicon.svg";
-import {
-  ChartComponent,
-  SeriesCollectionDirective,
-  SeriesDirective,
-  Inject,
-  Legend,
-  Category,
-  StackingColumnSeries,
-  Tooltip,
-} from "@syncfusion/ej2-react-charts";
 import { userFullDataDecrypted } from "../data/api/calls";
 import axios from "axios";
+import { useUserYoutubeInfo } from "../state/state";
+import Spinner from "../components/Spinner";
+import donought from "../data/donought3.png";
 
 const DropDown = ({ currentMode }) => (
   <div className="w-28 border-1 border-color px-2 py-1 rounded-md">
@@ -63,14 +68,14 @@ const DropDown = ({ currentMode }) => (
 //   console.log("decryptedFullData", decryptedFullData);
 //   await axios
 //   .post(
-//     "http://localhost:8080/api/saveUserToken",
+//     "${process.env.REACT_APP_BASE_URL}/saveUserToken",
 //     {
 //       encryptedFullData: JSON.stringify(decryptedFullData)
 //     },
 //     {
 //       headers: {
 //         "Content-Type": "application/json",
-//         "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+//         "x-api-key": process.env.REACT_APP_X_API_KEY,
 //         Authorization: `Bearer ${decryptedFullData.token}`,
 //       },
 //     },
@@ -87,6 +92,7 @@ const DropDown = ({ currentMode }) => (
 // }
 
 const Reporting = () => {
+  const [mostWatchedUserVideos, setMostWatchedUserVideos] = useState(0);
   const [activeAccordion, setActiveAccordion] = useState(0);
   const [activeAccordion2, setActiveAccordion2] = useState(0);
   const { currentColor, currentMode } = useStateContext();
@@ -99,8 +105,50 @@ const Reporting = () => {
   };
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [reportingSelected, setReportingSelected] = useState(false);
+  const decryptedFullData = userFullDataDecrypted();
+  const [isUserDataLoaded, setIsuserDataLoaded] = useState(false);
 
   // saveUserToken();
+  useEffect(() => {
+    console.log("allUserDeetsallUserDeetsallUserDeets", decryptedFullData);
+    let isMounted = true;
+
+    const fetchMyYoutubeInfo = async () => {
+      try {
+        axios
+          .get(`${process.env.REACT_APP_BASE_URL}/fetchMyYoutubeInfo`, {
+            params: {
+              channel_id: decryptedFullData.channelId,
+            },
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.REACT_APP_X_API_KEY,
+              Authorization: `Bearer ${decryptedFullData.token}`,
+              gToken: decryptedFullData.gToken,
+            },
+          })
+          .then((response) => {
+            if (isMounted) {
+              setMostWatchedUserVideos(response.data);
+              setIsuserDataLoaded(true);
+              console.log(response);
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching data:", error);
+          });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchMyYoutubeInfo();
+
+    return () => {
+      // Cleanup function to be called when the component is unmounted
+      isMounted = false;
+    };
+  }, []);
 
   const getOneMonthDateRange = () => {
     const today = new Date();
@@ -166,6 +214,103 @@ const Reporting = () => {
 
   const last4weeks = getLast4WeeksDateRange();
   const dateRange = getOneWeekDateRange();
+
+  const formatDate = (props) => {
+    const options = { day: "numeric", month: "short", year: "numeric" };
+    return (
+      <div>
+        {new Date(props.publishedAt).toLocaleDateString("en-US", options)}
+      </div>
+    );
+  };
+
+  const ThumbnailTitleTemplate = (props) => {
+    console.log("propsppp", props);
+    return (
+      <div>
+        <div className="flex justify-start items-center">
+          <img
+            src={props.thumbnails.url}
+            alt="Thumbnail"
+            style={{ width: "100px", height: "80px" }}
+          />
+          <div className="ml-3">
+            <div className="whitespace-normal mt-4 mb-3 flex">
+              {props.title}
+            </div>
+            <div className="text-gray-500 italic">Public</div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  function formatNumberToKPlus(number) {
+    if (number >= 1000) {
+      const formattedNumber = Math.floor(number / 1000);
+      return formattedNumber + "k+";
+    } else {
+      return number.toString();
+    }
+  }
+
+  const viewCountTemplate = (props) => {
+    const formatedNumber = formatNumberToKPlus(props.viewCount);
+    return <div>{formatedNumber}</div>;
+  };
+
+  const gridOrderOptimizationLevel = (props) => {
+    return props.viewCount < 1000 ? (
+      <div className="h-2 w-full rounded-full flex flex-row items-center justify-between">
+        <div className="h-full w-80 bg-gray-300 rounded-full mr-2">
+          <div className="h-full w-10 bg-purple-600 rounded-full"></div>
+        </div>
+        <span className="w-20 text-xs text-purple-600">20%</span>
+      </div>
+    ) : props.viewCount < 5000 ? (
+      <div className="h-2 w-full rounded-full flex flex-row items-center justify-between">
+        <div className="h-full w-80 bg-gray-300 rounded-full mr-2">
+          <div className="h-full w-40 bg-purple-600 rounded-full"></div>
+        </div>
+        <span className="w-20 text-xs text-purple-600">50%</span>
+      </div>
+    ) : (
+      <div className="h-2 w-full rounded-full flex flex-row items-center justify-between">
+        <div className="h-full w-80 bg-gray-300 rounded-full mr-2">
+          <div className="h-full w-50 bg-purple-600 rounded-full"></div>
+        </div>
+        <span className="w-20 text-xs text-purple-600">70%</span>
+      </div>
+    );
+  };
+
+  const gridOrderOptimizationImpact = (props) => {
+    return props.viewCount < 1000 ? (
+      <div className="h-5 w-full rounded-full flex flex-row items-center justify-between">
+        <div className="h-full bg-gray-300 w-full rounded-full mr-2">
+          <div className="h-full w-10 bg-purple-600 rounded-full">
+            <span className="w-20 text-xs ml-3 text-white">Low</span>
+          </div>
+        </div>
+      </div>
+    ) : props.viewCount < 5000 ? (
+      <div className="h-5 w-full rounded-full flex flex-row items-center justify-between">
+        <div className="h-full bg-gray-300 w-full rounded-full mr-2">
+          <div className="h-full w-40 bg-purple-600 rounded-full">
+            <span className="w-20 text-xs ml-3 text-white">Med</span>
+          </div>
+        </div>
+      </div>
+    ) : (
+      <div className="h-5 w-full rounded-full flex flex-row items-center justify-between">
+        <div className="h-full bg-gray-300 w-full rounded-full mr-2">
+          <div className="h-full w-60 bg-purple-600 rounded-full">
+            <span className="w-20 text-xs ml-3 text-white">High</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="py-5 px-10 mt-20">
@@ -361,7 +506,10 @@ const Reporting = () => {
               </div>
             </div>
             <div className="text-gray-500 text-sm -mt-2">of 3 Keywords</div>
-            <div className="reportingPie">
+            <div className="h-fit items-center justify-center ml-20 mt-20">
+              <img src={donought} alt="" height={250} width={250} />
+            </div>
+            {/* <div className="reportingPie">
               {" "}
               <PieChart
                 id="chart-pie"
@@ -370,7 +518,7 @@ const Reporting = () => {
                 // height="full"
                 className="reportingPie"
               />
-            </div>
+            </div> */}
           </div>
           <div
             className="flex flex-col justify-start items-center rankingStatBoxes border-1 w-1/3 mr-8 border-gray-300 rounded py-10"
@@ -382,30 +530,73 @@ const Reporting = () => {
               Most Watched Videos Organically
             </div>
             <div className="text-gray-500 text-sm">{dateRange}</div>
-            <div className="flex flex-col items-center mt-10">
-              <img src={tubicsLogo} alt="" height="100px" width="100px" />
-              <div className="mt-2">We have too little data.</div>
+            <div className="flex flex-col items-center mt-10 px-5">
+              {mostWatchedUserVideos.length < 1 && (
+                <div>
+                  <img src={tubicsLogo} alt="" height="100px" width="100px" />
+                  <div className="mt-2">We have too little data.</div>
+                </div>
+              )}
+              {isUserDataLoaded ? (
+                <GridComponent
+                  dataSource={mostWatchedUserVideos}
+                  allowExcelExport
+                  allowPdfExport
+                  allowPaging
+                  allowSorting
+                >
+                  <ColumnsDirective>
+                    <ColumnDirective field="" headerText="#" />
+                    <ColumnDirective
+                      field="title"
+                      headerText="Videos"
+                      template={ThumbnailTitleTemplate}
+                      width={300}
+                    />
+                    <ColumnDirective
+                      field="viewCount"
+                      headerText="View Count"
+                      template={viewCountTemplate}
+                      width={150}
+                    />
+                  </ColumnsDirective>
+                  <Inject
+                    services={[
+                      Resize,
+                      Sort,
+                      ContextMenu,
+                      Filter,
+                      Page,
+                      ExcelExport,
+                      Edit,
+                      PdfExport,
+                    ]}
+                  />
+                </GridComponent>
+              ) : (
+                <Spinner />
+              )}
             </div>
           </div>
-          <div
+          {/* <div
             className="flex flex-col justify-start items-center rankingStatBoxes border-1 w-1/3 border-gray-300 rounded"
             style={{ backgroundColor: "#FBFCFE", height: "600px" }}
           >
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center mt-10">
               Monetary Value of Organic Traffic
             </div>
-            <div className="flex">
+            <div className="flex mt-10">
               <div
                 className="text-gray-900 mr-3"
-                style={{ fontSize: "30px", fontWeight: "600" }}
+                style={{ fontSize: "50px", fontWeight: "600" }}
               >
                 € 0
               </div>
-              <div className="rounded-full bg-gray-300 text-black p-2 w-10">
+              <div className="rounded-full bg-gray-300 text-black w-10 flex justify-center items-center">
                 0%
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

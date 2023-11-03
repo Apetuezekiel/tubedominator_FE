@@ -2,15 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import { AiOutlineMenu } from "react-icons/ai";
-import { FiShoppingCart } from "react-icons/fi";
-import { BsChatLeft } from "react-icons/bs";
-import { RiNotification3Line } from "react-icons/ri";
+// import { FiShoppingCart } from "react-icons/fi";
+// import { BsChatLeft } from "react-icons/bs";
+// import { RiNotification3Line } from "react-icons/ri";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 import { GoogleLogin } from "react-google-login";
 
-import avatar from "../data/tubicHome.svg";
-import { Cart, Chat, Notification, UserProfile } from ".";
+import avatar from "../assets/images/TubeDominator 1000x1000.png";
+import { UserProfile } from ".";
 import PreviewKeyword from "./PreviewKeyword";
 // import PreviewKeyword from
 import { useStateContext } from "../contexts/ContextProvider";
@@ -18,14 +18,16 @@ import { useStateContext } from "../contexts/ContextProvider";
 import axios from "axios";
 import { useUserData, useUserAuthToken, useUserLoggedin } from "../state/state";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  getUserEncryptedData,
-  getUserEncryptedDataFromDb,
-  userFullDataDecrypted,
-} from "../data/api/calls";
+// import {
+//   getUserEncryptedData,
+//   getUserEncryptedDataFromDb,
+//   userFullDataDecrypted,
+// } from "../data/api/calls";
 import CryptoJS from "crypto-js";
-import showToast from "../utils/toastUtils";
+// import showToast from "../utils/toastUtils";
 import GoogleLoginComp from "../pages/UserAuth/GoogleLogin";
+import { BiLoaderCircle } from "react-icons/bi";
+import { useRef } from "react";
 
 const clientId =
   "372673946018-lu1u3llu6tqi6hmv8m2226ri9qev8bb8.apps.googleusercontent.com";
@@ -48,7 +50,7 @@ const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
 );
 
 const encryptAndStoreData = (data) => {
-  const secretKey = "+)()^77---<@#$>";
+  const secretKey = process.env.REACT_APP_JWT_SECRET;
   const jsonData = JSON.stringify(data);
   const encryptedGData = CryptoJS.AES.encrypt(jsonData, secretKey).toString();
   localStorage.setItem("encryptedGData", encryptedGData);
@@ -56,6 +58,9 @@ const encryptAndStoreData = (data) => {
 };
 
 const Navbar = () => {
+  const googleLoginBtn = useRef(null);
+  const appRegisterBtn = useRef(null);
+  const appLoginBbtn = useRef(null);
   const {
     currentColor,
     activeMenu,
@@ -65,11 +70,12 @@ const Navbar = () => {
     setScreenSize,
     screenSize,
   } = useStateContext();
-  const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
-  const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
+  // const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
+  // const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
+  const userLoggedIn = localStorage.getItem("userLoggedin");
 
   const decryptAndRetrieveData = (data) => {
-    const secretKey = "+)()^77---<@#$>";
+    const secretKey = process.env.REACT_APP_JWT_SECRET;
 
     if (data) {
       const decryptedBytes = CryptoJS.AES.decrypt(data, secretKey);
@@ -104,6 +110,7 @@ const Navbar = () => {
   const userEncryptedData = localStorage.getItem("encryptedGData");
   const decryptedFullData = decryptAndRetrieveData(userEncryptedData);
   const navigate = useNavigate();
+  const [loadedUserData, setLoadeduserData] = useState(false);
 
   const handleActiveMenu = () => setActiveMenu(!activeMenu);
 
@@ -111,17 +118,18 @@ const Navbar = () => {
     // const { isLoaded, isSignedIn, user } = useUser();
     try {
       const response = await axios.get(
-        "http://localhost:8080/api/getSavedUserYoutubeInfo",
+        `${process.env.REACT_APP_BASE_URL}/getSavedUserYoutubeInfo`,
         {
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
             Authorization: `Bearer ${decryptedFullData.token}`,
           },
         },
       );
 
       setUserData(response.data);
+      setLoadeduserData(true);
       console.log(
         "getSavedUserYoutubeInfo:",
         response.data,
@@ -156,15 +164,29 @@ const Navbar = () => {
   }, [userLoggedIn]);
 
   console.log("userLoggedIn", userLoggedIn);
+  const RegisterUser = () => {
+    if (googleLoginBtn.current) {
+      googleLoginBtn.current.click(); // Triggering click on the second element
+    }
+  };
 
   return (
     <div
       // style={{backgroundColor: 'black'}}
-
-      className="w-8/9 flex justify-between py-2 md:ml-6 md:mr-6 relative shadow-xl"
+      className={`w-8/9 flex justify-between py-2 md:ml-6 md:mr-6 relative ${
+        userLoggedIn ? "" : "shadow-xl"
+      }`}
     >
-      {/* <div>Hello, {user.firstName} welcome to Clerk</div> */}
-      {userLoggedIn && userData ? (
+      {userLoggedIn && !userData ? (
+        <div className="flex flex-col justify-center items-center w-full mt-20">
+          <BiLoaderCircle
+            className="animate-spin text-center"
+            color="#7352FF"
+            size={30}
+          />
+          <div>Give us a minute to load up your account data</div>
+        </div>
+      ) : userLoggedIn && userData ? (
         <>
           <NavButton
             title="Menu"
@@ -200,7 +222,13 @@ const Navbar = () => {
           className="w-5/6 flex justify-between p-2 md:ml-6 md:mr-6 relative homeHeader"
           // style={{backgroundColor: 'black'}}
         >
-          <img className="w-15" src={avatar} alt="user-profile" />
+          <img
+            className="w-15"
+            src={avatar}
+            alt="user-profile"
+            height={50}
+            width={50}
+          />
           <div className="navbar-nav ms-auto py-0 flex justify-between items-center">
             <a href="/project" className="nav-item nav-link mr-8">
               Services
@@ -231,14 +259,18 @@ const Navbar = () => {
               >
                 Log In
               </GoogleLogin> */}
-              <GoogleLoginComp />
-              <Link
+              <div className="mr-[-8rem] z-10 opacity-0">
+                {<GoogleLoginComp ref={googleLoginBtn} />}
+              </div>
+              <div
                 className="text-lg mr-4 text-black py-2 px-5 rounded-full"
-                to="/sign-up"
+                // to="/sign-up"
                 style={{ backgroundColor: "#F2F2F2" }}
+                onClick={RegisterUser}
+                ref={appRegisterBtn}
               >
                 Register
-              </Link>
+              </div>
               <p>
                 <button
                   type="submit"

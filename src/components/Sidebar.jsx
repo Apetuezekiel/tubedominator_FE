@@ -1,10 +1,12 @@
+/* eslint-disable */
+
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
 import { SiShopware } from "react-icons/si";
 import { MdOutlineCancel } from "react-icons/md";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 import { FaYoutube, FaGoogle, FaPlus } from "react-icons/fa";
-import tubicLogo from "./tubicsLogo1.png";
+import tubedominatorLogo from "../assets/images/TubeDominator 1000x1000.png";
 
 import { menuLinks } from "../data/dummy";
 import { useStateContext } from "../contexts/ContextProvider";
@@ -34,7 +36,11 @@ const Sidebar = () => {
               onClick={handleCloseSideBar}
               className="items-center gap-3 ml-3 mt-4 flex text-xl font-extrabold tracking-tight dark:text-white text-slate-900"
             >
-              <img className="mainLogo" src={tubicLogo} alt="Tubics Logo" />
+              <img
+                className="mainLogo"
+                src={tubedominatorLogo}
+                alt="Tubics Logo"
+              />
             </Link>
             <TooltipComponent content="Menu" position="BottomCenter">
               <button
@@ -67,7 +73,7 @@ const Sidebar = () => {
                   >
                     {/* <div className='flex flex-col items-center justify-center'> */}
                     <div>{link.icon}</div>
-                    <div className="capitalize">{link.name}</div>
+                    <div className="capitalize pr-4">{link.name}</div>
                     {/* </div> */}
                   </NavLink>
                 ))}

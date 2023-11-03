@@ -47,7 +47,7 @@ const RegistrationForm = () => {
   const setUserAuthToken = useUserAuthToken((state) => state.setUserAuthToken);
   const allUserDeets = useAllUserDeets((state) => state.allUserDeets);
   const setAllUserDeets = useAllUserDeets((state) => state.setAllUserDeets);
-  const secretKey = "+)()^77---<@#$>";
+  const secretKey = process.env.REACT_APP_JWT_SECRET;
   const decryptedFullData = userFullDataDecrypted();
   console.log("decryptedFullDataaaaaa", decryptedFullData);
 
@@ -55,10 +55,10 @@ const RegistrationForm = () => {
     const fetchChannel = () => {
       setIsLoading(true);
       axios
-        .get(`http://localhost:8080/api/getMyChannels`, {
+        .get(`${process.env.REACT_APP_BASE_URL}/getMyChannels`, {
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
             Authorization: `Bearer ${decryptedFullData.gToken}`,
           },
         })
@@ -147,14 +147,14 @@ const RegistrationForm = () => {
 
     await axios
       .post(
-        "http://localhost:8080/api/saveUserToken",
+        `${process.env.REACT_APP_BASE_URL}/saveUserToken`,
         {
           encryptedFullData,
         },
         {
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
             Authorization: `Bearer ${token}`,
           },
         },
@@ -208,12 +208,12 @@ const RegistrationForm = () => {
     try {
       // Send updated form data to the server
       const response = await axios.post(
-        "http://localhost:8080/api/saveUserYoutubeInfo",
+        `${process.env.REACT_APP_BASE_URL}/saveUserYoutubeInfo`,
         updatedFormData,
         {
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
           },
         },
       );

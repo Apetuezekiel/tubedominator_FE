@@ -50,7 +50,7 @@ const RegistrationForm = () => {
   // const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
   const allUserDeets = useAllUserDeets((state) => state.allUserDeets);
   const setAllUserDeets = useAllUserDeets((state) => state.setAllUserDeets);
-  const secretKey = "+)()^77---<@#$>";
+  const secretKey = process.env.REACT_APP_JWT_SECRET;
 
   // useEffect(() => {
   //   const isChannelRegistered = async () => {
@@ -61,14 +61,14 @@ const RegistrationForm = () => {
   //     clerkUser && setAllUserDeets(clerkUser);
   //     try {
   //       const response = await axios.get(
-  //         "http://localhost:8080/api/ischannelRegistered",
+  //         "${process.env.REACT_APP_BASE_URL}/ischannelRegistered",
   //         {
   //           params: {
   //             user_id: clerkUser.id
   //           },
   //           headers: {
   //             "Content-Type": "application/json",
-  //             "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+  //             "x-api-key": process.env.REACT_APP_X_API_KEY,
   //           },
   //         },
   //       );
@@ -109,14 +109,14 @@ const RegistrationForm = () => {
   //   console.log("----------------------------------");
   //   axios
   //     .get(
-  //       "http://localhost:8080/api/getChannels",
+  //       "${process.env.REACT_APP_BASE_URL}/getChannels",
   //       {
   //         channelTitle: channel_title,
   //       },
   //       {
   //         headers: {
   //           "Content-Type": "application/json",
-  //           "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+  //           "x-api-key": process.env.REACT_APP_X_API_KEY,
   //         },
   //       },
   //     )
@@ -141,13 +141,13 @@ const RegistrationForm = () => {
   const fetchChannel = (channel_title) => {
     setIsLoading(true);
     axios
-      .get(`http://localhost:8080/api/getChannels`, {
+      .get(`${process.env.REACT_APP_BASE_URL}/getChannels`, {
         params: {
           channelTitle: channel_title,
         },
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
         },
       })
       .then((response) => {
@@ -258,14 +258,14 @@ const RegistrationForm = () => {
 
     await axios
       .post(
-        "http://localhost:8080/api/saveUserToken",
+        `${process.env.REACT_APP_BASE_URL}/saveUserToken`,
         {
           encryptedFullData,
         },
         {
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
             Authorization: `Bearer ${token}`,
           },
         },
@@ -330,12 +330,12 @@ const RegistrationForm = () => {
     try {
       // Send updated form data to the server
       const response = await axios.post(
-        "http://localhost:8080/api/saveUserYoutubeInfo",
+        `${process.env.REACT_APP_BASE_URL}/saveUserYoutubeInfo`,
         updatedFormData,
         {
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
           },
         },
       );

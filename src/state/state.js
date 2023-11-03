@@ -51,32 +51,35 @@ export const useAllUserDeets = create((set) => ({
   setAllUserDeets: (data) => set({ allUserDeets: data }),
 }));
 
+export const useDisplayPreviewKeyword = create((set) => ({
+  displayPreviewKeyword: false,
+  setDisplayPreviewKeyword: (data) => set({ displayPreviewKeyword: data }),
+}));
+
 export const useUserLoggedin = create((set) => ({
   userLoggedIn: false,
   setUserLoggedIn: (data) => set({ userLoggedIn: data }),
 }));
 
-// export const useSavedIdeasData = create((set) => ({
-//   savedIdeasData: [],
-//   setSavedIdeasData: (data) => set({ savedIdeasData: data }),
-// }));
-
 export const useSavedIdeasData = create((set) => ({
   savedIdeasData: [],
-  isLoading: false,
-  error: null,
-
-  fetchSavedIdeasData: async () => {
-    try {
-      set({ isLoading: true, error: null });
-      const data = await getSavedIdeas();
-      set({ savedIdeasData: data, isLoading: false });
-    } catch (error) {
-      set({ error, isLoading: false });
-    }
-  },
-
   setSavedIdeasData: (data) => set({ savedIdeasData: data }),
 }));
 
-// export default useKeywordStore;
+// export const useSavedIdeasData = create((set) => ({
+//   savedIdeasData: [],
+//   isLoading: false,
+//   error: null,
+
+//   fetchSavedIdeasData: async () => {
+//     try {
+//       set({ isLoading: true, error: null });
+//       const data = await getSavedIdeas();
+//       set({ savedIdeasData: data, isLoading: false });
+//     } catch (error) {
+//       set({ error, isLoading: false });
+//     }
+//   },
+
+//   setSavedIdeasData: (data) => set({ savedIdeasData: data }),
+// }));

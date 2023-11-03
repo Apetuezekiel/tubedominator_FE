@@ -15,7 +15,7 @@ import Spinner from "./Spinner";
 import { userFullDataDecrypted } from "../data/api/calls";
 import axios from "axios";
 import { FiCamera, FiEdit3 } from "react-icons/fi";
-import { BiSearch } from "react-icons/bi";
+import { BiLoaderCircle, BiSearch } from "react-icons/bi";
 import { BsFillBookmarkCheckFill, BsBookmark } from "react-icons/bs";
 import { AiOutlineCopy, AiOutlineRollback } from "react-icons/ai";
 import { Tooltip } from "react-tippy";
@@ -34,6 +34,7 @@ import {
   Inject,
 } from "@syncfusion/ej2-react-grids";
 import showToast from "../utils/toastUtils";
+import countriesWithLanguages from "../data/countries";
 
 const staticData = [
   { keyword: "Keyword 1", source: "Source 1", monthlysearch: 1000 },
@@ -41,7 +42,7 @@ const staticData = [
   { keyword: "Keyword 3", source: "Source 3", monthlysearch: 800 },
 ];
 
-function SearchTerm() {
+function SearchTerm({ videoId }) {
   const userSavedSearchTerm = useUserSavedSearchTerm(
     (state) => state.userSavedSearchTerm,
   );
@@ -54,7 +55,9 @@ function SearchTerm() {
   const setUserYoutubeData = useUserYoutubeInfo(
     (state) => state.setUserYoutubeData,
   );
-  const showSearchTermPanel = useShowSearchTermPanel((state) => state.showSearchTermPanel);
+  const showSearchTermPanel = useShowSearchTermPanel(
+    (state) => state.showSearchTermPanel,
+  );
   const setShowSearchTermPanel = useShowSearchTermPanel(
     (state) => state.setShowSearchTermPanel,
   );
@@ -75,20 +78,25 @@ function SearchTerm() {
   const [processedUserSearchTerms, setProcessedUserSearchTerms] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const initialCountry = {
+    countryCode: "GLB",
+    languageCode: "en",
+  };
+  const [selectedCountry, setSelectedCountry] = useState(initialCountry);
 
   // useEffect(() => {
   //   let isMounted = true;
   //   const fetchMyYoutubeVideos = async () => {
   //     try {
   //       axios
-  //         .get(`http://localhost:8080/api/fetchMyYoutubeVideos`, {
+  //         .get(`${process.env.REACT_APP_BASE_URL}/fetchMyYoutubeVideos`, {
   //           params: {
   //             channel_id: decryptedFullData.channelId,
   //             videoIds: "BdG8R9pqHA0",
   //           },
   //           headers: {
   //             "Content-Type": "application/json",
-  //             "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+  //             "x-api-key": process.env.REACT_APP_X_API_KEY,
   //             Authorization: `Bearer ${decryptedFullData.token}`,
   //             gToken: decryptedFullData.gToken,
   //           },
@@ -111,6 +119,41 @@ function SearchTerm() {
   //   fetchMyYoutubeVideos();
   // }, []);
 
+  let savedSearchTermData;
+  useEffect(() => {
+    savedSearchTermData = JSON.parse(
+      localStorage.getItem(`${videoId}searchTermData`),
+    );
+    const savedSearchTerm = JSON.parse(
+      localStorage.getItem(`${videoId}searchTerm`),
+    );
+    setSearchQuery(savedSearchTerm);
+    setProcessedUserSearchTerms(savedSearchTermData);
+    if (!savedSearchTermData) {
+      console.log("got to local storage bay here");
+
+      return null;
+    } else {
+      console.log(
+        "now serving search term from local storage",
+        savedSearchTermData,
+      );
+    }
+  }, []);
+
+  const handleCountryChange = (event) => {
+    const selectedValue = event.target.value;
+    const [selectedCountryCode, selectedLanguageCode] =
+      selectedValue.split(":");
+
+    // if (selectedCountryData) {
+    setSelectedCountry({
+      countryCode: selectedCountryCode,
+      languageCode: selectedLanguageCode,
+    });
+    // }
+  };
+
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
@@ -123,34 +166,40 @@ function SearchTerm() {
 
     console.log("You searched");
 
+    const postData = {
+      keyword: searchQuery,
+      countryCode: selectedCountry.countryCode,
+      languageCode: selectedCountry.languageCode,
+    };
+
     try {
-      // setIsLoading(true);
-      // const response = await axios.get(
-      //   `http://localhost:8080/api/fetchKeywordStat?keyword=${searchQuery}`,
-      //   {
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
-      //       Authorization: `Bearer ${decryptedFullData.token}`,
-      //     },
-      //   },
-      // );
+      setIsLoading(true);
+      const response = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/fetchKeywordStat`,
+        postData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
+            Authorization: `Bearer ${decryptedFullData.token}`,
+          },
+        },
+      );
 
-      // const data = response.data;
-      // console.log("response.data", response.data);
+      const data = response.data;
+      console.log("response.data", response.data);
       setIsLoading(false);
-
-      // const exactKeyword = data.response.exact_keyword[0];
-      // const relatedKeywords = data.response.related_keywords;
-      // const mergedData = relatedKeywords.unshift({
-      //   competition_score: exactKeyword.competition_score,
-      //   difficulty: exactKeyword.difficulty,
-      //   estimated_views: exactKeyword.estimated_views,
-      //   keyword: exactKeyword.keyword,
-      //   monthlysearch: exactKeyword.monthlysearch,
-      //   overallscore: exactKeyword.overallscore,
-      // });
-      setProcessedUserSearchTerms(staticData);
+      const allKeywords = data.response.all;
+      const exactKeyword = data.response.exact_keyword[0];
+      localStorage.setItem(
+        `${videoId}searchTermData`,
+        JSON.stringify(allKeywords),
+      );
+      localStorage.setItem(
+        `${videoId}searchTerm`,
+        JSON.stringify(exactKeyword.string),
+      );
+      setProcessedUserSearchTerms(allKeywords);
     } catch (error) {
       console.error("Error fetching data:", error);
       showToast(
@@ -159,6 +208,12 @@ function SearchTerm() {
         5000,
       );
       setIsLoading(false);
+    }
+  };
+
+  const handleGetIdeasOnEnter = (event) => {
+    if (event.key === "Enter") {
+      handleGetIdeas();
     }
   };
 
@@ -278,16 +333,20 @@ function SearchTerm() {
 
     const requestHeaders = {
       "Content-Type": "application/json",
-      "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+      "x-api-key": process.env.REACT_APP_X_API_KEY,
       Authorization: `Bearer ${decryptedFullData.token}`,
       gToken: decryptedFullData.gToken,
     };
 
     try {
       axios
-        .put(`http://localhost:8080/api/updateMyYoutubeVideos`, requestData, {
-          headers: requestHeaders,
-        })
+        .put(
+          `${process.env.REACT_APP_BASE_URL}/updateMyYoutubeVideos`,
+          requestData,
+          {
+            headers: requestHeaders,
+          },
+        )
         .then((response) => {
           if (isMounted) {
             console.log("Success:", response.data);
@@ -425,7 +484,7 @@ function SearchTerm() {
   const selectUserSearchTerm = (selectedSearchTerm) => {
     setUserSavedSearchTerm(selectedSearchTerm);
     setShowSearchTermPanel(false);
-  }
+  };
 
   return (
     <div className="flex h-screen flex-col px-10 py-5">
@@ -471,7 +530,14 @@ function SearchTerm() {
       </div> */}
       <div className="flex flex-col justify-center items-center h-screen mt-20">
         <div className="flex flex-col justify-center items-center">
-          <div><TiDeleteOutline onClick={() => setShowSearchTermPanel(false)} size={30} color="#7352FF" className="cursor-pointer"/></div>
+          <div>
+            <TiDeleteOutline
+              onClick={() => setShowSearchTermPanel(false)}
+              size={30}
+              color="#7352FF"
+              className="cursor-pointer"
+            />
+          </div>
           <h1 className="text-xl">Define a Search Term To Rank For</h1>
           <div className="text-sm text-center">
             Choosing a search term gets you better recommendations for your
@@ -497,7 +563,7 @@ function SearchTerm() {
                 </button>
                 {isOpen1 && (
                   <div v className="p-3 text-sm">
-                    <p>
+                    <div>
                       <div className="flex w-full items-end">
                         <div className="flex flex-col w-4/6">
                           <span className="mb-2">
@@ -510,6 +576,7 @@ function SearchTerm() {
                               className="flex-grow bg-transparent outline-none pr-2 text-xs"
                               value={searchQuery}
                               onChange={handleSearchChange}
+                              onKeyDown={handleGetIdeasOnEnter}
                             />
                             <BiSearch
                               className="text-gray-500 text-xs cursor-pointer"
@@ -519,17 +586,41 @@ function SearchTerm() {
                         </div>
 
                         <div className="relative ml-4 w-2/6">
-                          <select className="rounded-full py-2 pl-4 pr-8 border border-gray-300 bg-white text-xs">
-                            <option value="en">Global (English)</option>
-                            <option value="es">Español </option>
-                            <option value="fr">Français</option>
-                            <option value="de">Deutsch</option>
+                          <select
+                            id="countrySelect"
+                            className="rounded-full py-2 pl-4 pr-8 border border-gray-300 bg-white text-xs"
+                            value={`${selectedCountry.countryCode}:${selectedCountry.languageCode}`}
+                            onChange={handleCountryChange}
+                          >
+                            {/* <option value="GLB:en">Global (English)</option> */}
+                            {countriesWithLanguages.map((item, index) => (
+                              <option
+                                key={index}
+                                value={`${item.countryCode}:${item.languageCode}`}
+                              >
+                                {`${item.country} (${item.language})`}
+                              </option>
+                            ))}
                           </select>
                         </div>
                       </div>
-                    </p>
+                    </div>
                     <div className="text-sm text-gray-500">
                       <div className="text-left flex items-center justify-between focus:outline-none border-b pb-3"></div>
+                    </div>
+                    <div>
+                      {isLoading ? (
+                        <div className="flex flex-col justify-center items-center w-full mt-20">
+                          <BiLoaderCircle
+                            className="animate-spin text-center"
+                            color="#7352FF"
+                            size={30}
+                          />
+                          <div>Gathering Insights for your Keyword.</div>
+                        </div>
+                      ) : (
+                        <div className=""></div>
+                      )}
                     </div>
                     <GridComponent
                       // id="gridcomp"
@@ -573,20 +664,10 @@ function SearchTerm() {
                         ]}
                       />
                     </GridComponent>
-
-                    <div>
-                      {isLoading ? (
-                        <div className="loading-container">
-                          <Spinner />
-                        </div>
-                      ) : (
-                        <div className=""></div>
-                      )}
-                    </div>
                   </div>
                 )}
               </div>
-              <div className="border rounded shadow mt-5">
+              {/* <div className="border rounded shadow mt-5">
                 <button
                   className="w-full text-sm text-left p-3 border-b flex items-center justify-between focus:outline-none"
                   onClick={toggleAccordion2}
@@ -606,7 +687,7 @@ function SearchTerm() {
                     </div>
                   </div>
                 )}
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

@@ -32,10 +32,12 @@ import {
 import { FaYoutube, FaGoogle, FaPlus, FaVideo } from "react-icons/fa";
 import CryptoJS from "crypto-js";
 import showToast from "../utils/toastUtils";
+import { getSavedIdeas, userFullDataDecrypted } from "../data/api/calls";
+import { BiLoaderCircle } from "react-icons/bi";
 
 const SavedIdeas = () => {
   const decryptAndRetrieveData = (data) => {
-    const secretKey = "+)()^77---<@#$>";
+    const secretKey = process.env.REACT_APP_JWT_SECRET;
 
     if (data) {
       const decryptedBytes = CryptoJS.AES.decrypt(data, secretKey);
@@ -47,42 +49,124 @@ const SavedIdeas = () => {
     return null;
   };
   // const [savedIdeasData, setSavedIdeasData] = useState([]);
-  // const savedIdeasData = useSavedIdeasData((state) => state.savedIdeasData);
-  const {
-    savedIdeasData,
-    setSavedIdeasData,
-    isLoading,
-    error,
-    fetchSavedIdeasData,
-  } = useSavedIdeasData();
-  // const setSavedIdeasData = useSavedIdeasData(
-  //   (state) => state.setUserYoutubeData,
-  // );
+  // const {
+  //   savedIdeasData,
+  //   setSavedIdeasData,
+  // } = useSavedIdeasData();
+  const savedIdeasData = useSavedIdeasData((state) => state.savedIdeasData);
+  const setSavedIdeasData = useSavedIdeasData(
+    (state) => state.setSavedIdeasData,
+  );
+  const [filterableSavedIdeasData, setFilterableSavedIdeasData] = useState({});
 
   const [favorites, setFavorites] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
+  const [fetchedSavedIdeas, setFetchedSavedIdeas] = useState("");
   const [filteredData, setFilteredData] = useState(savedIdeasData);
   const userEncryptedData = localStorage.getItem("encryptedFullData");
-  const decryptedFullData = decryptAndRetrieveData(userEncryptedData);
+  const decryptedFullData = userFullDataDecrypted();
   const relatedKeywordData = useKeywordStore(
     (state) => state.relatedKeywordData,
   );
   const setRelatedKeywordData = useKeywordStore(
     (state) => state.setRelatedKeywordData,
   );
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   useEffect(() => {
-    fetchSavedIdeasData();
-    console.log("savedIdeasData", savedIdeasData);
+    setFetchedSavedIdeas(true);
+    const fetchSavedIdeas = async () => {
+      try {
+        const userSavedIdeas = await getSavedIdeas();
+        console.log("userSavedIdeas", userSavedIdeas);
+        setSavedIdeasData(userSavedIdeas);
+        setFilterableSavedIdeasData(userSavedIdeas);
+        setFetchedSavedIdeas(false);
+        // Create a Set to store unique categories
+        const uniqueCategories = new Set();
+
+        // Process the fetched data and add categories to the Set
+        // userSavedIdeas.forEach((item) => {
+        //   // Check if item.category is null or undefined
+        //   if (item.category === null || item.category === undefined) {
+        //     uniqueCategories.add("Uncategorized Ideas");
+        //   } else {
+        //     uniqueCategories.add(item.category);
+        //   }
+        // });
+        userSavedIdeas.forEach((item) => {
+          uniqueCategories.add(item.category);
+        });
+
+        // Convert the Set back to an array (if needed)
+        const uniqueCategoriesArray = Array.from(uniqueCategories);
+
+        // Set the unique categories in the state
+        setCategories(uniqueCategoriesArray);
+        console.log("uniqueCategoriesArrayyyyyyyyyyy", uniqueCategoriesArray);
+      } catch (error) {
+        setFetchedSavedIdeas(false);
+        console.error("Error fetching saved ideas:", error);
+      }
+    };
+
+    fetchSavedIdeas();
   }, []);
 
-  // if (isLoading) {
-  //   return <div>Loading...</div>;
-  // }
+  useEffect(() => {
+    console.log("savedIdeasData", "savedIdeasData");
+  }, []);
 
-  // if (error) {
-  //   return <div>Error: {error.message}</div>;
-  // }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const userSavedIdeas = await getSavedIdeas();
+        console.log("userSavedIdeas from ideas category view", userSavedIdeas);
+
+        // Create a Set to store unique categories
+        const uniqueCategories = new Set();
+
+        // Process the fetched data and add categories to the Set
+        userSavedIdeas.forEach((item) => {
+          uniqueCategories.add(item.category);
+        });
+
+        // Convert the Set back to an array (if needed)
+        const uniqueCategoriesArray = Array.from(uniqueCategories);
+
+        // Set the unique categories in the state
+        setCategories(uniqueCategoriesArray);
+
+        setFetchedSavedIdeas(true); // Data fetched successfully
+        console.log("categories, categories", categories);
+      } catch (error) {
+        setFetchedSavedIdeas(false); // Handle the error
+        console.error("Error fetching saved ideas:", error);
+      }
+    };
+
+    fetchData(); // Call the fetchData function when the component mounts
+  }, []);
+
+  const handleCategoryChange = (event) => {
+    console.log("savedIdeasData from saved Ideas", savedIdeasData);
+    const selectedValue = event.target.value;
+    setSelectedCategory(selectedValue);
+
+    if (selectedValue === "all") {
+      // If "all" is selected, set FilterableSavedIdeasData to the original savedIdeasData
+      setFilterableSavedIdeasData(savedIdeasData);
+    } else {
+      // Filter the savedIdeasData based on the selectedValue
+      const filteredIdeas = savedIdeasData.filter(
+        (item) => item.category === selectedValue,
+      );
+
+      // Update FilterableSavedIdeasData with the filtered data
+      setFilterableSavedIdeasData(filteredIdeas);
+    }
+  };
 
   const contextMenuItems = [
     "AutoFit",
@@ -119,11 +203,14 @@ const SavedIdeas = () => {
 
     if (!newSearchQuery) {
       const originalData = JSON.parse(localStorage.getItem("savedIdeasData"));
-      setSavedIdeasData(originalData);
+      setFilterableSavedIdeasData(originalData);
     } else {
       // Filter the data based on the new search query
-      const filteredResults = searchFilter(savedIdeasData, newSearchQuery);
-      setSavedIdeasData(filteredResults);
+      const filteredResults = searchFilter(
+        filterableSavedIdeasData,
+        newSearchQuery,
+      );
+      setFilterableSavedIdeasData(filteredResults);
     }
   };
 
@@ -131,11 +218,11 @@ const SavedIdeas = () => {
     const selectedRowData = args.data;
     try {
       const responseDelete = await axios.delete(
-        `http://localhost:8080/api/deleteSavedIdea/${selectedRowData.id}`,
+        `${process.env.REACT_APP_BASE_URL}/deleteSavedIdea/${selectedRowData.id}`,
         {
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
             Authorization: `Bearer ${decryptedFullData.token}`,
           },
           params: {
@@ -193,33 +280,14 @@ const SavedIdeas = () => {
     );
   }
 
-  const deleteSavedKeyword = async (keyword) => {
+  const deleteSavedKeyword = async (id) => {
     try {
-      const response = await axios.get(
-        "http://localhost:8080/api/getAllSavedIdeas",
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
-            Authorization: `Bearer ${decryptedFullData.token}`,
-          },
-        },
-      );
-      // return response.data;
-      const data = response.data.data;
-      const findFoundObjectInSaved = data.find(
-        (item) => item.video_ideas === keyword,
-      );
-
-      console.log("to delete response.data 2", keyword, findFoundObjectInSaved);
-      console.log("decryptedFullData.email", decryptedFullData.email);
-
       const responseDelete = await axios.delete(
-        `http://localhost:8080/api/deleteSavedIdea/${findFoundObjectInSaved.id}`,
+        `${process.env.REACT_APP_BASE_URL}/deleteSavedIdea/${id}`,
         {
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
             Authorization: `Bearer ${decryptedFullData.token}`,
           },
           params: {
@@ -229,7 +297,7 @@ const SavedIdeas = () => {
       );
       if (responseDelete.data.success) {
         showToast("success", "Idea removed from Saved Ideas", 2000);
-        fetchSavedIdeasData();
+        // fetchSavedIdeasData();
       } else {
         showToast("error", "Idea wasn't removed. Try again", 2000);
       }
@@ -240,18 +308,27 @@ const SavedIdeas = () => {
   };
 
   const gridOrderStars = (props) => {
-    const keyword = props.video_ideas;
+    const id = props.id;
     // if (!rowData || typeof rowData.isFavorite === 'undefined') {
     //   return null; // Handle cases where rowData is missing or isFavorite is undefined
     // }
     const [isFavorite, setIsFavorite] = useState(false);
     const makeFavorite = () => {
-      deleteSavedKeyword(keyword);
+      setIsFavorite((prevIsFavorite) => !prevIsFavorite);
+      deleteSavedKeyword(id);
     };
 
-    const starIcon = isFavorite ? <AiFillStar /> : <AiOutlineStar />;
+    const starIcon = isFavorite ? (
+      <AiFillStar color="#7352FF" size={20} />
+    ) : (
+      <BiLoaderCircle className="animate-spin" color="#7352FF" size={20} />
+    );
 
-    return <div onClick={makeFavorite}>{<AiFillStar color="#7352FF" />}</div>;
+    return (
+      <div onClick={makeFavorite}>
+        {<AiFillStar color="#7352FF" size={20} />}
+      </div>
+    );
   };
 
   function formatNumberToKMBPlus(number) {
@@ -326,8 +403,19 @@ const SavedIdeas = () => {
         <div className="w-1/2 flex py-2">
           <div className="flex justify-start items-center">
             <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
-              <span className="mr-2 text-xs">All saved ideas</span>
-              <HiOutlineChevronDown />
+              <select
+                className="rounded-full w-full py-2 pl-4 pr-8 border"
+                style={{ border: "1px solid transparent" }}
+                value={selectedCategory && selectedCategory}
+                onChange={handleCategoryChange}
+              >
+                <option value="all">All saved Ideas</option>
+                {categories.map((category, index) => (
+                  <option key={index} value={category} className="text-black">
+                    {category}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="bg-white rounded-tl-full rounded-bl-full border border-gray-300 px-4 py-2 flex items-center">
               <span className="mr-2 text-xs">All ideas</span>
@@ -365,19 +453,29 @@ const SavedIdeas = () => {
           </div>
         </div>
       </div>
-      {!savedIdeasData ? (
+      {!filterableSavedIdeasData ? (
         <div className="loading-container">
           <Spinner />
         </div>
       ) : (
         <div>
           <Header
-            title={`All saved ideas (${savedIdeasData.length} ideas)`}
+            title={`All saved ideas (${
+              filterableSavedIdeasData && filterableSavedIdeasData.length
+            } ideas)`}
             size="text-1xl"
           />
+          {fetchedSavedIdeas && (
+            <div className="flex w-full items-center justify-center mb-5">
+              <span className="mr-2">Loading Saved Ideas </span>
+              <span className={"animate-spin ml-2"}>
+                <BiLoaderCircle color="#7438FF" size={20} />
+              </span>
+            </div>
+          )}
           <GridComponent
             // id="gridcomp"
-            dataSource={savedIdeasData}
+            dataSource={filterableSavedIdeasData}
             allowExcelExport
             allowPdfExport
             allowPaging

@@ -22,8 +22,16 @@ import {
   useUserYoutubeInfo,
   useKeywordStore,
   useSavedIdeasData,
+  useUserChannelKeywords,
+  useDisplayPreviewKeyword,
 } from "../state/state";
-import { AiOutlineStar, AiFillStar } from "react-icons/ai";
+import {
+  AiOutlineStar,
+  AiFillStar,
+  AiOutlineArrowUp,
+  AiOutlineArrowDown,
+  AiOutlineArrowRight,
+} from "react-icons/ai";
 import {
   FaYoutube,
   FaGoogle,
@@ -32,10 +40,20 @@ import {
   FaDownload,
 } from "react-icons/fa";
 import Spinner from "../components/Spinner";
-import { BiSearch, BiWorld, BiStar } from "react-icons/bi";
 import { Link, NavLink } from "react-router-dom";
+import { BiSearch, BiWorld, BiStar, BiLoaderCircle } from "react-icons/bi";
+import { IoWarningOutline } from "react-icons/io5";
+import { userFullDataDecrypted } from "../data/api/calls";
+import showToast from "../utils/toastUtils";
+import { useStateContext } from "../contexts/ContextProvider";
+import PreviewKeyword from "../components/PreviewKeyword";
+import { TooltipComponent } from "@syncfusion/ej2-react-popups";
+import { MdCancel } from "react-icons/md";
+import { BsFillSquareFill } from "react-icons/bs";
+import donought from "../data/donought2.png";
 
 const Keyword2 = () => {
+  const decryptedFullData = userFullDataDecrypted();
   const userYoutubeData = useUserYoutubeInfo((state) => state.userYoutubeData);
   const setUserYoutubeData = useUserYoutubeInfo(
     (state) => state.setUserYoutubeData,
@@ -47,6 +65,12 @@ const Keyword2 = () => {
   const setExactKeywordData = useKeywordStore(
     (state) => state.setExactKeywordData,
   );
+  const displayPreviewKeyword = useDisplayPreviewKeyword(
+    (state) => state.displayPreviewKeyword,
+  );
+  const setDisplayPreviewKeyword = useDisplayPreviewKeyword(
+    (state) => state.setDisplayPreviewKeyword,
+  );
   const relatedKeywordData = useKeywordStore(
     (state) => state.relatedKeywordData,
   );
@@ -56,10 +80,70 @@ const Keyword2 = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(null);
   const [loadedLocalStorage, setLoadedLocalStorage] = useState(false);
+  const userChannelKeywords = useUserChannelKeywords(
+    (state) => state.userChannelKeywords,
+  );
+  const setUserChannelKeywords = useUserChannelKeywords(
+    (state) => state.setUserChannelKeywords,
+  );
+  const [loadingUserChannelKeyword, setLoadingUserChannelKeyword] =
+    useState(false);
+
+  const { handleClick, isClicked } = useStateContext();
+  const [selectedKeyword, setSelectedKeyword] = useState("");
+  const [isShowPreviewKw, setIsShowPreviewKw] = useState(false);
+  let unconventionalKeyword = "";
+  const [unconventionalKeywordd, setUnconventionalKeywordd] = useState("Holy");
+  // const [displayPreviewKeyword, setDisplayPreviewKeyword] = useState(false);
 
   function removeUndefinedOrNull(arr) {
     return arr.filter((item) => item !== undefined && item !== null);
   }
+
+  useEffect(() => {
+    setLoadingUserChannelKeyword(true);
+    console.log("decryptedFullData", decryptedFullData);
+    const fetchUserKeywords = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_BASE_URL}/getUserKeyword`,
+          {
+            params: {
+              email: decryptedFullData.email,
+            },
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.REACT_APP_X_API_KEY,
+              Authorization: `Bearer ${decryptedFullData.token}`,
+            },
+          },
+        );
+
+        const data = response.data;
+        console.log("data", response);
+
+        console.log("response", response.data.success === "trueNut");
+        if (response.data.success === "trueNut") {
+          showToast("error", "No saved Keywords", 2000);
+        } else if (response.data.success == true) {
+          setUserChannelKeywords(data.data);
+          setLoadingUserChannelKeyword(false);
+        } else {
+          showToast(
+            "error",
+            "An error occured with fetching your saved keywords",
+            2000,
+          );
+          setLoadingUserChannelKeyword(false);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        showToast("error", "No saved Keywords", 2000);
+      }
+    };
+
+    fetchUserKeywords(); // Call the async function
+  }, []);
 
   const toggleSave = async (keyword, save) => {
     // fetchSavedIdeasData()
@@ -74,7 +158,7 @@ const Keyword2 = () => {
 
       if (save) {
         await axios.post(
-          "http://localhost:8080/api/addToSavedIdeas",
+          `${process.env.REACT_APP_BASE_URL}/addToSavedIdeas`,
           {
             video_ideas: foundObject.keyword,
             search_volume: foundObject.monthlysearch,
@@ -93,7 +177,7 @@ const Keyword2 = () => {
       } else {
         try {
           const response = await axios.get(
-            "http://localhost:8080/api/getAllSavedIdeas",
+            `${process.env.REACT_APP_BASE_URL}/getAllSavedIdeas`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -107,7 +191,7 @@ const Keyword2 = () => {
           );
 
           await axios.delete(
-            `http://localhost:8080/api/deleteSavedIdea/${findFoundObjectInSaved.id}`,
+            `${process.env.REACT_APP_BASE_URL}/deleteSavedIdea/${findFoundObjectInSaved.id}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -139,7 +223,7 @@ const Keyword2 = () => {
       console.log("saved");
       // Use selectedRowData here instead of selectedRows
       await axios.post(
-        "http://localhost:8080/api/addToSavedIdeas",
+        `${process.env.REACT_APP_BASE_URL}/addToSavedIdeas`,
         {
           video_ideas: args.data.keyword,
           search_volume: args.data.monthlysearch,
@@ -216,12 +300,10 @@ const Keyword2 = () => {
   };
 
   const formatViews = (props) => {
-    const estimatedViews = parseInt(props.estimated_views);
+    const estimatedViews = parseInt(props.search_volume);
     // const formattedViews = estimatedViews.toLocaleString() + "+";
     return (
-      <span className="flex items-center justify-center">
-        {estimatedViews}+
-      </span>
+      <span className="flex items-center justify-start">{estimatedViews}+</span>
     );
   };
 
@@ -293,7 +375,7 @@ const Keyword2 = () => {
     // Make the API call here
     axios
       .get(
-        `http://localhost:8080/api/fetchKeywordStat?keywords=${searchQuery}`,
+        `${process.env.REACT_APP_BASE_URL}/fetchKeywordStat?keywords=${searchQuery}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -374,6 +456,82 @@ const Keyword2 = () => {
     setExactKeywordData(savedData.exact_keyword);
   };
 
+  const keywordTemplate = (props) => {
+    setSelectedKeyword(props.keyword);
+    // unconventionalKeyword = props.keyword;
+
+    return (
+      <span className="flex items-center justify-start">{props.keyword}</span>
+    );
+  };
+
+  const previewYoutubeKwSearch = (props) => {
+    return (
+      <TooltipComponent>
+        <div
+          className="flex justify-start items-center"
+          onClick={() => {
+            callEM(props);
+          }}
+        >
+          <span className="mr-2 cursor-pointer underline">Preview</span>
+          <FaYoutube color="red" />
+        </div>
+      </TooltipComponent>
+    );
+  };
+
+  const RankTemplate = (props) => {
+    // Array of valid values
+    const validValues = [20, 30, 40];
+
+    // Choose a random value from the validValues array
+    const randomNumber =
+      validValues[Math.floor(Math.random() * validValues.length)];
+
+    return (
+      <span className="cursor-pointer underline flex justify-start">
+        &gt;{randomNumber}
+      </span>
+    );
+  };
+
+  const RankChangeTemplate = (props) => {
+    // Generate a random number between -3 and 3
+    const randomNumber = Math.floor(Math.random() * 7) - 3;
+
+    return (
+      <span className="cursor-pointer underline flex justify-center">
+        {randomNumber} <AiOutlineArrowRight className="ml-1" color="gray" />
+      </span>
+    );
+  };
+
+  const callEM = (props) => {
+    console.log("got the props", props);
+    setUnconventionalKeywordd(props.keyword);
+    setDisplayPreviewKeyword(true);
+  };
+
+  const renderPreviewKeyword = (props) => {
+    console.log("props", props);
+    return <PreviewKeyword keywordd={props.keyword} />;
+  };
+
+  const showPreviewKeyword = (props) => {
+    setDisplayPreviewKeyword(true);
+
+    console.log("/////////////////////////", props);
+    showToast("warning", "/////////////////////////", 2000);
+    setUnconventionalKeywordd(props.keyword);
+    renderPreviewKeyword(props);
+    unconventionalKeyword = props.keyword;
+    setIsShowPreviewKw(!isShowPreviewKw);
+    handleClick("previewKw");
+    console.log("unconventionalKeywordd", unconventionalKeywordd);
+    console.log("unconventionalKeyword", unconventionalKeyword);
+  };
+
   const isSearchEmpty = searchQuery.trim() === "";
 
   const getOneMonthDateRange = () => {
@@ -412,6 +570,13 @@ const Keyword2 = () => {
 
   return (
     <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
+      {/* {displayPreviewKeyword == false && (<div>
+        <div className="flex justify-center z-10">  
+        <MdCancel onClick={() => setDisplayPreviewKeyword(false)} size={20} />
+      </div>
+        <PreviewKeyword keywordd={"hot"}/>
+      </div>)} */}
+      {isClicked.previewKw && <PreviewKeyword keywordd={"hot"} />}
       {isLoading ? (
         <div className="loading-container">
           <Spinner />
@@ -447,78 +612,152 @@ const Keyword2 = () => {
           </div>
         </div>
         <div className="flex justify-between items-center w-full mt-10">
-          <div className="flex flex-col justify-start items-center rankingStatBoxes border-1 w-1/3 mr-8 border-gray-300 rounded">
+          <div className="h-30 flex flex-col justify-start items-center rankingStatBoxes border-1 w-1/3 py-20 px-5 mr-8 border-gray-300 rounded">
             <div>Average Position</div>
             <div className="text-gray-500 text-sm">{dateRange}</div>
             <div>n/a</div>
+            <div className="w-full bg-gray-300 h-5 mt-3">
+              {/* <input
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              className="w-full bg-gray-300"
+            /> */}
+            </div>
           </div>
-          <div className="flex flex-col justify-start items-center rankingStatBoxes border-1 w-1/3 mr-8 border-gray-300 rounded">
-            <div>Average Position</div>
+          <div className="h-30 flex flex-col justify-start items-center rankingStatBoxes border-1 w-1/3 py-8 mr-8 border-gray-300 rounded">
+            <div>Keyword Distribution</div>
             <div className="text-gray-500 text-sm">{dateRange}</div>
-            <div>n/a</div>
+            <div className="flex items-center mt-5">
+              <div className="mr-20">
+                <img src={donought} alt="" />
+              </div>
+              <div className="mr-20">
+                <div className="flex items-center mb-3">
+                  <BsFillSquareFill className="mr-2" color="Purple" />
+                  <span>Top 3</span>
+                </div>
+                <div className="flex items-center mb-3">
+                  <BsFillSquareFill className="mr-2" color="blue" />
+                  <span>Top 10</span>
+                </div>
+                <div className="flex items-center mb-3">
+                  <BsFillSquareFill className="mr-2" color="yellow" />
+                  <span>Top 20</span>
+                </div>
+                <div className="flex items-center mb-3">
+                  <BsFillSquareFill className="mr-2" color="gray" />
+                  <span>No Rank</span>
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center mb-3">
+                  <span className="mr-2">0</span>
+                  <AiOutlineArrowRight />
+                  <span>0</span>
+                </div>
+                <div className="flex items-center mb-3">
+                  <span className="mr-2">0</span>
+                  <AiOutlineArrowRight />
+                  <span>0</span>
+                </div>
+                <div className="flex items-center mb-3">
+                  <span className="mr-2">0</span>
+                  <AiOutlineArrowRight />
+                  <span>0</span>
+                </div>
+                <div className="flex items-center mb-3">
+                  <span className="mr-2">0</span>
+                  <AiOutlineArrowRight />
+                  <span>0</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="flex flex-col justify-start items-center rankingStatBoxes border-1 w-1/3 border-gray-300 rounded">
-            <div>Average Position</div>
+          <div className="h-30 flex flex-col justify-start items-center rankingStatBoxes border-1 w-1/3 py-20 px-5 border-gray-300 rounded">
+            <div>Keyword Rank Up/Down</div>
             <div className="text-gray-500 text-sm">{dateRange}</div>
-            <div>n/a</div>
+            <div className="flex items-center">
+              <span className="flex items-center mr-5 text-lg">
+                0 <AiOutlineArrowUp className="ml-1" color="green" />
+              </span>
+              <span className="flex items-center mr-5 text-lg">
+                0 <AiOutlineArrowDown className="ml-1" color="red" />
+              </span>
+              <span className="flex items-center text-lg">
+                0 <AiOutlineArrowRight className="ml-1" color="gray" />
+              </span>
+            </div>
+            <div className="w-full bg-gray-500 h-5 mt-3"></div>
           </div>
         </div>
         <div className="w-full flex mb-5">
           <div className="w-1/2 py-2">
-            <Header title="Keywords" size="text-1xl" />
+            <div className="flex justify-start items-center">
+              <Header title="Keywords" size="text-1xl" />
+              <span className="text-xs font-thin italic ml-2 mt-5">
+                {userChannelKeywords.length < 1 && (
+                  <span className="flex gap-1 justify-start items-center">
+                    <IoWarningOutline color="#F49C0E" /> (You haven't added any
+                    major keyword for your Channel)
+                  </span>
+                )}
+              </span>
+            </div>
             <span className="text-xs">From 18 Aug - 25 Aug 2023</span>
           </div>
           <div className="w-1/2 flex justify-end py-2"></div>
         </div>
+        {loadingUserChannelKeyword && (
+          <div className="blinking flex w-full items-center justify-center mb-5">
+            <span className="mr-2">Loading your saved Keywords </span>
+            <span className={"animate-spin ml-2"}>
+              <BiLoaderCircle color="#7438FF" size={30} />
+            </span>
+          </div>
+        )}
         <GridComponent
-          // id="gridcomp"
-          dataSource={exactKeywordData}
+          dataSource={userChannelKeywords}
           allowExcelExport
           allowPdfExport
           allowPaging
           allowSorting
-          selectionSettings={{ type: "Multiple" }}
-          toolbar={["Delete"]}
-          // contextMenuItems={contextMenuItems}
-          // editSettings={editing}
-          // rowSelected={handleRowSelected}
         >
           <ColumnsDirective>
-            <ColumnDirective type="checkbox" width="50" />
+            <ColumnDirective
+              field="keyword"
+              headerText="Keywords"
+              // template={keywordTemplate}
+            />
             <ColumnDirective
               field=""
               headerText="Youtube Results"
               headerTemplate={VideoIconTitleTemplate}
+              template={previewYoutubeKwSearch}
             />
-            <ColumnDirective
-              field="monthlysearch"
+            {/* <ColumnDirective
+              field=""
               headerText="Rank"
               headerTemplate={VolumeTitleTemplate}
-              template={searchVolumeDataRowTemplate}
+              template={RankTemplate}
             />
+            <ColumnDirective field="" headerText="Change" template={RankChangeTemplate}/>
             <ColumnDirective
-              field="difficulty"
-              headerText="Change"
-              template={keywordDiffTemplate}
-            />
-            <ColumnDirective
-              field="estimated_views"
+              field=""
               headerText="Video Result"
               headerTemplate={VideoIconTitleTemplate}
-              template={formatViews}
-            />
+            /> */}
             <ColumnDirective
-              field="estimated_views"
+              field="search_volume"
               headerText="Volume"
               template={formatViews}
             />
             <ColumnDirective
-              field="estimated_views"
+              field="created_at_formatted"
               headerText="Date added"
-              template={formatViews}
             />
           </ColumnsDirective>
-
           <Inject
             services={[
               Resize,
@@ -533,11 +772,17 @@ const Keyword2 = () => {
           />
         </GridComponent>
         <Link
-          className="flex justify-center items-center w-full mt-3"
+          className="flex justify-center items-center w-full mt-3 underline"
           to="/keywords"
         >
-          <span>VIEW ALL KEYWORDS</span>
+          <span>
+            {userChannelKeywords.length < 1
+              ? "Add to Keywords"
+              : "View All Keywords"}
+          </span>
         </Link>
+        {/* {displayPreviewKeyword && <PreviewKeyword keywordd={unconventionalKeywordd} />} */}
+        {/* {<PreviewKeyword keywordd={"hot"}/>} */}
       </div>
     </div>
   );

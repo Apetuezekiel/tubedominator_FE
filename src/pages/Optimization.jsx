@@ -31,13 +31,13 @@ import CryptoJS from "crypto-js";
 import Spinner from "../components/Spinner";
 import { userFullDataDecrypted } from "../data/api/calls";
 import showToast from "../utils/toastUtils";
-import { BiChevronDown } from "react-icons/bi";
+import { BiChevronDown, BiEdit, BiTrendingUp } from "react-icons/bi";
 import { AiOutlineSearch } from "react-icons/ai";
 import Opitimize from "../components/Opitimize";
 
 const Ideation = () => {
   const decryptAndRetrieveData = (data) => {
-    const secretKey = "+)()^77---<@#$>";
+    const secretKey = process.env.REACT_APP_JWT_SECRET;
 
     if (data) {
       const decryptedBytes = CryptoJS.AES.decrypt(data, secretKey);
@@ -80,13 +80,13 @@ const Ideation = () => {
     const fetchMyYoutubeInfo = async () => {
       try {
         axios
-          .get(`http://localhost:8080/api/fetchMyYoutubeInfo`, {
+          .get(`${process.env.REACT_APP_BASE_URL}/fetchMyYoutubeInfo`, {
             params: {
               channel_id: decryptedFullData.channelId,
             },
             headers: {
               "Content-Type": "application/json",
-              "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+              "x-api-key": process.env.REACT_APP_X_API_KEY,
               Authorization: `Bearer ${decryptedFullData.token}`,
               gToken: decryptedFullData.gToken,
             },
@@ -109,13 +109,13 @@ const Ideation = () => {
     const fetchMyPlaylists = async () => {
       try {
         axios
-          .get(`http://localhost:8080/api/fetchMyPlaylists`, {
+          .get(`${process.env.REACT_APP_BASE_URL}/fetchMyPlaylists`, {
             params: {
               channel_id: decryptedFullData.channelId,
             },
             headers: {
               "Content-Type": "application/json",
-              "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+              "x-api-key": process.env.REACT_APP_X_API_KEY,
               Authorization: `Bearer ${decryptedFullData.token}`,
               gToken: decryptedFullData.gToken,
             },
@@ -185,20 +185,50 @@ const Ideation = () => {
   };
 
   const ThumbnailTitleTemplate = (props) => {
+    console.log("propsppp", props);
     return (
-      <div className="flex justify-center items-center">
-        <div>
+      <div>
+        <div className="flex justify-start items-center">
           <img
             src={props.thumbnails.url}
             alt="Thumbnail"
             style={{ width: "100px", height: "80px" }}
           />
-          <div className="whitespace-normal mt-4 flex">{props.title}</div>
+          <div className="ml-3">
+            <div className="whitespace-normal mt-4 mb-3 flex">
+              {props.title}
+            </div>
+            <div className="text-gray-500 italic">Public</div>
+          </div>
         </div>
-        <div>
-          <span className="cursor-pointer" onClick={() => optimizeVideo(props)}>
-            Optimize
+        <div className="flex justify-between items-center mt-3">
+          <span
+            className="flex justify-center items-center cursor-pointer"
+            onClick={() => optimizeVideo(props)}
+          >
+            <span className="text-gray-500 hover:text-black">Optimize</span>
+            <span className="ml-2 text-purple-600">
+              <BiEdit />
+            </span>
           </span>
+          <Link
+            to="/optimization"
+            className="flex justify-center items-center cursor-pointer"
+          >
+            <span className="text-gray-500 hover:text-black">Reportings</span>
+            <span className="ml-2 text-purple-600">
+              <BiTrendingUp />
+            </span>
+          </Link>
+          <Link
+            to={`https://www.youtube.com/watch?v=${props.videoId}`}
+            className="flex justify-center items-center cursor-pointer"
+          >
+            <span className="text-gray-500 hover:text-black">View on YT</span>
+            <span className="ml-2 text-red-600">
+              <FaYoutube />
+            </span>
+          </Link>
         </div>
       </div>
     );
@@ -327,7 +357,7 @@ const Ideation = () => {
   return (
     <div>
       {isOptimizeVideo ? (
-        selectedVideoId && <Opitimize id={selectedVideoId} />
+        selectedVideoId && <Opitimize videoId={selectedVideoId} />
       ) : (
         <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl w-8/9">
           <div className="w-full flex">

@@ -1,13 +1,13 @@
 /* eslint-disable */
 
 import { React, useEffect, useState } from "react";
-import { MdOutlineCancel } from "react-icons/md";
-
+import { MdCancel, MdOutlineCancel } from "react-icons/md";
+import { BiLinkExternal } from "react-icons/bi";
 import { Button } from ".";
 import { userProfileData } from "../data/dummy";
 import { useStateContext } from "../contexts/ContextProvider";
 import avatar from "../data/avatar.jpg";
-import { useUserData } from "../state/state";
+import { useDisplayPreviewKeyword, useUserData } from "../state/state";
 import { SignOutButton } from "@clerk/clerk-react";
 import { useUser } from "@clerk/clerk-react";
 import {
@@ -31,8 +31,10 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { userFullDataDecrypted } from "../data/api/calls";
 import Spinner from "./Spinner";
+import showToast from "../utils/toastUtils";
 
-const PreviewKeyword = ({ keyword }) => {
+const PreviewKeyword = ({ keywordd }) => {
+  showToast("warning", `keyword ${keywordd}`, 2000);
   const { currentColor } = useStateContext();
   const userData = useUserData((state) => state.userData);
   const setUserData = useUserData((state) => state.setUserData);
@@ -59,29 +61,38 @@ const PreviewKeyword = ({ keyword }) => {
     allowDeleting: true,
     mode: "Normal",
   };
+  const displayPreviewKeyword = useDisplayPreviewKeyword(
+    (state) => state.displayPreviewKeyword,
+  );
+  const setDisplayPreviewKeyword = useDisplayPreviewKeyword(
+    (state) => state.setDisplayPreviewKeyword,
+  );
   const settings = { persistSelection: true };
 
   useEffect(() => {
     let isMounted = true;
     // Define the API URL you want to fetch data from
-    console.log("keyword", keyword);
+    console.log("keyword", keywordd);
     axios
-      .get(`http://localhost:8080/api/getKeywordVideos`, {
+      .get(`https://hq.tubedominator.com/api/fetchMyYoutubeVideos`, {
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
           Authorization: `Bearer ${decryptedFullData.token}`,
         },
         params: {
-          query: keyword,
+          keyword: keywordd ?? "Football",
+          channel_id: decryptedFullData.channelId,
         },
       })
       .then((response) => {
+        console.log("@££££££££££££££££", response);
         if (isMounted) {
           const keywordVideosInfo = response.data.map((item, index) => ({
             ...item,
             index: index + 1,
           }));
+          console.log("keywordVideosInfo", keywordVideosInfo);
           setKeywordVideosInfo(keywordVideosInfo);
           setIsResultLoaded(false);
         }
@@ -116,17 +127,41 @@ const PreviewKeyword = ({ keyword }) => {
           style={{ width: "100px", height: "80px" }}
           className="ml-5 rounded"
         />
-        {/* <Link to={}> */}
-        <div className="ml-4">{props.title}</div>
-        {/* </Link> */}
+        <Link to={props.videoLink}>
+          <div className="ml-4 cursor-pointer whitespace-normal underline flex items-top justify-start">
+            {props.title}{" "}
+            <BiLinkExternal className="ml-1" color="#7352FF" size={10} />
+          </div>
+        </Link>
       </div>
+    );
+  };
+
+  // const ThumbnailTitleTemplate = (props) => {
+  //   const playerHtml = { __html: props.player };
+
+  //   return (
+  //     <div className="flex">
+  //       <div dangerouslySetInnerHTML={playerHtml} style={{ width: '100px', height: '100px' }}></div>
+  //     </div>
+  //   );
+  // };
+
+  const videoChannelTemplate = (props) => {
+    return (
+      <Link to={props.channelLink}>
+        <div className="ml-4 cursor-pointer underline flex items-top justify-start">
+          {props.channelTitle}{" "}
+          <BiLinkExternal className="ml-1" color="#7352FF" size={10} />{" "}
+        </div>
+      </Link>
     );
   };
 
   const gridOrderOptimizationLevel = (props) => {
     return (
       <div className="h-2 w-full rounded-full flex flex-row items-center justify-between">
-        <div className="h-full w-80 bg-gray-300 w-full ro unded-full mr-2">
+        <div className="h-full bg-gray-300 w-full rounded-full mr-2">
           <div className="h-full w-10 bg-purple-600 rounded-full"></div>
         </div>
         <span className="w-20 text-xs text-purple-600">20%</span>
@@ -154,15 +189,17 @@ const PreviewKeyword = ({ keyword }) => {
       <div className="bg-white dark:bg-[#42464D] p-8 my-20 rounded-lg w-4/6">
         <div className="flex justify-between items-center">
           <p className="font-semibold text-lg dark:text-gray-200">
-            Search Result from Youtube
+            Search Result from Youtube {keywordd}
           </p>
-          <Button
+          {/* <Button
             icon={<MdOutlineCancel />}
             color="rgb(153, 171, 180)"
             bgHoverColor="light-gray"
             size="2xl"
             borderRadius="50%"
-          />
+            
+          /> */}
+          <MdCancel onClick={setDisplayPreviewKeyword(false)} size={20} />
         </div>
         {isSearchLoaded ? (
           <div className="loading-container my-10">
@@ -195,7 +232,7 @@ const PreviewKeyword = ({ keyword }) => {
               <ColumnDirective
                 field="channelTitle"
                 headerText="Channels"
-                // template={gridOrderOptimizationLevel}
+                template={videoChannelTemplate}
                 // width="200"
               />
               <ColumnDirective

@@ -28,7 +28,7 @@ function Home() {
               We Make YouTube <br /> Work for Business
             </div>
             <div className="mt-5">
-              tubics is more than just an agency. We empower brands with
+              Tubedominator is more than just an agency. We empower brands with
               easy-to-use software tools, actionable insights, and expert agency
               services to grow their YouTube channel.
             </div>

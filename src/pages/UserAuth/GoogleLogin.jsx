@@ -1,6 +1,13 @@
 /* eslint-disable */
 
-import { React, useState, useEffect } from "react";
+import {
+  React,
+  useState,
+  useEffect,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { GoogleLogin } from "react-google-login";
 import GoogleApiInitializer from "../../utils/GoogleApiInitializer";
 import axios from "axios";
@@ -17,14 +24,22 @@ const clientId =
   "372673946018-lu1u3llu6tqi6hmv8m2226ri9qev8bb8.apps.googleusercontent.com";
 const apiKey = "AIzaSyBhnxmlAowrcFI7owW40YrsqI3xPVVk0IU";
 
-function GoogleLoginComp() {
+const GoogleLoginComp = forwardRef((props, ref) => {
+  const internalRef = useRef(null);
+
+  useImperativeHandle(ref, () => ({
+    click: () => {
+      internalRef.current.click();
+    },
+  }));
+
   const navigate = useNavigate();
   const [initialized, setInitialized] = useState(false);
-  const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
-  const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
+  // const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
+  // const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
 
   const encryptAndStoreData = (data) => {
-    const secretKey = "+)()^77---<@#$>";
+    const secretKey = process.env.REACT_APP_JWT_SECRET;
     const jsonData = JSON.stringify(data);
     const encryptedGData = CryptoJS.AES.encrypt(jsonData, secretKey).toString();
     localStorage.setItem("encryptedGData", encryptedGData);
@@ -34,14 +49,14 @@ function GoogleLoginComp() {
   const isChannelRegistered = async (user_id, GUserData) => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/api/ischannelRegistered",
+        `${process.env.REACT_APP_BASE_URL}/ischannelRegistered`,
         {
           params: {
             user_id,
           },
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
           },
         },
       );
@@ -66,7 +81,8 @@ function GoogleLoginComp() {
           }
         }
 
-        setUserLoggedIn(true);
+        // setUserLoggedIn(true);
+        localStorage.setItem("userLoggedin", true);
         setTimeout(async () => {
           const currentURL = window.location.href;
           console.log("I got here and will redirect", currentURL);
@@ -122,11 +138,13 @@ function GoogleLoginComp() {
       gId: googleId,
     };
     showToast("success", "Login Successful", 2000);
-    setUserLoggedIn(true);
+    // setUserLoggedIn(true);
+    localStorage.setItem("userLoggedin", true);
     isChannelRegistered(`TUBE_${googleId}`, GUserData);
   };
 
   const handleLoginClick = () => {
+    console.log("Second element clicked");
     setInitialized(true);
   };
 
@@ -139,7 +157,7 @@ function GoogleLoginComp() {
           initializeOnLoad={true}
         />
       )}
-      <button onClick={handleLoginClick}>
+      <button onClick={handleLoginClick} ref={internalRef}>
         <GoogleLogin
           clientId={clientId}
           buttonText="Login with Google"
@@ -152,6 +170,6 @@ function GoogleLoginComp() {
       </button>
     </div>
   );
-}
+});
 
 export default GoogleLoginComp;

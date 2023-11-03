@@ -25,7 +25,6 @@ const UserProfile = () => {
 
   const onLogoutSuccess = (res) => {
     console.log("Logout Success, res:", res);
-    setUserLoggedIn(false);
     localStorage.clear();
     navigate("/");
   };

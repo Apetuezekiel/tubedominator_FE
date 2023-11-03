@@ -1,7 +1,7 @@
 @import url("https://cdn.syncfusion.com/ej2/material.css");
 
 .sidebar {
-  box-shadow: rgb(113 122 131 / 11%) 0px 7px 30px 0px;
+  /* box-shadow: rgb(113 122 131 / 11%) 0px 7px 30px 0px; */
 }
 .nav-item,
 .navbar {
@@ -222,4 +222,17 @@
 
 .chosenView {
   border-bottom: #7F48FF solid 2px;
+}
+
+.blinking {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
 }

@@ -117,7 +117,7 @@ const Keyword2 = () => {
 
       if (save) {
         await axios.post(
-          "http://localhost:8080/api/addToSavedIdeas",
+          `${process.env.REACT_APP_BASE_URL}/addToSavedIdeas`,
           {
             video_ideas: foundObject.keyword,
             search_volume: foundObject.monthlysearch,
@@ -136,7 +136,7 @@ const Keyword2 = () => {
       } else {
         try {
           const response = await axios.get(
-            "http://localhost:8080/api/getAllSavedIdeas",
+            `${process.env.REACT_APP_BASE_URL}/getAllSavedIdeas`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -150,7 +150,7 @@ const Keyword2 = () => {
           );
 
           await axios.delete(
-            `http://localhost:8080/api/deleteSavedIdea/${findFoundObjectInSaved.id}`,
+            `${process.env.REACT_APP_BASE_URL}/deleteSavedIdea/${findFoundObjectInSaved.id}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -185,14 +185,14 @@ const Keyword2 = () => {
     const fetchUserKeywords = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/getUserKeyword",
+          `${process.env.REACT_APP_BASE_URL}/getUserKeyword`,
           {
             params: {
               email: decryptedFullData.email,
             },
             headers: {
               "Content-Type": "application/json",
-              "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+              "x-api-key": process.env.REACT_APP_X_API_KEY,
               Authorization: `Bearer ${decryptedFullData.token}`,
             },
           },
@@ -326,7 +326,7 @@ const Keyword2 = () => {
     // Make the API call here
     axios
       .get(
-        `http://localhost:8080/api/fetchKeywordStat?keywords=${searchQuery}`,
+        `${process.env.REACT_APP_BASE_URL}/fetchKeywordStat?keywords=${searchQuery}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -425,11 +425,11 @@ const Keyword2 = () => {
 
     try {
       const fetchKeywordResponse = await axios.get(
-        `http://localhost:8080/api/fetchKeywordStat?keyword=${userKeyword}`,
+        `${process.env.REACT_APP_BASE_URL}/fetchKeywordStat?keyword=${userKeyword}`,
         {
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
             Authorization: `Bearer ${decryptedFullData.token}`,
           },
         },
@@ -438,7 +438,7 @@ const Keyword2 = () => {
       const searchData = fetchKeywordResponse.data;
       if (searchData) {
         const saveKeywordResponse = await axios.post(
-          "http://localhost:8080/api/saveUserKeyword",
+          `${process.env.REACT_APP_BASE_URL}/saveUserKeyword`,
           {
             keyword: userKeyword,
             email: decryptedFullData.email,
@@ -448,7 +448,7 @@ const Keyword2 = () => {
           {
             headers: {
               "Content-Type": "application/json",
-              "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+              "x-api-key": process.env.REACT_APP_X_API_KEY,
               Authorization: `Bearer ${decryptedFullData.token}`,
             },
           },

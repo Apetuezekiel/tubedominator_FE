@@ -33,7 +33,7 @@ import {
   FaDownload,
 } from "react-icons/fa";
 import Spinner from "../components/Spinner";
-import { BiSearch, BiWorld, BiStar } from "react-icons/bi";
+import { BiSearch, BiWorld, BiStar, BiLoaderCircle } from "react-icons/bi";
 import { useUser } from "@clerk/clerk-react";
 import { Link, NavLink } from "react-router-dom";
 import PreviewKeyword from "../components/PreviewKeyword";
@@ -41,6 +41,7 @@ import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 import { useStateContext } from "../contexts/ContextProvider";
 import showToast from "../utils/toastUtils";
 import { userFullDataDecrypted } from "../data/api/calls";
+import { TiDelete } from "react-icons/ti";
 
 const Keyword2 = () => {
   const userYoutubeData = useUserYoutubeInfo((state) => state.userYoutubeData);
@@ -72,7 +73,11 @@ const Keyword2 = () => {
   const [userKeyword, setUserKeyword] = useState("");
   const [isAddKeyword, setIsAddKeyword] = useState(false);
   const [isShowPreviewKw, setIsShowPreviewKw] = useState(false);
+  const [loadingUserChannelKeyword, setLoadingUserChannelKeyword] =
+    useState(false);
   const [selectedKeyword, setSelectedKeyword] = useState("");
+  const [unconventionalKeywordd, setUnconventionalKeywordd] =
+    useState("Holy Ghost");
   const {
     currentColor,
     activeMenu,
@@ -103,6 +108,7 @@ const Keyword2 = () => {
     mode: "Normal",
   };
   const settings = { persistSelection: true };
+  let unconventionalKeyword = "God";
 
   const toggleSave = async (keyword, save) => {
     // fetchSavedIdeasData()
@@ -117,7 +123,7 @@ const Keyword2 = () => {
 
       if (save) {
         await axios.post(
-          "http://localhost:8080/api/addToSavedIdeas",
+          `${process.env.REACT_APP_BASE_URL}/addToSavedIdeas`,
           {
             video_ideas: foundObject.keyword,
             search_volume: foundObject.monthlysearch,
@@ -136,7 +142,7 @@ const Keyword2 = () => {
       } else {
         try {
           const response = await axios.get(
-            "http://localhost:8080/api/getAllSavedIdeas",
+            `${process.env.REACT_APP_BASE_URL}/getAllSavedIdeas`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -150,7 +156,7 @@ const Keyword2 = () => {
           );
 
           await axios.delete(
-            `http://localhost:8080/api/deleteSavedIdea/${findFoundObjectInSaved.id}`,
+            `${process.env.REACT_APP_BASE_URL}/deleteSavedIdea/${findFoundObjectInSaved.id}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -181,18 +187,19 @@ const Keyword2 = () => {
   }
 
   useEffect(() => {
+    setLoadingUserChannelKeyword(true);
     console.log("decryptedFullData", decryptedFullData);
     const fetchUserKeywords = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/getUserKeyword",
+          `${process.env.REACT_APP_BASE_URL}/getUserKeyword`,
           {
             params: {
               email: decryptedFullData.email,
             },
             headers: {
               "Content-Type": "application/json",
-              "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+              "x-api-key": process.env.REACT_APP_X_API_KEY,
               Authorization: `Bearer ${decryptedFullData.token}`,
             },
           },
@@ -204,14 +211,17 @@ const Keyword2 = () => {
         console.log("response", response.data.success === "trueNut");
         if (response.data.success === "trueNut") {
           showToast("error", "No saved Keywords", 2000);
+          setLoadingUserChannelKeyword(false);
         } else if (response.data.success == true) {
           setUserChannelKeywords(data.data);
+          setLoadingUserChannelKeyword(false);
         } else {
           showToast(
             "error",
             "An error occured with fetching your saved keywords",
             2000,
           );
+          setLoadingUserChannelKeyword(false);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -221,25 +231,6 @@ const Keyword2 = () => {
 
     fetchUserKeywords(); // Call the async function
   }, [saveSuccess]);
-
-  const editing = { allowDeleting: true, allowEditing: true };
-  const showPreviewKeyword = () => {
-    setIsShowPreviewKw(!isShowPreviewKw);
-    handleClick("previewKw");
-  };
-  const previewYoutubeKwSearch = (props) => {
-    return (
-      <TooltipComponent>
-        <div
-          className="flex justify-center items-center"
-          onClick={showPreviewKeyword}
-        >
-          <span className="mr-2 cursor-pointer">Preview</span>
-          <FaYoutube />
-        </div>
-      </TooltipComponent>
-    );
-  };
 
   const formatViews = (props) => {
     const estimatedViews = parseInt(props.search_volume);
@@ -251,10 +242,60 @@ const Keyword2 = () => {
     );
   };
 
-  const keywordTemplate = (props) => {
-    setSelectedKeyword(props.keyword);
+  const deleteChannelKeyword = async (props) => {
+    showToast("success", "I WAN DELETE", 2000);
+    // try {
+    //   const responseDelete = await axios.delete(
+    //     `${process.env.REACT_APP_BASE_URL}/deleteUserKeyword`,
+    //     {
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //         "x-api-key": process.env.REACT_APP_X_API_KEY,
+    //         Authorization: `Bearer ${decryptedFullData.token}`,
+    //       },
+    //       params: {
+    //         keyword: props.keyword,
+    //       },
+    //     },
+    //   );
+    //   console.log("Data removed successfully", props.keyword);
+    //   if (responseDelete.data.success) {
+    //       setUserChannelKeywords((prevData) =>
+    //       prevData.filter((d) => d.keyword !== props.keyword),
+    //     );
+    //     showToast("success", "Keyword removed from saved keywords", 2000);
+    //   } else {
+    //     showToast("error", "saved keyword wasn't removed. Try again", 2000);
+    //   }
+    // } catch (error) {
+    //   console.error("Error fetching data:", error);
+    //   throw error;
+    // }
+  };
+
+  const recordCtrlTemplate = (props) => {
     return (
-      <span className="flex items-center justify-center">{props.keyword}</span>
+      <span className="flex items-center justify-center">
+        <TiDelete color="#7352FF" onClick={() => deleteChannelKeyword(props)} />
+      </span>
+    );
+  };
+
+  const keywordTemplate = (props) => {
+    setUnconventionalKeywordd(props.keyword);
+    unconventionalKeyword = props.keyword;
+    console.log("setSelectedKeyword(props.keyword)", props.keyword);
+    // console.log("selectedKeyword", selectedKeyword);
+    return (
+      // <span className="flex items-center justify-start">{props.keyword}</span>
+      <span className="flex items-center justify-start">
+        <TiDelete
+          color="#7352FF"
+          onClick={() => deleteChannelKeyword(props)}
+          size={20}
+        />{" "}
+        <span className="ml-3">{props.keyword}</span>
+      </span>
     );
   };
 
@@ -326,7 +367,7 @@ const Keyword2 = () => {
     // Make the API call here
     axios
       .get(
-        `http://localhost:8080/api/fetchKeywordStat?keywords=${searchQuery}`,
+        `${process.env.REACT_APP_BASE_URL}/fetchKeywordStat?keywords=${searchQuery}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -414,58 +455,59 @@ const Keyword2 = () => {
   const submitUserKeyword = async () => {
     console.log("decryptedFullData", decryptedFullData);
     if (userKeyword === "") {
-      console.log("Keyword is empty. Please provide a keyword."); // You can replace this with a toast message
+      console.log("Keyword is empty. Please provide a keyword.");
       showToast("error", "Keyword is empty. Please provide a keyword.", 2000);
       return;
     }
-    showToast("success", `userKeyword ${userKeyword}`, 2000);
+    showToast("success", "Keyword Added Successfully", 2000);
     console.log("userKeyword", userKeyword);
 
     setIsAddKeyword(false);
 
     try {
-      const fetchKeywordResponse = await axios.get(
-        `http://localhost:8080/api/fetchKeywordStat?keyword=${userKeyword}`,
+      // const fetchKeywordResponse = await axios.get(
+      //   `${process.env.REACT_APP_BASE_URL}/fetchKeywordStat?keyword=${userKeyword}`,
+      //   {
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       "x-api-key": process.env.REACT_APP_X_API_KEY,
+      //       Authorization: `Bearer ${decryptedFullData.token}`,
+      //     },
+      //   },
+      // );
+
+      // const searchData = fetchKeywordResponse.data;
+      // if (12) {
+      const saveKeywordResponse = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/saveUserKeyword`,
+        {
+          keyword: userKeyword,
+          email: decryptedFullData.email,
+          user_id: decryptedFullData.user_id,
+          // search_volume: searchData.response.exact_keyword[0].monthlysearch ?? 34000,
+          search_volume: 34000,
+        },
         {
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
             Authorization: `Bearer ${decryptedFullData.token}`,
           },
         },
       );
 
-      const searchData = fetchKeywordResponse.data;
-      if (searchData) {
-        const saveKeywordResponse = await axios.post(
-          "http://localhost:8080/api/saveUserKeyword",
-          {
-            keyword: userKeyword,
-            email: decryptedFullData.email,
-            user_id: decryptedFullData.user_id,
-            search_volume: searchData.response.exact_keyword[0].monthlysearch,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
-              Authorization: `Bearer ${decryptedFullData.token}`,
-            },
-          },
-        );
-
-        console.log("API response:", saveKeywordResponse.data);
-        if (saveKeywordResponse.data.success) {
-          setSaveSuccess(true);
-        }
-      } else {
-        console.error("Error occured");
-        showToast(
-          "error",
-          "could not add keyword. Please try again. Dont refresh so information isn't lost",
-          5000,
-        );
+      console.log("API response:", saveKeywordResponse.data);
+      if (saveKeywordResponse.data.success) {
+        setSaveSuccess(true);
       }
+      // } else {
+      //   console.error("Error occured");
+      //   showToast(
+      //     "error",
+      //     "could not add keyword. Please try again. Dont refresh so information isn't lost",
+      //     5000,
+      //   );
+      // }
     } catch (error) {
       console.error("Error while making API call:", error);
       showToast(
@@ -484,10 +526,36 @@ const Keyword2 = () => {
 
   const isSearchEmpty = searchQuery.trim() === "";
 
+  const showPreviewKeyword = (keyword) => {
+    unconventionalKeyword = keyword;
+    setUnconventionalKeywordd(keyword);
+    showToast("success", unconventionalKeywordd, 2000);
+    setIsShowPreviewKw(!isShowPreviewKw);
+    handleClick("previewKw");
+  };
+
+  const previewYoutubeKwSearch = (props) => {
+    return (
+      <TooltipComponent>
+        <div
+          className="flex justify-center items-center"
+          onClick={() => {
+            unconventionalKeyword = props.keyword;
+            setUnconventionalKeywordd(props.keyword);
+            showPreviewKeyword(props.keyword);
+          }}
+        >
+          <span className="mr-2 cursor-pointer">Preview</span>
+          <FaYoutube />
+        </div>
+      </TooltipComponent>
+    );
+  };
+
   return (
     <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
-      {isShowPreviewKw && isClicked.previewKw && (
-        <PreviewKeyword keyword={selectedKeyword} />
+      {isClicked.previewKw && (
+        <PreviewKeyword keywordd={unconventionalKeywordd} />
       )}
       {isLoading ? (
         <div className="loading-container">
@@ -575,29 +643,26 @@ const Keyword2 = () => {
             </div>
           </div>
         </div>
+        {loadingUserChannelKeyword && (
+          <div className="blinking flex w-full items-center justify-center mb-5">
+            <span className="mr-2">Loading your saved Keywords </span>
+            <span className={"animate-spin ml-2"}>
+              <BiLoaderCircle color="#7438FF" size={30} />
+            </span>
+          </div>
+        )}
         <GridComponent
-          // id="gridcomp"
           dataSource={userChannelKeywords}
           allowExcelExport
           allowPdfExport
           allowPaging
           allowSorting
-          // selectionSettings={{ type: "Multiple" }}
-          // toolbar={["Delete"]}
-          // contextMenuItems={contextMenuItems}
-          // editSettings={editing}
-          // rowSelected={handleRowSelected}
-          toolbar={toolbarOptions}
-          editSettings={editSettings}
-          selectionSettings={settings}
-          filterSettings={filterOptions}
         >
           <ColumnsDirective>
-            <ColumnDirective type="checkbox" width="50" />
             <ColumnDirective
               field="keyword"
               headerText="Keywords"
-              template={keywordTemplate}
+              // template={keywordTemplate}
             />
             <ColumnDirective
               field=""
@@ -609,14 +674,12 @@ const Keyword2 = () => {
               field=""
               headerText="Rank"
               headerTemplate={VolumeTitleTemplate}
-              // template={searchVolumeDataRowTemplate}
             />
             <ColumnDirective field="" headerText="Change" />
             <ColumnDirective
               field=""
               headerText="Video Result"
               headerTemplate={VideoIconTitleTemplate}
-              // template={formatViews}
             />
             <ColumnDirective
               field="search_volume"
@@ -626,7 +689,6 @@ const Keyword2 = () => {
             <ColumnDirective
               field="created_at_formatted"
               headerText="Date added"
-              // template={formatViews}
             />
           </ColumnsDirective>
           <Inject

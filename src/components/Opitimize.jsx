@@ -3,7 +3,7 @@ import { useState } from "react";
 import heroImage from "../data/avatar3.png";
 import { FaChevronDown, FaChevronUp, FaYoutube } from "react-icons/fa";
 import { TiDelete } from "react-icons/ti";
-import { BiEdit } from "react-icons/bi";
+import { BiCopy, BiEdit, BiLoaderCircle } from "react-icons/bi";
 import { thingsToFix, itemsFixed } from "../data/optimizeData";
 import { useEffect } from "react";
 import {
@@ -15,10 +15,19 @@ import {
 import Spinner from "./Spinner";
 import { userFullDataDecrypted } from "../data/api/calls";
 import axios from "axios";
-import { FiCamera } from "react-icons/fi";
+import { FiCamera, FiLoader } from "react-icons/fi";
 import { BiSearch } from "react-icons/bi";
-import { AiOutlineCopy, AiOutlineRollback } from "react-icons/ai";
-import { BsFillBookmarkCheckFill, BsBookmark } from "react-icons/bs";
+import {
+  AiFillCheckCircle,
+  AiFillWarning,
+  AiOutlineCopy,
+  AiOutlineRollback,
+} from "react-icons/ai";
+import {
+  BsFillBookmarkCheckFill,
+  BsBookmark,
+  BsFillPlusCircleFill,
+} from "react-icons/bs";
 import showToast from "../utils/toastUtils";
 import {
   GridComponent,
@@ -36,6 +45,10 @@ import {
 } from "@syncfusion/ej2-react-grids";
 import { Tooltip } from "react-tippy";
 import SearchTerm from "./SearchTerm";
+import { useNavigate } from "react-router-dom";
+import { IoPencil } from "react-icons/io5";
+import { MdDeleteSweep } from "react-icons/md";
+import countriesWithLanguages from "../data/countries";
 // const exactKeywordData = useKeywordStore((state) => state.exactKeywordData);
 // const setExactKeywordData = useKeywordStore(
 //   (state) => state.setExactKeywordData,
@@ -43,13 +56,31 @@ import SearchTerm from "./SearchTerm";
 // import Spinner from "../components/Spinner";
 
 function Opitimize({ videoId }) {
+  const initialCountry = {
+    countryCode: "GLB",
+    languageCode: "en",
+  };
+  const [selectedCountry, setSelectedCountry] = useState(initialCountry);
+  // showToast("warning", videoId, 2000)
+  // const navigate = useNavigate();
+
+  // useEffect(() => {
+  //   if (!videoId) {
+  //     showToast('warning', 'No video was selected. Redirecting you now', 2000);
+  //     setTimeout(() => {
+  //       navigate("/optimization");
+  //     }, 2000);
+  //   }
+  // }, [videoId, navigate]);
   const decryptedFullData = userFullDataDecrypted();
   const [isUserDataLoaded, setIsuserDataLoaded] = useState(false);
   const userYoutubeData = useUserYoutubeInfo((state) => state.userYoutubeData);
   const setUserYoutubeData = useUserYoutubeInfo(
     (state) => state.setUserYoutubeData,
   );
-  const showSearchTermPanel = useShowSearchTermPanel((state) => state.showSearchTermPanel);
+  const showSearchTermPanel = useShowSearchTermPanel(
+    (state) => state.showSearchTermPanel,
+  );
   const setShowSearchTermPanel = useShowSearchTermPanel(
     (state) => state.setShowSearchTermPanel,
   );
@@ -66,7 +97,14 @@ function Opitimize({ videoId }) {
       userYoutubeData[0]?.tags !== undefined
         ? String(userYoutubeData[0].tags)
         : "",
-    thumbnail: "",
+    thumbnail:
+      userYoutubeData[0]?.thumbnails.url !== undefined
+        ? String(userYoutubeData[0].thumbnails.url)
+        : "",
+  });
+  const [newTemplateData, setNewTemplateData] = useState({
+    title: "",
+    content: "",
   });
 
   const [selectedFile, setSelectedFile] = useState(null);
@@ -83,6 +121,22 @@ function Opitimize({ videoId }) {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [userSearchTerms, setUserSearchTerms] = useState([]);
   const [isSearchTermFavorite, setIsSearchTermFavorite] = useState(false);
+  const [revertToOriginalPost, setRevertToOriginalPost] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
+  const [addTemplateBox, setAddTemplateBox] = useState(false);
+  const [updatingYtPost, setUpdatingYtPost] = useState(false);
+  const [saveUserTemplateSuccess, setSaveUserTemplateSuccess] = useState(false);
+  const [updateUserTemplate, setUpdateUserTemplate] = useState(false);
+  const [updateUserTemplateSuccess, setUpdateUserTemplateSuccess] =
+    useState(false);
+  const [deleteUserTemplate, setDeleteUserTemplate] = useState(-1);
+  const [deleteUserTemplateSuccess, setDeleteUserTemplateSuccess] =
+    useState(false);
+  const [saveUserTemplatesSuccess, setSaveUserTemplatesSuccess] =
+    useState(false);
+  const [fetchingUserTemplates, setFetchingUserTemplates] = useState(false);
+  const [editUserTemplate, setEditUserTemplate] = useState(-1);
+  const [userChannelTemplates, setUserChannelTemplates] = useState([]);
   const [processedUserSearchTerms, setProcessedUserSearchTerms] = useState([]);
   const userSavedSearchTerm = useUserSavedSearchTerm(
     (state) => state.userSavedSearchTerm,
@@ -100,25 +154,48 @@ function Opitimize({ videoId }) {
     { keyword: "Keyword 3", source: "Source 3", monthlysearch: 800 },
   ];
 
+  let savedSearchTermData;
   useEffect(() => {
+    savedSearchTermData = JSON.parse(
+      localStorage.getItem(`${videoId}searchTermData`),
+    );
+    const savedSearchTerm = JSON.parse(
+      localStorage.getItem(`${videoId}searchTerm`),
+    );
+    setSearchQuery(savedSearchTerm);
+    setProcessedUserSearchTerms(savedSearchTermData);
+    if (!savedSearchTermData) {
+      return null;
+    } else {
+      console.log(
+        "now serving search term from local storage",
+        savedSearchTermData,
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    userSavedSearchTerm ? null : setShowSearchTermPanel(true);
     let isMounted = true;
-    const fetchMyYoutubeVideos = async () => {
+    const fetchMyYoutubeVideo = async () => {
       try {
         axios
-          .get(`http://localhost:8080/api/fetchMyYoutubeVideos`, {
+          .get(`${process.env.REACT_APP_BASE_URL}/fetchMyYoutubeVideo`, {
             params: {
               channel_id: decryptedFullData.channelId,
-              videoIds: videoId,
+              video_id: videoId,
             },
             headers: {
               "Content-Type": "application/json",
-              "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+              "x-api-key": process.env.REACT_APP_X_API_KEY,
               Authorization: `Bearer ${decryptedFullData.token}`,
               gToken: decryptedFullData.gToken,
             },
           })
           .then((response) => {
             if (isMounted) {
+              console.log("setUserYoutubeData", response.data);
+              console.log("videoId", videoId);
               setUserYoutubeData(response.data);
               setIsuserDataLoaded(true);
               console.log(response);
@@ -132,8 +209,8 @@ function Opitimize({ videoId }) {
       }
     };
 
-    fetchMyYoutubeVideos();
-  }, []);
+    fetchMyYoutubeVideo();
+  }, [revertToOriginalPost]);
 
   // Loading searchTerms from localstorage
   useEffect(() => {
@@ -150,14 +227,14 @@ function Opitimize({ videoId }) {
 
         try {
           const response = await axios.get(
-            "http://localhost:8080/api/allBookmarkSearchTerms",
+            `${process.env.REACT_APP_BASE_URL}/allBookmarkSearchTerms`,
             {
               params: {
                 email: decryptedFullData.email,
               },
               headers: {
                 "Content-Type": "application/json",
-                "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+                "x-api-key": process.env.REACT_APP_X_API_KEY,
                 Authorization: `Bearer ${decryptedFullData.token}`,
               },
             },
@@ -205,58 +282,108 @@ function Opitimize({ videoId }) {
     fetchUserKeywords();
   }, [saveSuccess]);
 
+  useEffect(() => {
+    setFetchingUserTemplates(true);
+    const fetchUserTemplates = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_BASE_URL}/getUserTemplate`,
+          {
+            params: {
+              email: decryptedFullData.email,
+            },
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.REACT_APP_X_API_KEY,
+              Authorization: `Bearer ${decryptedFullData.token}`,
+            },
+          },
+        );
+
+        const data = response.data;
+        console.log("data", response);
+        console.log("response", response.data.success === "trueNut");
+        if (response.data.success === "trueNut") {
+          showToast("error", "No saved Templates", 2000);
+          setFetchingUserTemplates(false);
+        } else if (response.data.success == true) {
+          setUserChannelTemplates(data.data);
+          setFetchingUserTemplates(false);
+        } else {
+          showToast(
+            "error",
+            "An error occured with fetching your saved Templates",
+            2000,
+          );
+          setFetchingUserTemplates(false);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        showToast("error", "No saved Templates", 2000);
+        setFetchingUserTemplates(false);
+      }
+    };
+
+    fetchUserTemplates(); // Call the async function
+  }, [
+    saveUserTemplateSuccess,
+    updateUserTemplateSuccess,
+    deleteUserTemplateSuccess,
+  ]);
+
+  const handleCountryChange = (event) => {
+    const selectedValue = event.target.value;
+    const [selectedCountryCode, selectedLanguageCode] =
+      selectedValue.split(":");
+
+    // if (selectedCountryData) {
+    setSelectedCountry({
+      countryCode: selectedCountryCode,
+      languageCode: selectedLanguageCode,
+    });
+    // }
+  };
+
   const handleGetIdeas = async () => {
     if (!searchQuery.trim()) {
+      showToast("warning", "Search box is empty", 2000);
       return;
     }
 
+    const postData = {
+      keyword: searchQuery,
+      countryCode: selectedCountry.countryCode,
+      languageCode: selectedCountry.languageCode,
+    };
+
     try {
-      // setIsLoading(true);
-      // console.log("handleGetIdeas   ", decryptedFullData.token);
+      setIsLoading(true);
+      const response = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/fetchKeywordStat`,
+        postData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
+            Authorization: `Bearer ${decryptedFullData.token}`,
+          },
+        },
+      );
 
-      // const response = await axios.get(
-      //   `http://localhost:8080/api/fetchKeywordStat?keyword=${searchQuery}`,
-      //   {
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
-      //       Authorization: `Bearer ${decryptedFullData.token}`,
-      //     },
-      //   },
-      // );
-
-      // const data = response.data;
-      // console.log("response.data", response.data);
+      const data = response.data;
+      console.log("response.data", response.data);
       setIsLoading(false);
-
-      // const exactKeyword = data.response.exact_keyword[0];
-      // const relatedKeywords = data.response.related_keywords;
-      // const mergedData = relatedKeywords.unshift({
-      //   competition_score: exactKeyword.competition_score,
-      //   difficulty: exactKeyword.difficulty,
-      //   estimated_views: exactKeyword.estimated_views,
-      //   keyword: exactKeyword.keyword,
-      //   monthlysearch: exactKeyword.monthlysearch,
-      //   overallscore: exactKeyword.overallscore,
-      // });
-
-      // console.log('relatedKeywords', relatedKeywords);
-      localStorage.setItem("searchedItems", JSON.stringify(staticData));
-      const updatedArray1 = staticData.map((obj1) => {
-        const matchingObj2 = userSearchTerms.find(
-          (obj2) => obj2.keyword === obj1.keyword,
-        );
-
-        if (matchingObj2) {
-          return { ...obj1, bookmarked: true };
-        }
-        return obj1;
-      });
-
-      setProcessedUserSearchTerms(updatedArray1);
-      console.log("updatedArray1", updatedArray1);
-
-      // console.log(keywordData);
+      const allKeywords = data.response.all;
+      const exactKeyword = data.response.exact_keyword[0];
+      localStorage.setItem(
+        `${videoId}searchTermData`,
+        JSON.stringify(allKeywords),
+      );
+      localStorage.setItem(
+        `${videoId}searchTerm`,
+        JSON.stringify(exactKeyword.string),
+      );
+      setProcessedUserSearchTerms(allKeywords);
     } catch (error) {
       console.error("Error fetching data:", error);
       showToast(
@@ -265,6 +392,12 @@ function Opitimize({ videoId }) {
         5000,
       );
       setIsLoading(false);
+    }
+  };
+
+  const handleGetIdeasOnEnter = (event) => {
+    if (event.key === "Enter") {
+      handleGetIdeas();
     }
   };
 
@@ -280,10 +413,6 @@ function Opitimize({ videoId }) {
       });
   };
 
-  // const bookmarkSearchTerm = (props) => {
-  //   console.log("propssssss", props);
-  // }
-
   const bookmarkSearchTerm = async (props) => {
     // You can make an API call here to save the value
     // For example:
@@ -296,7 +425,7 @@ function Opitimize({ videoId }) {
     //   });
 
     const response = await axios.post(
-      "http://localhost:8080/api/bookmarkSearchTerm",
+      `${process.env.REACT_APP_BASE_URL}/bookmarkSearchTerm`,
       {
         keyword: props.keyword,
         search_volume: props.monthlysearch,
@@ -305,7 +434,7 @@ function Opitimize({ videoId }) {
       {
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
           Authorization: `Bearer ${decryptedFullData.token}`,
         },
       },
@@ -341,28 +470,10 @@ function Opitimize({ videoId }) {
   const toggleSave = async (props, save) => {
     console.log("props", props);
     setProcessingBookmarked(true);
-    // let foundObject;
-    // try {
-    //   if (savedData.exact_keyword[0].keyword === keyword) {
-    //     foundObject = savedData.exact_keyword.find(
-    //       (item) => item.keyword === keyword,
-    //     );
-    //     alert(
-    //       "Yo Bro. I am about to delete the exact Keyword. You sure about this bro?. This shit is irreversible bro. You gotta be sure bro. Click okay if you sure, but think hard bro!!",
-    //     );
-    //   } else {
-    //     foundObject = savedData.related_keywords.find(
-    //       (item) => item.keyword === keyword,
-    //     );
-    //   }
-
-    //   console.log("savedIdeasData", savedIdeasData);
-    //   console.log("foundObject.monthlysearch", foundObject);
-
     if (save) {
       showToast("success", "I WAN SAVE", 2000);
       const response = await axios.post(
-        "http://localhost:8080/api/bookmarkSearchTerm",
+        `${process.env.REACT_APP_BASE_URL}/bookmarkSearchTerm`,
         {
           keyword: props.keyword,
           search_volume: props.monthlysearch,
@@ -371,12 +482,11 @@ function Opitimize({ videoId }) {
         {
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
             Authorization: `Bearer ${decryptedFullData.token}`,
           },
         },
       );
-      // fetchSavedIdeasData()
 
       setProcessingBookmarked(false);
       // console.log("Data saved successfully and response:", foundObject);
@@ -399,11 +509,11 @@ function Opitimize({ videoId }) {
       showToast("success", "I WAN DELETE", 2000);
       try {
         const responseDelete = await axios.delete(
-          `http://localhost:8080/api/deleteSavedIdeaBookmarkSearchTerm`,
+          `${process.env.REACT_APP_BASE_URL}/deleteSavedIdeaBookmarkSearchTerm`,
           {
             headers: {
               "Content-Type": "application/json",
-              "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+              "x-api-key": process.env.REACT_APP_X_API_KEY,
               Authorization: `Bearer ${decryptedFullData.token}`,
             },
             params: {
@@ -413,6 +523,7 @@ function Opitimize({ videoId }) {
         );
         console.log("Data removed successfully", props.keyword);
         if (responseDelete.data.success) {
+          setSaveSuccess(true);
           setUserSearchTerms((prevData) =>
             prevData.filter((d) => d.keyword !== props.keyword),
           );
@@ -439,40 +550,40 @@ function Opitimize({ videoId }) {
     // }
   };
 
-  useEffect(() => {
-    let isMounted = true;
-    const fetchMyYoutubeVideos = async () => {
-      try {
-        axios
-          .get(`http://localhost:8080/api/fetchMyYoutubeVideos`, {
-            params: {
-              channel_id: decryptedFullData.channelId,
-              videoIds: videoId,
-            },
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
-              Authorization: `Bearer ${decryptedFullData.token}`,
-              gToken: decryptedFullData.gToken,
-            },
-          })
-          .then((response) => {
-            if (isMounted) {
-              setUserYoutubeData(response.data);
-              setIsuserDataLoaded(true);
-              console.log(response);
-            }
-          })
-          .catch((error) => {
-            console.error("Error fetching data:", error);
-          });
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  // useEffect(() => {
+  //   let isMounted = true;
+  //   const fetchMyYoutubeVideos = async () => {
+  //     try {
+  //       axios
+  //         .get(`${process.env.REACT_APP_BASE_URL}/fetchMyYoutubeVideos`, {
+  //           params: {
+  //             channel_id: decryptedFullData.channelId,
+  //             videoIds: videoId,
+  //           },
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             "x-api-key": process.env.REACT_APP_X_API_KEY,
+  //             Authorization: `Bearer ${decryptedFullData.token}`,
+  //             gToken: decryptedFullData.gToken,
+  //           },
+  //         })
+  //         .then((response) => {
+  //           if (isMounted) {
+  //             setUserYoutubeData(response.data);
+  //             setIsuserDataLoaded(true);
+  //             console.log(response);
+  //           }
+  //         })
+  //         .catch((error) => {
+  //           console.error("Error fetching data:", error);
+  //         });
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
 
-    fetchMyYoutubeVideos();
-  }, []);
+  //   fetchMyYoutubeVideos();
+  // }, []);
 
   // urban metro -- Island
   // board room -- Mainland
@@ -522,7 +633,8 @@ function Opitimize({ videoId }) {
     validateAndAddToFixed(1, titleLengthOkay, "Invalid title");
 
     // Validation and checks for description
-    const descriptionHasSearchTerm = formData.description.includes(userSavedSearchTerm);
+    const descriptionHasSearchTerm =
+      formData.description.includes(userSavedSearchTerm);
     const descriptionHasUrl = formData.description.match(urlRegex);
     const descriptionHasHashtag = formData.description.match(hashtagRegex);
     const descriptionHasTimestamps = formData.description.match(timestampRegex);
@@ -552,11 +664,59 @@ function Opitimize({ videoId }) {
     setFormData({ ...formData, [name]: value });
   };
 
+  // const handleFileChange = (event) => {
+  //   const file = event.target.files[0];
+  //   setSelectedFile(file);
+  //   setFormData({ ...formData, ["thumbnail"]: file });
+  // };
+
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     setSelectedFile(file);
-    setFormData({ ...formData, ["thumbnail"]: file });
+
+    // Read the image file and convert it to Base64
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64String = e.target.result;
+      setFormData({ ...formData, thumbnail: base64String });
+    };
+
+    if (file) {
+      reader.readAsDataURL(file);
+    }
   };
+
+  // const handleFileChange = (event) => {
+  //   const file = event.target.files[0];
+  //   setSelectedFile(file);
+
+  //   // Read the image file and convert it to Base64
+  //   const reader = new FileReader();
+  //   reader.onload = (e) => {
+  //     const base64String = e.target.result;
+  //     setFormData({ ...formData, thumbnail: base64String });
+
+  //     // Create an image element to get the image dimensions
+  //     const image = new Image();
+  //     image.src = base64String;
+
+  //     // When the image is loaded, get the dimensions
+  //     image.onload = () => {
+  //       const width = image.width;
+  //       const height = image.height;
+  //       // Add the dimensions to the requestData object
+  //       setRequestData((prevData) => ({
+  //         ...prevData,
+  //         videoThumbnailHeight: height,
+  //         videoThumbnailWidth: width,
+  //       }));
+  //     };
+  //   };
+
+  //   if (file) {
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
 
   const handlePostUpdate = async () => {
     if (!selectedFile) {
@@ -583,40 +743,125 @@ function Opitimize({ videoId }) {
     }
   };
 
+  const deleteDraftPost = async () => {
+    try {
+      const responseDelete = await axios.delete(
+        `${process.env.REACT_APP_BASE_URL}/deleteDraftPost`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
+            Authorization: `Bearer ${decryptedFullData.token}`,
+          },
+          params: {
+            video_id: videoId,
+          },
+        },
+      );
+      console.log("Draft removed successfully");
+      if (responseDelete.data.success) {
+        showToast("success", "Draft post removed from Search Terms", 2000);
+      } else {
+        showToast("error", "Draft post wasn't removed. Try again", 2000);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      throw error;
+    }
+  };
+
   const updateUserVideo = async () => {
+    console.log("userYoutubeData", userYoutubeData);
+    setUpdatingYtPost(true);
     const requestData = {
-      videoId: userYoutubeData.videoId,
-      categoryId: userYoutubeData.categoryId,
+      videoId: videoId,
       videoTitle: formData.title,
-      videoDescription: formData.description,
-      videoTags: formData.tags,
-      // videoThumbnailUrl: 'https://example.com/thumbnail.jpg',
-      // videoThumbnailHeight: 120,
-      // videoThumbnailWidth: 160,
     };
+
+    if (
+      userYoutubeData[0].categoryId !== null &&
+      userYoutubeData[0].categoryId !== undefined
+    ) {
+      requestData.categoryId = userYoutubeData[0].categoryId;
+    } else {
+      showToast(
+        "error",
+        "Cannot be updated due to technical issues. Kindly save draft and refresh page",
+        2000,
+      );
+    }
+
+    if (formData.description !== null && formData.description !== undefined) {
+      requestData.videoDescription = formData.description;
+    }
+
+    if (formData.tags !== null && formData.tags !== undefined) {
+      requestData.videoTags = formData.tags;
+    }
+
+    if (/^data:image\/\w+;base64,/.test(formData.thumbnail)) {
+      showToast("success", "GOTTEN", 5000);
+      // If formData.thumbnail is a valid Base64 string
+      requestData.videoThumbnail = formData.thumbnail;
+
+      // Create an image element to get the image dimensions
+      const image = new Image();
+
+      // When the image is loaded, get the dimensions
+      image.onload = () => {
+        const width = image.width;
+        const height = image.height;
+
+        // Add the dimensions to the requestData object
+        requestData.videoThumbnailHeight = height;
+        requestData.videoThumbnailWidth = width;
+
+        showToast("success", width, 5000); // Show the width
+        showToast("success", height, 5000); // Show the height
+        console.log("Width:", width);
+        console.log("Height:", height);
+      };
+
+      // Set the source after the onload handler is defined
+      image.src = formData.thumbnail;
+    }
+
+    console.log("requestData", requestData);
 
     const requestHeaders = {
       "Content-Type": "application/json",
-      "x-api-key": "27403342c95d1d83a40c0a8523803ec1518e2e5!@@+=",
+      "x-api-key": process.env.REACT_APP_X_API_KEY,
       Authorization: `Bearer ${decryptedFullData.token}`,
       gToken: decryptedFullData.gToken,
     };
 
     try {
       axios
-        .put(`http://localhost:8080/api/updateMyYoutubeVideos`, requestData, {
-          headers: requestHeaders,
-        })
+        .put(
+          `${process.env.REACT_APP_BASE_URL}/updateMyYoutubeVideos`,
+          requestData,
+          {
+            headers: requestHeaders,
+          },
+        )
         .then((response) => {
-          if (isMounted) {
-            console.log("Success:", response.data);
+          console.log("updateMyYoutubeVideos response", response);
+          if (response.data.status === "success") {
+            deleteDraftPost();
+            showToast("success", "Post updated successfully", 2000);
+            setUpdatingYtPost(false);
+          } else {
+            showToast("error", "Post updating failed", 2000);
+            setUpdatingYtPost(false);
           }
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
+          setUpdatingYtPost(false);
         });
     } catch (error) {
       console.error("Error fetching data:", error);
+      setUpdatingYtPost(false);
     }
   };
 
@@ -791,6 +1036,40 @@ function Opitimize({ videoId }) {
     );
   };
 
+  const saveDraftPost = async () => {
+    setSavingDraft(true);
+    console.log("formData", formData);
+    console.log("searchTerm", userSavedSearchTerm);
+    console.log("userYoutubeData.videoId", videoId);
+    console.log("formData.thumbnail", formData.thumbnail);
+    const response = await axios.post(
+      `${process.env.REACT_APP_BASE_URL}/saveDraftPost`,
+      {
+        video_id: videoId,
+        search_term: userSavedSearchTerm,
+        video_title: formData.title,
+        video_description: formData.description,
+        video_tags: formData.tags,
+        video_thumbnail: formData.thumbnail,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+          Authorization: `Bearer ${decryptedFullData.token}`,
+        },
+      },
+    );
+
+    console.log("response", response);
+    if (response.data.success) {
+      showToast("success", "post saved successfully", 2000);
+      setSavingDraft(false);
+    } else {
+      showToast("error", "post wasn't saved. Try again", 2000);
+    }
+  };
+
   // const handleTagRemove = (tag) => {
   //   const updatedTags = formData.tags
   //     .split(',')
@@ -812,7 +1091,7 @@ function Opitimize({ videoId }) {
   const maxDescriptionCharacters = 5000;
   const maxTagsCharacters = 500;
 
-  // ?VIEWS
+  // VIEWS SECTION
   const handleViewChange = (viewName) => {
     setActiveView(viewName);
   };
@@ -902,10 +1181,12 @@ function Opitimize({ videoId }) {
                 {fixedState[index] && (
                   <div className="p-3 text-sm">
                     <p
-                      dangerouslySetInnerHTML={{ __html: String(section.content).replace(
-                        "search_term",
-                        userSavedSearchTerm,
-                      ) }}
+                      dangerouslySetInnerHTML={{
+                        __html: String(section.content).replace(
+                          "search_term",
+                          userSavedSearchTerm,
+                        ),
+                      }}
                     ></p>
                     <div className="text-sm text-gray-500">
                       <div className="text-left flex items-center justify-between focus:outline-none border-b pb-3">
@@ -936,7 +1217,7 @@ function Opitimize({ videoId }) {
   };
 
   const [isOpen1, setIsOpen1] = useState(false);
-  const [isOpen2, setIsOpen2] = useState(false);
+  const [isOpen2, setIsOpen2] = useState(true);
 
   const toggleAccordion1 = () => {
     setIsOpen1(!isOpen1);
@@ -1054,6 +1335,7 @@ function Opitimize({ videoId }) {
                                 className="flex-grow bg-transparent outline-none pr-2 text-xs"
                                 value={searchQuery}
                                 onChange={handleSearchChange}
+                                onKeyDown={handleGetIdeasOnEnter}
                               />
                               <BiSearch
                                 className="text-gray-500 text-lg cursor-pointer"
@@ -1063,16 +1345,38 @@ function Opitimize({ videoId }) {
                           </div>
 
                           <div className="relative ml-4 w-2/6">
-                            <select className="rounded-full py-2 pl-4 border border-gray-300 bg-white text-xs">
-                              <option value="en">Global (English)</option>
-                              <option value="es">Español </option>
-                              <option value="fr">Français</option>
-                              <option value="de">Deutsch</option>
+                            <select
+                              id="countrySelect"
+                              className="rounded-full py-2 pl-4 pr-8 border border-gray-300 bg-white text-xs"
+                              value={`${selectedCountry.countryCode}:${selectedCountry.languageCode}`}
+                              onChange={handleCountryChange}
+                            >
+                              {countriesWithLanguages.map((item, index) => (
+                                <option
+                                  key={index}
+                                  value={`${item.countryCode}:${item.languageCode}`}
+                                >
+                                  {`${item.country} (${item.language})`}
+                                </option>
+                              ))}
                             </select>
                           </div>
                         </div>
                         <br />
-
+                        <div>
+                          {isLoading ? (
+                            <div className="flex flex-col justify-center items-center w-full mt-20">
+                              <BiLoaderCircle
+                                className="animate-spin text-center"
+                                color="#7352FF"
+                                size={30}
+                              />
+                              <div>Gathering Insights for your Keyword.</div>
+                            </div>
+                          ) : (
+                            <div className=""></div>
+                          )}
+                        </div>
                         <GridComponent
                           // id="gridcomp"
                           dataSource={processedUserSearchTerms}
@@ -1115,16 +1419,6 @@ function Opitimize({ videoId }) {
                             ]}
                           />
                         </GridComponent>
-
-                        <div>
-                          {isLoading ? (
-                            <div className="loading-container">
-                              <Spinner />
-                            </div>
-                          ) : (
-                            <div className=""></div>
-                          )}
-                        </div>
                       </div>
                       <div className="text-sm text-gray-500">
                         <div className="text-left flex items-center justify-between focus:outline-none border-b pb-3"></div>
@@ -1133,6 +1427,360 @@ function Opitimize({ videoId }) {
                   )}
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const handleTemplateTitleChange = (index, value) => {
+    const updatedTemplates = [...userChannelTemplates];
+    updatedTemplates[index].title = value;
+    setUserChannelTemplates(updatedTemplates);
+  };
+
+  const handleTemplateContentChange = (index, value) => {
+    const updatedTemplates = [...userChannelTemplates];
+    updatedTemplates[index].content = value;
+    setUserChannelTemplates(updatedTemplates);
+  };
+
+  const handleNewTemplateChange = (e) => {
+    const { name, value } = e.target;
+    setNewTemplateData({ ...newTemplateData, [name]: value });
+  };
+
+  const clearNewTemplateData = () => {
+    setNewTemplateData({
+      title: "",
+      content: "",
+    });
+  };
+
+  const addNewUserTemplate = async () => {
+    setSaveUserTemplateSuccess(true);
+    if (newTemplateData.title === "" || newTemplateData.content === "") {
+      console.log("Template is empty. Please provide a Template.");
+      showToast("error", "Template title and content must not be empty", 2000);
+      return;
+    }
+    showToast("success", `newTemplateData ${newTemplateData.title}`, 2000);
+    console.log("newTemplateData", newTemplateData);
+
+    // setIsAddKeyword(false);
+
+    try {
+      const saveUserTemplateResponse = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/saveUserTemplate`,
+        {
+          title: newTemplateData.title,
+          content: newTemplateData.content,
+          email: decryptedFullData.email,
+          user_id: decryptedFullData.user_id,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
+            Authorization: `Bearer ${decryptedFullData.token}`,
+          },
+        },
+      );
+
+      console.log("API response:", saveUserTemplateResponse.data);
+      if (saveUserTemplateResponse.data.success) {
+        setSaveUserTemplateSuccess(false);
+        setAddTemplateBox(false);
+        showToast("success", "Template saved successfully", 2000);
+      }
+    } catch (error) {
+      setSaveUserTemplateSuccess(false);
+      console.error("Error while making API call:", error);
+      showToast(
+        "error",
+        "could not add keyword. Please try again. Dont refresh so information isn't lost",
+        5000,
+      );
+    }
+
+    // setUserKeyword(""); // Clear the userKeyword after successful submission
+  };
+
+  const updateUserTemplateFunc = async (index) => {
+    setUpdateUserTemplate(true);
+    if (
+      userChannelTemplates[index].title === "" ||
+      userChannelTemplates[index].content === ""
+    ) {
+      console.log("Template is empty. Please provide a Template.");
+      showToast("error", "Template title and content must not be empty", 2000);
+      return;
+    }
+    showToast(
+      "success",
+      `newTemplateData ${userChannelTemplates[index].title}`,
+      2000,
+    );
+    console.log("userChannelTemplates[index]", userChannelTemplates[index]);
+
+    try {
+      const templateId = userChannelTemplates[index].id;
+      const updateUserTemplateResponse = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/updateUserTemplate`,
+        {
+          title: userChannelTemplates[index].title,
+          content: userChannelTemplates[index].content,
+          email: decryptedFullData.email,
+          template_id: templateId,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
+            Authorization: `Bearer ${decryptedFullData.token}`,
+          },
+        },
+      );
+
+      console.log("API response:", updateUserTemplateResponse.data);
+
+      if (updateUserTemplateResponse.data.success) {
+        setUpdateUserTemplate(false);
+        setUpdateUserTemplateSuccess(true);
+        setEditUserTemplate(-1);
+        setAddTemplateBox(false);
+        showToast("success", "Template updated successfully", 2000);
+      }
+    } catch (error) {
+      setUpdateUserTemplate(false);
+      console.error("Error while making API call:", error);
+      showToast(
+        "error",
+        "Could not update Template. Please try again. Don't refresh so information isn't lost",
+        5000,
+      );
+    }
+  };
+
+  const deleteUserTemplateFunc = async (index) => {
+    setDeleteUserTemplate(index);
+
+    const templateId = userChannelTemplates[index].id;
+
+    try {
+      const deleteUserTemplateResponse = await axios.post(
+        `process.env.REACT_APP_BASE_URL}/deleteUserTemplate`,
+        {
+          email: decryptedFullData.email,
+          template_id: templateId,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
+            Authorization: `Bearer ${decryptedFullData.token}`,
+          },
+        },
+      );
+
+      console.log("API response:", deleteUserTemplateResponse.data);
+
+      if (deleteUserTemplateResponse.data.success) {
+        setDeleteUserTemplate(-1);
+        setDeleteUserTemplateSuccess(true);
+        showToast("success", "Template deleted successfully", 2000);
+      }
+    } catch (error) {
+      setDeleteUserTemplate(-1);
+      console.error("Error while making API call:", error);
+      showToast(
+        "error",
+        "Could not delete Template. Please try again. Don't refresh so information isn't lost",
+        5000,
+      );
+    }
+  };
+
+  const TemplatesView = () => {
+    return (
+      <div className="w-1/2 h-full overflow-y-auto p-4">
+        <div className="p-4">
+          <div className="flex flex-col items-center justify-center h-full mb-5">
+            <div className="p-4 w-full">
+              <div className="mb-4 flex items-center justify-between">
+                <span>Template</span>
+                {addTemplateBox === false && (
+                  <button
+                    onClick={() => {
+                      clearNewTemplateData();
+                      setAddTemplateBox(true);
+                    }}
+                    style={{ border: "#7438FF 1px solid" }}
+                    className="text-md py-2 px-5 rounded ml-10 mr-3 flex items-center"
+                  >
+                    <BsFillPlusCircleFill
+                      color="#7438FF"
+                      className="mr-2"
+                      size={20}
+                    />{" "}
+                    New Template
+                  </button>
+                )}
+              </div>
+              {addTemplateBox === true && (
+                <div className="new_template bg-white mt-5 border border-gray-300 py-5 px-4 rounded-md">
+                  <div className="mb-4 flex items-center justify-between">
+                    <span> New Template</span>
+                    <div className="flex gap-1 items-center">
+                      <span
+                        className="cursor-pointer"
+                        style={{ color: "#7438FF" }}
+                        onClick={() => setAddTemplateBox(false)}
+                      >
+                        CANCEL
+                      </span>
+                      <button
+                        onClick={() => {
+                          showToast("message", newTemplateData.title, 2000);
+                        }}
+                        style={{ backgroundColor: "#7438FF" }}
+                        className="text-md text-white py-2 px-5 rounded ml-10 mr-3"
+                      >
+                        {/* <span className="flex items-center" onClick={addNewUserTemplate}>Save <AiFillCheckCircle color="white" className="ml-2"/> {saveUserTemplateSuccess === false && <FiLoader/>}</span> */}
+                        <span
+                          className={`flex items-center`}
+                          onClick={addNewUserTemplate}
+                        >
+                          Save{" "}
+                          <AiFillCheckCircle color="white" className="ml-2" />
+                          {saveUserTemplateSuccess && (
+                            <span className={"animate-spin ml-2"}>
+                              <BiLoaderCircle color="white" size={20} />
+                            </span>
+                          )}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                  <input
+                    type="text"
+                    className="border-b border-gray-300 outline-none focus:border-purple-600 w-full py-1 mb-8"
+                    placeholder="Add title for your template"
+                    name="title"
+                    value={newTemplateData.title}
+                    onChange={handleNewTemplateChange}
+                  />
+                  <textarea
+                    className="border-b border-gray-300 outline-none focus:border-purple-600 w-full py-1"
+                    placeholder="Add template content here"
+                    rows="5"
+                    name="content"
+                    value={newTemplateData.content}
+                    onChange={handleNewTemplateChange}
+                  />
+                </div>
+              )}
+              {fetchingUserTemplates ? (
+                <div className="w-full flex justify-center">
+                  <BiLoaderCircle
+                    className="animate-spin"
+                    color="#7438FF"
+                    size={30}
+                  />
+                </div>
+              ) : userChannelTemplates.length >= 1 ? (
+                userChannelTemplates.map((item, index) => (
+                  <div key={index}>
+                    {editUserTemplate === index ? (
+                      <div className="edit_template bg-white mt-5 border border-gray-300 py-5 px-4 rounded-md">
+                        <div className="mb-4 flex items-center justify-between">
+                          <span>Edit Template</span>
+                          <div className="flex gap-1 items-center">
+                            <span style={{ color: "#7438FF" }}>CANCEL</span>
+                            <button
+                              onClick={updateUserTemplate}
+                              style={{ backgroundColor: "#7438FF" }}
+                              className="text-md text-white py-2 px-5 rounded ml-10 mr-3"
+                            >
+                              <span
+                                className={`flex items-center`}
+                                onClick={() => updateUserTemplateFunc(index)}
+                              >
+                                Save{" "}
+                                <AiFillCheckCircle
+                                  color="white"
+                                  className="ml-2"
+                                />
+                                {updateUserTemplate && (
+                                  <span className={"animate-spin ml-2"}>
+                                    <BiLoaderCircle color="white" size={20} />
+                                  </span>
+                                )}
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                        <input
+                          type="text"
+                          className="border-b border-gray-300 outline-none focus:border-purple-600 w-full py-1 mb-8"
+                          placeholder="Add title for your template"
+                          value={item.title}
+                          onChange={(e) =>
+                            handleTemplateTitleChange(index, e.target.value)
+                          }
+                        />
+                        <textarea
+                          className="border-b border-gray-300 outline-none focus-border-purple-600 w-full py-1"
+                          placeholder="Add template content here"
+                          rows="5"
+                          value={item.content}
+                          onChange={(e) =>
+                            handleTemplateContentChange(index, e.target.value)
+                          }
+                        />
+                      </div>
+                    ) : (
+                      <div className="saved_template bg-white mt-5 border border-gray-300 py-5 px-4 rounded-md">
+                        <div className="mt-2 mb-4 flex items-center justify-between">
+                          <span>{item.title}</span>
+                          <span className="flex items-center mr-3">
+                            {deleteUserTemplate === index ? (
+                              <span className="animate-spin ml-2">
+                                <BiLoaderCircle color="#7438FF" size={20} />
+                              </span>
+                            ) : (
+                              <MdDeleteSweep
+                                onClick={() => deleteUserTemplateFunc(index)}
+                                color="#7438FF"
+                                size={25}
+                                className="cursor-pointer"
+                              />
+                            )}
+                            <IoPencil
+                              onClick={() => setEditUserTemplate(index)}
+                              color="#7438FF"
+                              className="ml-2"
+                              size={25}
+                            />
+                          </span>
+                        </div>
+                        <hr />
+                        <div className="mt-2 mb-4 flex items-center justify-between">
+                          <span>{item.content}</span>
+                          <span className="flex items-center mr-3">
+                            <BiCopy color="#7438FF" size={25} />
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="w-full flex justify-center">
+                  You have no Templates. Add one
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1160,19 +1808,52 @@ function Opitimize({ videoId }) {
           <div className="underline">{userYoutubeData[0]?.title}</div>
           <span
             className="ml-3 text-xs px-5 py-1 rounded-lg text-white"
-            style={{ backgroundColor: "#7438FF" }}
+            style={{ backgroundColor: "#9D88FF" }}
           >
             Draft
+          </span>
+          <span
+            className="ml-3 text-xs px-5 py-1 rounded-lg text-white cursor-pointer"
+            style={{ backgroundColor: "#7438FF" }}
+            onClick={() => setRevertToOriginalPost(!revertToOriginalPost)}
+          >
+            Revert to original
           </span>
         </div>
         <div className="w-1/2 flex justify-end items-center">
           <button
+            onClick={saveDraftPost}
+            style={{ backgroundColor: "#7438FF" }}
+            className="text-md text-white py-2 px-5 rounded mr-3"
+          >
+            Save to Draft
+          </button>
+          {savingDraft ? (
+            <BiLoaderCircle
+              className="animate-spin"
+              color="#7438FF"
+              size={20}
+            />
+          ) : (
+            ""
+          )}
+
+          <button
             onClick={updateUserVideo}
             style={{ backgroundColor: "#7438FF" }}
-            className="text-md text-white py-2 px-5 rounded"
+            className="text-md text-white py-2 px-5 rounded ml-10 mr-3"
           >
             Update on Youtube
           </button>
+          {updatingYtPost ? (
+            <BiLoaderCircle
+              className="animate-spin"
+              color="#7438FF"
+              size={20}
+            />
+          ) : (
+            ""
+          )}
         </div>
       </div>
       <div className="flex pl-5 pb-5 border-b border-t pt-5">
@@ -1205,9 +1886,10 @@ function Opitimize({ videoId }) {
                 animation="fade"
                 theme="translucent"
               >
-                <BiEdit
+                <AiFillWarning
                   className="ml-3"
-                  color="#7352FF"
+                  color="#F49C0E"
+                  size={20}
                   onClick={() => setShowSearchTermPanel(true)}
                 />
               </Tooltip>
@@ -1223,7 +1905,7 @@ function Opitimize({ videoId }) {
           >
             Things to fix
           </button>
-          <button className="text-center px-7 h-full">AI</button>
+          {/* <button className="text-center px-7 h-full">AI</button> */}
           <button
             className={`text-center px-7 h-full ${
               activeView === "KeywordsView" && "chosenView"
@@ -1232,11 +1914,18 @@ function Opitimize({ videoId }) {
           >
             Keywords
           </button>
-          <button className="text-center px-7 h-full">Templates</button>
+          <button
+            className={`text-center px-7 h-full ${
+              activeView === "TemplatesView" && "chosenView"
+            }`}
+            onClick={() => handleViewChange("TemplatesView")}
+          >
+            Templates
+          </button>
         </div>
       </div>
       {showSearchTermPanel ? (
-        <SearchTerm />
+        <SearchTerm videoId={videoId} />
       ) : (
         <div className="flex h-screen">
           <div className="w-1/2 h-full overflow-y-auto p-4 pr-8 mt-7">
@@ -1315,14 +2004,14 @@ function Opitimize({ videoId }) {
                   alt="Video Thumbnail"
                 />
               </div>
-              <div class="relative px-5 py-2 border-2 w-2/4 border-gray-400 rounded-md">
-                <label class="cursor-pointer flex items-center">
+              <div className="relative px-5 py-2 border-2 w-2/4 border-gray-400 rounded-md">
+                <label className="cursor-pointer flex items-center">
                   <FiCamera className="camera-icon mr-3" />
                   Update your thumbnail
                   <input
                     type="file"
                     accept="image/*"
-                    class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
+                    className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
                     onChange={handleFileChange}
                   />
                 </label>
@@ -1331,6 +2020,7 @@ function Opitimize({ videoId }) {
           </div>
           {activeView === "thingsToFix" && ThingsToFixView()}
           {activeView === "KeywordsView" && KeywordsView()}
+          {activeView === "TemplatesView" && TemplatesView()}
         </div>
       )}
     </div>

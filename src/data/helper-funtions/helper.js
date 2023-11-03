@@ -1,7 +1,7 @@
 /* eslint-disable */
 
 const decryptAndRetrieveData = (data) => {
-  const secretKey = "+)()^77---<@#$>";
+  const secretKey = process.env.REACT_APP_JWT_SECRET;
 
   if (data) {
     const decryptedBytes = CryptoJS.AES.decrypt(data, secretKey);

@@ -13,29 +13,11 @@ import { FiSettings } from "react-icons/fi";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import "tippy.js/dist/tippy.css"; // Import Tippy.js CSS
-import "tippy.js/themes/translucent.css"; // Import a Tippy.js theme (optional)
+import "tippy.js/dist/tippy.css";
+import "tippy.js/themes/translucent.css";
 import "react-tippy/dist/tippy.css";
 
 import { Navbar, Footer, Sidebar, ThemeSettings } from "./components";
-import {
-  Ecommerce,
-  Orders,
-  Calendar,
-  Employees,
-  Stacked,
-  Pyramid,
-  Customers,
-  Kanban,
-  Line,
-  Area,
-  Bar,
-  Pie,
-  Financial,
-  ColorPicker,
-  ColorMapping,
-  Editor,
-} from "./pages";
 import Ideation from "./pages/Ideation3";
 import Optimization from "./pages/Optimization";
 import Reporting from "./pages/Reporting";
@@ -51,17 +33,20 @@ import SignUpPage from "./pages/UserAuth/SignUpPage";
 import Opitimize from "./components/Opitimize";
 import SearchTerm from "./components/SearchTerm";
 import Tests from "./components/Tests";
+import IdeasCategoryView from "./components/IdeasCategoryView";
 
 import { useStateContext } from "./contexts/ContextProvider";
 import Home from "./pages/Home";
 import { gapi } from "gapi-script";
 import Auth from "./components/Auth";
+import Insights from "./pages/keywords/Insights";
+import Competition from "./pages/keywords/Competition";
 const client_id =
   "372673946018-lu1u3llu6tqi6hmv8m2226ri9qev8bb8.apps.googleusercontent.com";
 const apiKey = "AIzaSyBhnxmlAowrcFI7owW40YrsqI3xPVVk0IU";
 
 const App = () => {
-  const { fetchSavedIdeasData } = useSavedIdeasData();
+  // const { fetchSavedIdeasData } = useSavedIdeasData();
 
   const {
     setCurrentColor,
@@ -72,8 +57,9 @@ const App = () => {
     themeSettings,
     setThemeSettings,
   } = useStateContext();
-  const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
-  const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
+  // const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
+  // const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
+  const userLoggedIn = localStorage.getItem("userLoggedin");
 
   function ProtectedRoute() {
     return userLoggedIn ? <Outlet /> : <Navigate to="/" />;
@@ -103,11 +89,12 @@ const App = () => {
 
         {/* User-Specific Routes */}
         <Route path="/savedideas" element={<SavedIdeas />} />
-        <Route path="/ecommerce" element={<Ecommerce />} />
-        <Route path="/pie" element={<Pie />} />
         <Route path="/keywords" element={<Keywords />} />
         <Route path="/rankings" element={<Rankings />} />
         <Route path="/searchterm" element={<SearchTerm />} />
+        <Route path="/ideascategory" element={<IdeasCategoryView />} />
+        <Route path="/competition" element={<Competition />} />
+        <Route path="/insights" element={<Insights />} />
         <Route path="/tests" element={<Tests />} />
 
         {/* User Registration */}
@@ -121,8 +108,6 @@ const App = () => {
   }
   useEffect(() => {
     // console.log("R--------------------", process.env.REACT_APP_YOUTUBE_API_KEY);
-
-    fetchSavedIdeasData();
     const currentThemeColor = localStorage.getItem("colorMode");
     const currentThemeMode = localStorage.getItem("themeMode");
     if (currentThemeColor && currentThemeMode) {
@@ -182,15 +167,18 @@ const App = () => {
               </button>
             </TooltipComponent>
           </div>
-          {userLoggedIn ? (
-            <div className="fixed sidebar dark:bg-secondary-dark-bg bg-white ">
-              <Sidebar />
-            </div>
-          ) : (
-            <div className="w-0 dark:bg-secondary-dark-bg">
-              <Sidebar />
-            </div>
-          )}
+          {
+            userLoggedIn && (
+              <div className="fixed sidebar dark:bg-secondary-dark-bg bg-white ">
+                <Sidebar />
+              </div>
+            )
+            // : (
+            //   <div className="w-0 dark:bg-secondary-dark-bg">
+            //     <Sidebar />
+            //   </div>
+            // )
+          }
           <div
             className={
               userLoggedIn
