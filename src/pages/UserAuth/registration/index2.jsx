@@ -9,12 +9,15 @@ import showToast from "../../../utils/toastUtils";
 import { useNavigate } from "react-router-dom";
 import {
   useAllUserDeets,
+  useUserAccessLevel,
   useUserAuthToken,
+  useUserLoggedin,
   // useUserLoggedin,
 } from "../../../state/state";
 import { useStateContext } from "../../../contexts/ContextProvider";
 import CryptoJS from "crypto-js";
 import { userFullDataDecrypted } from "../../../data/api/calls";
+import countriesWithLanguages from "../../../data/countries";
 
 const RegistrationForm = () => {
   const navigate = useNavigate();
@@ -34,7 +37,10 @@ const RegistrationForm = () => {
   });
 
   const [selectedFormData, setSelectedFormData] = useState(null);
-
+  const accessLevel = useUserAccessLevel((state) => state.accessLevel);
+  const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
+  const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
+  const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
   const [suggestedChannels, setSuggestedChannels] = useState([]);
   const [showChannel, setShowChannel] = useState(false);
   const [channels, setChannels] = useState([]);
@@ -47,19 +53,24 @@ const RegistrationForm = () => {
   const setUserAuthToken = useUserAuthToken((state) => state.setUserAuthToken);
   const allUserDeets = useAllUserDeets((state) => state.allUserDeets);
   const setAllUserDeets = useAllUserDeets((state) => state.setAllUserDeets);
-  const secretKey = process.env.REACT_APP_JWT_SECRET;
+  const secretKey = "+)()^77---<@#$>";
   const decryptedFullData = userFullDataDecrypted();
   console.log("decryptedFullDataaaaaa", decryptedFullData);
+  const initialCountry = {
+    countryCode: "GLB",
+    languageCode: "en",
+  };
+  const [selectedCountry, setSelectedCountry] = useState(initialCountry);
 
   useEffect(() => {
     const fetchChannel = () => {
       setIsLoading(true);
       axios
-        .get(`${process.env.REACT_APP_BASE_URL}/getMyChannels`, {
+        .get(`${process.env.REACT_APP_API_BASE_URL}/getMyChannels`, {
           headers: {
             "Content-Type": "application/json",
             "x-api-key": process.env.REACT_APP_X_API_KEY,
-            Authorization: `Bearer ${decryptedFullData.gToken}`,
+            gToken: decryptedFullData.gToken,
           },
         })
         .then((response) => {
@@ -121,19 +132,6 @@ const RegistrationForm = () => {
   };
 
   const saveUserToken = async (token) => {
-    // store the whole data to local storage and redirect
-    // const userFullData = {
-    //   token: token,
-    //   channel_id: selectedChannel.id,
-    //   business_email: user.externalAccounts[0].emailAddress,
-    //   channelFirstName: user.firstName,
-    //   channelLastName: user.lastName,
-    //   channelFullName: user.fullName,
-    //   channel_image_link: selectedChannel.image,
-    //   description: selectedChannel.description,
-    //   channel_title: selectedChannel.title,
-    //   user_id: user.id,
-    // };
     const updatedGUserData = {
       ...decryptedFullData,
       token,
@@ -147,7 +145,7 @@ const RegistrationForm = () => {
 
     await axios
       .post(
-        `${process.env.REACT_APP_BASE_URL}/saveUserToken`,
+        `${process.env.REACT_APP_API_BASE_URL}/saveUserToken`,
         {
           encryptedFullData,
         },
@@ -180,6 +178,22 @@ const RegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const userRecordId = localStorage.getItem("userRecordId");
+
+    if (!userRecordId || userRecordId.trim() === "") {
+      showToast("error", "Error occurred. Kindly login again", 5000);
+  
+      // Redirect to sign-in after 2 seconds
+      setTimeout(() => {
+        setAccessLevel("");
+        setUserLoggedIn(false);
+        localStorage.clear();
+        navigate("/sign-in");
+      }, 2000);
+  
+      return; // Stop further execution
+    }
+
     // Extract relevant user data
     const userFirstName = decryptedFullData.firstName;
     const userLastName = decryptedFullData.lastName;
@@ -194,13 +208,14 @@ const RegistrationForm = () => {
       ...formData,
       channel_id: selectedChannel.id,
       business_email: businessEmail,
-      fullName: `${formData.firstName} ${formData.lastName}`,
+      fullName: `${userFirstName} ${userLastName}`,
       channelFirstName: userFirstName,
       channelLastName: userLastName,
       channelFullName: userFullName,
       channel_image_link: channel_image_link,
       description: description,
       user_id,
+      userRecordId,
     };
 
     console.log("updatedFormData", updatedFormData);
@@ -208,7 +223,7 @@ const RegistrationForm = () => {
     try {
       // Send updated form data to the server
       const response = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/saveUserYoutubeInfo`,
+        `${process.env.REACT_APP_API_BASE_URL}/saveUserYoutubeInfo`,
         updatedFormData,
         {
           headers: {
@@ -218,12 +233,15 @@ const RegistrationForm = () => {
         },
       );
 
-      console.log("Channel details stored successfully", response.data.token);
-      const token = response.data.token;
-
-      setTimeout(() => {
-        saveUserToken(token);
-      }, 2000);
+      if (response.data.success){
+        localStorage.setItem("accessLevel", "L2")
+        setAccessLevel("L2")
+        console.log("Channel details stored successfully", response.data.token);
+        const token = response.data.token;
+        setTimeout(() => {
+          saveUserToken(token);
+        }, 2000);
+      }
     } catch (error) {
       console.error("-----------------------", error.response.data.message);
       showToast("error", "Error saving channel. Try again", 5000);
@@ -240,14 +258,41 @@ const RegistrationForm = () => {
     window.location.href = "http://localhost:3000/";
   }
 
+    const renderCapsules = () => {
+    if (formData.keywords) {
+      const keywordsArray = formData.keywords.split(',').map(keyword => keyword.trim());
+
+      return keywordsArray.map((keyword, index) => (
+        <div key={index} className="inline-block bg-gray-200 text-gray-700 rounded-full px-2 py-1 m-1">
+          {keyword}
+        </div>
+      ));
+    }
+  }
+
+  const handleCountryChange = (event) => {
+    const selectedValue = event.target.value;
+    const [selectedCountryCode, selectedLanguageCode] =
+      selectedValue.split(":");
+
+    // if (selectedCountryData) {
+    setSelectedCountry({
+      countryCode: selectedCountryCode,
+      languageCode: selectedLanguageCode,
+    });
+    // }
+  };
+
+
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 ">
       <div className="bg-white shadow-lg rounded p-8 w-96 m-10">
-        <h2 className="text-2xl font-semibold mb-4">
-          Let's Get Your Channel Details
+        <h2 className="text-2xl font-semibold mb-8 text-center">
+          Let's get some of your Channel Details
         </h2>
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <label
               htmlFor="firstName"
               className="block text-sm font-medium text-gray-700"
@@ -280,7 +325,7 @@ const RegistrationForm = () => {
               className="mt-1 p-2 border rounded w-full"
               placeholder="Please enter your Last Name"
             />
-          </div>
+          </div> */}
           <div className="mb-4">
             <label
               htmlFor="channel_name"
@@ -358,44 +403,50 @@ const RegistrationForm = () => {
               <div className=""></div>
             )}
           </div>
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <label
               htmlFor="channel_language"
               className="block text-sm font-medium text-gray-700"
             >
               Channel Language
             </label>
-            <select
-              id="channel_language"
-              name="channel_language"
-              value={formData.channel_language}
-              onChange={handleChange}
-              className="mt-1 p-2 border rounded w-full"
+              <select
+              id="countrySelect"
+              className="rounded-full py-2 pl-4 pr-8 border border-gray-300 bg-white text-xs"
+              value={`${selectedCountry.countryCode}:${selectedCountry.languageCode}`}
+              onChange={handleCountryChange}
             >
-              <option value="">Select a language</option>
-              <option value="en">English</option>
-              <option value="es">Spanish</option>
-              <option value="fr">French</option>
-              {/* Add more language options */}
+              {countriesWithLanguages.map((item, index) => (
+                <option
+                  key={index}
+                  value={`${item.countryCode}:${item.languageCode}`}
+                >
+                  {`${item.country} (${item.language})`}
+                </option>
+              ))}
             </select>
-          </div>
+          </div> */}
           <div className="mb-4">
-            <label
-              htmlFor="keywords"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Channel Keywords (optional)
-            </label>
-            <input
-              type="text"
-              id="keywords"
-              name="keywords"
-              value={formData.keywords}
-              onChange={handleChange}
-              className="mt-1 p-2 border rounded w-full"
-              placeholder="keywords your channel focuses on"
-            />
+          <label
+            htmlFor="keywords"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Channel Keywords (optional)
+          </label>
+          <input
+            type="text"
+            id="keywords"
+            name="keywords"
+            value={formData.keywords}
+            onChange={handleChange}
+            className="mt-1 p-2 border rounded w-full"
+            placeholder="keywords your channel focuses on"
+          />
+          <div className="mt-2">
+            {/* Render the capsules */}
+            {renderCapsules()}
           </div>
+        </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">
               <input
@@ -413,7 +464,7 @@ const RegistrationForm = () => {
             style={{ backgroundColor: "#7352FF" }}
             className="w-full text-white p-2 rounded"
           >
-            Register
+            Connect Channel
           </button>
         </form>
       </div>

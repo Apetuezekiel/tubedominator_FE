@@ -106,7 +106,7 @@ const Keyword2 = () => {
     const fetchUserKeywords = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_BASE_URL}/getUserKeyword`,
+          `${process.env.REACT_APP_API_BASE_URL}/getUserKeyword`,
           {
             params: {
               email: decryptedFullData.email,
@@ -158,7 +158,7 @@ const Keyword2 = () => {
 
       if (save) {
         await axios.post(
-          `${process.env.REACT_APP_BASE_URL}/addToSavedIdeas`,
+          `${process.env.REACT_APP_API_BASE_URL}/addToSavedIdeas`,
           {
             video_ideas: foundObject.keyword,
             search_volume: foundObject.monthlysearch,
@@ -177,7 +177,7 @@ const Keyword2 = () => {
       } else {
         try {
           const response = await axios.get(
-            `${process.env.REACT_APP_BASE_URL}/getAllSavedIdeas`,
+            `${process.env.REACT_APP_API_BASE_URL}/getAllSavedIdeas?email=${decryptedFullData.email}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -191,7 +191,7 @@ const Keyword2 = () => {
           );
 
           await axios.delete(
-            `${process.env.REACT_APP_BASE_URL}/deleteSavedIdea/${findFoundObjectInSaved.id}`,
+            `${process.env.REACT_APP_API_BASE_URL}/deleteSavedIdea/${findFoundObjectInSaved.id}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -223,7 +223,7 @@ const Keyword2 = () => {
       console.log("saved");
       // Use selectedRowData here instead of selectedRows
       await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/addToSavedIdeas`,
+        `${process.env.REACT_APP_API_BASE_URL}/addToSavedIdeas`,
         {
           video_ideas: args.data.keyword,
           search_volume: args.data.monthlysearch,
@@ -375,7 +375,7 @@ const Keyword2 = () => {
     // Make the API call here
     axios
       .get(
-        `${process.env.REACT_APP_BASE_URL}/fetchKeywordStat?keywords=${searchQuery}`,
+        `${process.env.REACT_APP_API_BASE_URL}/fetchKeywordStat?keywords=${searchQuery}`,
         {
           headers: {
             "Content-Type": "application/json",

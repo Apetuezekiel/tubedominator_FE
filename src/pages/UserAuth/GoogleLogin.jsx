@@ -15,10 +15,11 @@ import {
   getUserEncryptedDataFromDb,
   userFullDataDecrypted,
 } from "../../data/api/calls";
-import { useUserLoggedin } from "../../state/state";
+import { useUserAccessLevel, useUserLoggedin } from "../../state/state";
 import showToast from "../../utils/toastUtils";
 import CryptoJS from "crypto-js";
 import { Link, useNavigate } from "react-router-dom";
+
 
 const clientId =
   "372673946018-lu1u3llu6tqi6hmv8m2226ri9qev8bb8.apps.googleusercontent.com";
@@ -35,11 +36,13 @@ const GoogleLoginComp = forwardRef((props, ref) => {
 
   const navigate = useNavigate();
   const [initialized, setInitialized] = useState(false);
+  const accessLevel = useUserAccessLevel((state) => state.accessLevel);
+  const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
   // const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
   // const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
 
   const encryptAndStoreData = (data) => {
-    const secretKey = process.env.REACT_APP_JWT_SECRET;
+    const secretKey = "+)()^77---<@#$>";
     const jsonData = JSON.stringify(data);
     const encryptedGData = CryptoJS.AES.encrypt(jsonData, secretKey).toString();
     localStorage.setItem("encryptedGData", encryptedGData);
@@ -49,7 +52,7 @@ const GoogleLoginComp = forwardRef((props, ref) => {
   const isChannelRegistered = async (user_id, GUserData) => {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_BASE_URL}/ischannelRegistered`,
+        `${process.env.REACT_APP_API_BASE_URL}/ischannelRegistered`,
         {
           params: {
             user_id,
@@ -63,6 +66,7 @@ const GoogleLoginComp = forwardRef((props, ref) => {
 
       console.log("is channel registered", response);
       if (response.data.success) {
+        // addUserId(`TUBE_${GUserData.gId}`);
         const decryptedFullData = userFullDataDecrypted();
         if (
           !decryptedFullData ||
@@ -82,18 +86,17 @@ const GoogleLoginComp = forwardRef((props, ref) => {
         }
 
         // setUserLoggedIn(true);
-        localStorage.setItem("userLoggedin", true);
+        // localStorage.setItem("userLoggedin", true);
         setTimeout(async () => {
+          const path = location.pathname;
+          const pageName = path.substring(path.lastIndexOf("/") + 1);
           const currentURL = window.location.href;
           console.log("I got here and will redirect", currentURL);
-          if (
-            currentURL === "http://localhost:3000/channel" ||
-            currentURL === "http://localhost:3000/channel/"
-          ) {
+          if (pageName === `channel`) {
             navigate("/ideation");
           } else if (
-            currentURL === "http://localhost:3000" ||
-            currentURL === "http://localhost:3000/"
+            currentURL === process.env.REACT_APP_BASE_URL ||
+            currentURL === `${process.env.REACT_APP_BASE_URL}/`
           ) {
             navigate("/ideation");
           } else {
@@ -114,6 +117,34 @@ const GoogleLoginComp = forwardRef((props, ref) => {
       );
       console.error("Error fetching data:", error);
       throw error;
+    }
+  };
+
+  const addUserId = async (user_id) => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/addUserId`,
+        {
+          user_id,
+          email: decryptedFullData.email,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
+          },
+        },
+      );
+
+      const data = response.data;
+      if (data.success) {
+        localStorage.setItem("userAcess", "L2");
+        navigate("/ideation");
+      } else {
+        console.log("Error occurred with adding user ID");
+      }
+    } catch (error) {
+      console.error("Error Adding user Id:", error);
     }
   };
 
@@ -139,7 +170,7 @@ const GoogleLoginComp = forwardRef((props, ref) => {
     };
     showToast("success", "Login Successful", 2000);
     // setUserLoggedIn(true);
-    localStorage.setItem("userLoggedin", true);
+    // localStorage.setItem("userLoggedin", true);
     isChannelRegistered(`TUBE_${googleId}`, GUserData);
   };
 
@@ -157,7 +188,7 @@ const GoogleLoginComp = forwardRef((props, ref) => {
           initializeOnLoad={true}
         />
       )}
-      <button onClick={handleLoginClick} ref={internalRef}>
+      <button onClick={() => handleLoginClick()}>
         <GoogleLogin
           clientId={clientId}
           buttonText="Login with Google"

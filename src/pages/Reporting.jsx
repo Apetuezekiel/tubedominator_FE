@@ -68,7 +68,7 @@ const DropDown = ({ currentMode }) => (
 //   console.log("decryptedFullData", decryptedFullData);
 //   await axios
 //   .post(
-//     "${process.env.REACT_APP_BASE_URL}/saveUserToken",
+//     "${process.env.REACT_APP_API_BASE_URL}/saveUserToken",
 //     {
 //       encryptedFullData: JSON.stringify(decryptedFullData)
 //     },
@@ -116,7 +116,7 @@ const Reporting = () => {
     const fetchMyYoutubeInfo = async () => {
       try {
         axios
-          .get(`${process.env.REACT_APP_BASE_URL}/fetchMyYoutubeInfo`, {
+          .get(`${process.env.REACT_APP_API_BASE_URL}/fetchMyYoutubeInfo`, {
             params: {
               channel_id: decryptedFullData.channelId,
             },

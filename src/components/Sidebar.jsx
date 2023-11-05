@@ -7,19 +7,31 @@ import { MdOutlineCancel } from "react-icons/md";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 import { FaYoutube, FaGoogle, FaPlus } from "react-icons/fa";
 import tubedominatorLogo from "../assets/images/TubeDominator 1000x1000.png";
+import GoogleLoginComp from "../pages/UserAuth/GoogleLogin";
 
 import { menuLinks } from "../data/dummy";
 import { useStateContext } from "../contexts/ContextProvider";
+import { FcGoogle } from "react-icons/fc";
+import GoogleLogOut from "../pages/UserAuth/GoogleLogOut";
+import { useUserAccessLevel } from "../state/state";
 
 const Sidebar = () => {
   const { currentColor, activeMenu, setActiveMenu, screenSize } =
     useStateContext();
+    const accessLevel = useUserAccessLevel((state) => state.accessLevel);
+    const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
+    if (accessLevel === "" || null){
+      setAccessLevel(localStorage.getItem("accessLevel"))
+     }
 
   const handleCloseSideBar = () => {
     if (activeMenu !== undefined && screenSize <= 900) {
       setActiveMenu(false);
     }
   };
+
+  const isDisabled = accessLevel !== "L2";
+  console.log("accessLevel", accessLevel);
 
   const activeLink =
     "flex items-center gap-5 pl-4 pt-3 pb-2.5 rounded-lg  text-white  text-md m-2";
@@ -54,31 +66,62 @@ const Sidebar = () => {
             </TooltipComponent>
           </div>
           <div className="mt-10 ">
+            {accessLevel === "L1" || accessLevel === null ? (
+              <div>
+                <div className="-mb-24 ml-8 opacity-0">
+                  <GoogleLoginComp />
+                </div>
+                <NavLink
+                  to={``}
+                  className="flex items-center ml-6 mt-10 px-5 py-3 rounded-md"
+                  style={{ backgroundColor: "#7438FF" }}
+                >
+                  <div className="mr-3">
+                    <FcGoogle size={20} />
+                  </div>
+                  <div className="capitalize pr-4 text-white">
+                    Connect your Youtube
+                  </div>
+                </NavLink>
+              </div>
+            ) : (
+              ""
+            )}
             {menuLinks.map((item) => (
               <div key={item.title}>
                 <p className="text-gray-400 dark:text-gray-400 m-3 mt-4 uppercase">
                   {item.title}
                 </p>
                 {item.links.map((link) => (
-                  <NavLink
-                    to={`/${link.link}`}
-                    key={link.name}
-                    onClick={handleCloseSideBar}
-                    style={({ isActive }) => ({
-                      backgroundColor: isActive ? currentColor : "",
-                    })}
-                    className={({ isActive }) =>
-                      isActive ? activeLink : normalLink
-                    }
-                  >
-                    {/* <div className='flex flex-col items-center justify-center'> */}
-                    <div>{link.icon}</div>
-                    <div className="capitalize pr-4">{link.name}</div>
-                    {/* </div> */}
-                  </NavLink>
+                  <div className="nav-link-container">
+                    <NavLink
+                      to={`/${link.link}`}
+                      key={link.name}
+                      onClick={handleCloseSideBar}
+                      style={({ isActive }) => ({
+                        backgroundColor: isActive ? currentColor : "",
+                        pointerEvents: isDisabled ? "none" : "auto",
+                        opacity: isDisabled ? 0.5 : 1,
+                      })}
+                      className={({ isActive }) =>
+                        isActive ? activeLink : normalLink
+                      }
+                    >
+                      <div>{link.icon}</div>
+                      <div className="capitalize pr-4">{link.name}</div>
+                    </NavLink>
+                    {isDisabled && ( // Show a message on hover if accessLevel is not 'L2'
+                      <div className="tooltip bg-white">
+                        Connect to Youtube to access feature
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             ))}
+            <div className="">
+              {/* <GoogleLogOut /> */}
+            </div>
           </div>
         </>
       )}

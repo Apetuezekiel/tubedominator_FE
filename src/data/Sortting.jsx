@@ -99,7 +99,7 @@ const Sortting = () => {
     try {
       // Use selectedRowData here instead of selectedRows
       await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/addToSavedIdeas`,
+        `${process.env.REACT_APP_API_BASE_URL}/addToSavedIdeas`,
         {
           video_ideas: args.data.keyword,
           search_volume: args.data.monthlysearch,
@@ -136,7 +136,7 @@ const Sortting = () => {
     // Make the API call here
     axios
       .get(
-        `${process.env.REACT_APP_BASE_URL}/fetchKeywordStat?keywords=${searchQuery}`,
+        `${process.env.REACT_APP_API_BASE_URL}/fetchKeywordStat?keywords=${searchQuery}`,
         {
           headers: {
             "Content-Type": "application/json",

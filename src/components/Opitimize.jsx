@@ -180,7 +180,7 @@ function Opitimize({ videoId }) {
     const fetchMyYoutubeVideo = async () => {
       try {
         axios
-          .get(`${process.env.REACT_APP_BASE_URL}/fetchMyYoutubeVideo`, {
+          .get(`${process.env.REACT_APP_API_BASE_URL}/fetchMyYoutubeVideo`, {
             params: {
               channel_id: decryptedFullData.channelId,
               video_id: videoId,
@@ -227,7 +227,7 @@ function Opitimize({ videoId }) {
 
         try {
           const response = await axios.get(
-            `${process.env.REACT_APP_BASE_URL}/allBookmarkSearchTerms`,
+            `${process.env.REACT_APP_API_BASE_URL}/allBookmarkSearchTerms`,
             {
               params: {
                 email: decryptedFullData.email,
@@ -287,7 +287,7 @@ function Opitimize({ videoId }) {
     const fetchUserTemplates = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_BASE_URL}/getUserTemplate`,
+          `${process.env.REACT_APP_API_BASE_URL}/getUserTemplate`,
           {
             params: {
               email: decryptedFullData.email,
@@ -359,7 +359,7 @@ function Opitimize({ videoId }) {
     try {
       setIsLoading(true);
       const response = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/fetchKeywordStat`,
+        `${process.env.REACT_APP_API_BASE_URL}/fetchKeywordStat`,
         postData,
         {
           headers: {
@@ -425,7 +425,7 @@ function Opitimize({ videoId }) {
     //   });
 
     const response = await axios.post(
-      `${process.env.REACT_APP_BASE_URL}/bookmarkSearchTerm`,
+      `${process.env.REACT_APP_API_BASE_URL}/bookmarkSearchTerm`,
       {
         keyword: props.keyword,
         search_volume: props.monthlysearch,
@@ -473,7 +473,7 @@ function Opitimize({ videoId }) {
     if (save) {
       showToast("success", "I WAN SAVE", 2000);
       const response = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/bookmarkSearchTerm`,
+        `${process.env.REACT_APP_API_BASE_URL}/bookmarkSearchTerm`,
         {
           keyword: props.keyword,
           search_volume: props.monthlysearch,
@@ -509,7 +509,7 @@ function Opitimize({ videoId }) {
       showToast("success", "I WAN DELETE", 2000);
       try {
         const responseDelete = await axios.delete(
-          `${process.env.REACT_APP_BASE_URL}/deleteSavedIdeaBookmarkSearchTerm`,
+          `${process.env.REACT_APP_API_BASE_URL}/deleteSavedIdeaBookmarkSearchTerm`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -555,7 +555,7 @@ function Opitimize({ videoId }) {
   //   const fetchMyYoutubeVideos = async () => {
   //     try {
   //       axios
-  //         .get(`${process.env.REACT_APP_BASE_URL}/fetchMyYoutubeVideos`, {
+  //         .get(`${process.env.REACT_APP_API_BASE_URL}/fetchMyYoutubeVideos`, {
   //           params: {
   //             channel_id: decryptedFullData.channelId,
   //             videoIds: videoId,
@@ -746,7 +746,7 @@ function Opitimize({ videoId }) {
   const deleteDraftPost = async () => {
     try {
       const responseDelete = await axios.delete(
-        `${process.env.REACT_APP_BASE_URL}/deleteDraftPost`,
+        `${process.env.REACT_APP_API_BASE_URL}/deleteDraftPost`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -838,7 +838,7 @@ function Opitimize({ videoId }) {
     try {
       axios
         .put(
-          `${process.env.REACT_APP_BASE_URL}/updateMyYoutubeVideos`,
+          `${process.env.REACT_APP_API_BASE_URL}/updateMyYoutubeVideos`,
           requestData,
           {
             headers: requestHeaders,
@@ -1043,7 +1043,7 @@ function Opitimize({ videoId }) {
     console.log("userYoutubeData.videoId", videoId);
     console.log("formData.thumbnail", formData.thumbnail);
     const response = await axios.post(
-      `${process.env.REACT_APP_BASE_URL}/saveDraftPost`,
+      `${process.env.REACT_APP_API_BASE_URL}/saveDraftPost`,
       {
         video_id: videoId,
         search_term: userSavedSearchTerm,
@@ -1472,7 +1472,7 @@ function Opitimize({ videoId }) {
 
     try {
       const saveUserTemplateResponse = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/saveUserTemplate`,
+        `${process.env.REACT_APP_API_BASE_URL}/saveUserTemplate`,
         {
           title: newTemplateData.title,
           content: newTemplateData.content,
@@ -1527,7 +1527,7 @@ function Opitimize({ videoId }) {
     try {
       const templateId = userChannelTemplates[index].id;
       const updateUserTemplateResponse = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/updateUserTemplate`,
+        `${process.env.REACT_APP_API_BASE_URL}/updateUserTemplate`,
         {
           title: userChannelTemplates[index].title,
           content: userChannelTemplates[index].content,
@@ -1570,7 +1570,7 @@ function Opitimize({ videoId }) {
 
     try {
       const deleteUserTemplateResponse = await axios.post(
-        `process.env.REACT_APP_BASE_URL}/deleteUserTemplate`,
+        `process.env.REACT_APP_API_BASE_URL}/deleteUserTemplate`,
         {
           email: decryptedFullData.email,
           template_id: templateId,

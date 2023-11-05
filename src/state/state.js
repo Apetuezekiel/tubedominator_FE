@@ -57,8 +57,13 @@ export const useDisplayPreviewKeyword = create((set) => ({
 }));
 
 export const useUserLoggedin = create((set) => ({
-  userLoggedIn: false,
+  userLoggedIn: null,
   setUserLoggedIn: (data) => set({ userLoggedIn: data }),
+}));
+
+export const useUserAccessLevel = create((set) => ({
+  accessLevel: '',
+  setAccessLevel: (data) => set({ accessLevel: data }),
 }));
 
 export const useSavedIdeasData = create((set) => ({

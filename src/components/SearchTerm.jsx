@@ -89,7 +89,7 @@ function SearchTerm({ videoId }) {
   //   const fetchMyYoutubeVideos = async () => {
   //     try {
   //       axios
-  //         .get(`${process.env.REACT_APP_BASE_URL}/fetchMyYoutubeVideos`, {
+  //         .get(`${process.env.REACT_APP_API_BASE_URL}/fetchMyYoutubeVideos`, {
   //           params: {
   //             channel_id: decryptedFullData.channelId,
   //             videoIds: "BdG8R9pqHA0",
@@ -175,7 +175,7 @@ function SearchTerm({ videoId }) {
     try {
       setIsLoading(true);
       const response = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/fetchKeywordStat`,
+        `${process.env.REACT_APP_API_BASE_URL}/fetchKeywordStat`,
         postData,
         {
           headers: {
@@ -341,7 +341,7 @@ function SearchTerm({ videoId }) {
     try {
       axios
         .put(
-          `${process.env.REACT_APP_BASE_URL}/updateMyYoutubeVideos`,
+          `${process.env.REACT_APP_API_BASE_URL}/updateMyYoutubeVideos`,
           requestData,
           {
             headers: requestHeaders,

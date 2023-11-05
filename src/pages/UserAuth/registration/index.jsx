@@ -50,7 +50,7 @@ const RegistrationForm = () => {
   // const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
   const allUserDeets = useAllUserDeets((state) => state.allUserDeets);
   const setAllUserDeets = useAllUserDeets((state) => state.setAllUserDeets);
-  const secretKey = process.env.REACT_APP_JWT_SECRET;
+  const secretKey = "+)()^77---<@#$>";
 
   // useEffect(() => {
   //   const isChannelRegistered = async () => {
@@ -61,7 +61,7 @@ const RegistrationForm = () => {
   //     clerkUser && setAllUserDeets(clerkUser);
   //     try {
   //       const response = await axios.get(
-  //         "${process.env.REACT_APP_BASE_URL}/ischannelRegistered",
+  //         "${process.env.REACT_APP_API_BASE_URL}/ischannelRegistered",
   //         {
   //           params: {
   //             user_id: clerkUser.id
@@ -109,7 +109,7 @@ const RegistrationForm = () => {
   //   console.log("----------------------------------");
   //   axios
   //     .get(
-  //       "${process.env.REACT_APP_BASE_URL}/getChannels",
+  //       "${process.env.REACT_APP_API_BASE_URL}/getChannels",
   //       {
   //         channelTitle: channel_title,
   //       },
@@ -141,7 +141,7 @@ const RegistrationForm = () => {
   const fetchChannel = (channel_title) => {
     setIsLoading(true);
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/getChannels`, {
+      .get(`${process.env.REACT_APP_API_BASE_URL}/getChannels`, {
         params: {
           channelTitle: channel_title,
         },
@@ -258,7 +258,7 @@ const RegistrationForm = () => {
 
     await axios
       .post(
-        `${process.env.REACT_APP_BASE_URL}/saveUserToken`,
+        `${process.env.REACT_APP_API_BASE_URL}/saveUserToken`,
         {
           encryptedFullData,
         },
@@ -330,7 +330,7 @@ const RegistrationForm = () => {
     try {
       // Send updated form data to the server
       const response = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/saveUserYoutubeInfo`,
+        `${process.env.REACT_APP_API_BASE_URL}/saveUserYoutubeInfo`,
         updatedFormData,
         {
           headers: {

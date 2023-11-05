@@ -16,8 +16,8 @@ import PreviewKeyword from "./PreviewKeyword";
 import { useStateContext } from "../contexts/ContextProvider";
 // import { useUser, SignOutButton } from "@clerk/clerk-react";
 import axios from "axios";
-import { useUserData, useUserAuthToken, useUserLoggedin } from "../state/state";
-import { Link, useNavigate } from "react-router-dom";
+import { useUserData, useUserAuthToken, useUserLoggedin, useUserAccessLevel } from "../state/state";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 // import {
 //   getUserEncryptedData,
 //   getUserEncryptedDataFromDb,
@@ -28,6 +28,8 @@ import CryptoJS from "crypto-js";
 import GoogleLoginComp from "../pages/UserAuth/GoogleLogin";
 import { BiLoaderCircle } from "react-icons/bi";
 import { useRef } from "react";
+import { pagesInfo } from "../data/pagesInfo";
+import userAvatar from "../assets/images/man-avatar-profile-picture-vector-illustration_268834-538.avif";
 
 const clientId =
   "372673946018-lu1u3llu6tqi6hmv8m2226ri9qev8bb8.apps.googleusercontent.com";
@@ -37,8 +39,8 @@ const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
     <button
       type="button"
       onClick={() => customFunc()}
-      style={{ color }}
-      className="relative text-xl rounded-full p-3 hover:bg-light-gray"
+      style={{ color, display: "none" }}
+      className="relative text-xl rounded-full p-3 hover:bg-light-gray hidden"
     >
       <span
         style={{ background: dotColor }}
@@ -50,7 +52,7 @@ const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
 );
 
 const encryptAndStoreData = (data) => {
-  const secretKey = process.env.REACT_APP_JWT_SECRET;
+  const secretKey = "+)()^77---<@#$>";
   const jsonData = JSON.stringify(data);
   const encryptedGData = CryptoJS.AES.encrypt(jsonData, secretKey).toString();
   localStorage.setItem("encryptedGData", encryptedGData);
@@ -70,12 +72,22 @@ const Navbar = () => {
     setScreenSize,
     screenSize,
   } = useStateContext();
-  // const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
-  // const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
-  const userLoggedIn = localStorage.getItem("userLoggedin");
+  const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
+  const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
+  const accessLevel = useUserAccessLevel((state) => state.accessLevel);
+  const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
+  // 
+ if (accessLevel === "" || null){
+  setAccessLevel(localStorage.getItem("accessLevel"))
+ }
+ if (userLoggedIn === "" || null){
+  setUserLoggedIn(localStorage.getItem("userLoggedin"));
+ }
+ console.log('localStorage.getItem("accessLevel")', localStorage.getItem("accessLevel"));
+ console.log('localStorage.getItem("userLoggedin")', localStorage.getItem("userLoggedin"));
 
   const decryptAndRetrieveData = (data) => {
-    const secretKey = process.env.REACT_APP_JWT_SECRET;
+    const secretKey = "+)()^77---<@#$>";
 
     if (data) {
       const decryptedBytes = CryptoJS.AES.decrypt(data, secretKey);
@@ -113,12 +125,15 @@ const Navbar = () => {
   const [loadedUserData, setLoadeduserData] = useState(false);
 
   const handleActiveMenu = () => setActiveMenu(!activeMenu);
+  const [pageTitle, setPageTitle] = useState("");
+  const [pageTag, setPageTag] = useState("");
+  const location = useLocation();
 
   const fetchUserYoutubeInfo = async () => {
     // const { isLoaded, isSignedIn, user } = useUser();
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_BASE_URL}/getSavedUserYoutubeInfo`,
+        `${process.env.REACT_APP_API_BASE_URL}/getSavedUserYoutubeInfo`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -163,6 +178,21 @@ const Navbar = () => {
     }
   }, [userLoggedIn]);
 
+  useEffect(() => {
+    const path = location.pathname;
+    const pageName = path.substring(path.lastIndexOf("/") + 1);
+
+    // Find the page info based on the extracted pageName
+    const pageInfo = pagesInfo.find(
+      (page) => page.page.toLowerCase() === pageName.toLowerCase(),
+    );
+
+    if (pageInfo) {
+      setPageTitle(pageInfo.page);
+      setPageTag(pageInfo.tag);
+    }
+  }, [location]);
+
   console.log("userLoggedIn", userLoggedIn);
   const RegisterUser = () => {
     if (googleLoginBtn.current) {
@@ -173,11 +203,11 @@ const Navbar = () => {
   return (
     <div
       // style={{backgroundColor: 'black'}}
-      className={`w-8/9 flex justify-between py-2 md:ml-6 md:mr-6 relative ${
+      className={`w-8/9 flex justify-between py-2 mt-5 md:ml-6 md:mr-6 relative ${
         userLoggedIn ? "" : "shadow-xl"
       }`}
     >
-      {userLoggedIn && !userData ? (
+      {userLoggedIn && accessLevel === "L2" && !userData ? (
         <div className="flex flex-col justify-center items-center w-full mt-20">
           <BiLoaderCircle
             className="animate-spin text-center"
@@ -188,12 +218,17 @@ const Navbar = () => {
         </div>
       ) : userLoggedIn && userData ? (
         <>
-          <NavButton
+          {/* <NavButton
             title="Menu"
             customFunc={handleActiveMenu}
             color={currentColor}
             icon={<AiOutlineMenu />}
-          />
+            
+          /> */}
+          <div className="ml-5">
+            <div className="pageTitle text-4xl font-semibold">{pageTitle}</div>
+            <div className="tag text-lg mt-2">{pageTag}</div>
+          </div>
           <div className="flex">
             <TooltipComponent content="Profile" position="BottomCenter">
               <div
@@ -201,7 +236,7 @@ const Navbar = () => {
                 onClick={() => handleClick("userProfile")}
               >
                 <img
-                  className="rounded-full w-8 h-8"
+                  className="rounded-full w-10 h-10"
                   src={userData.data.channel_image_link}
                   alt="user-profile"
                 />
@@ -217,11 +252,21 @@ const Navbar = () => {
             {isClicked.userProfile && <UserProfile />}
           </div>
         </>
+      ) : userLoggedIn && accessLevel === "L1" ? (
+        <div className="w-5/6 flex justify-between p-2 md:ml-6 md:mr-6 relative homeHeader">
+          <div className="navbar-nav ms-auto py-0 flex justify-between items-center text-lg">
+            Welcome, <span className="text-2xl ml-2 font-semibold">{localStorage.getItem("userFirstName")}</span>
+          </div>
+          <div className="flex">
+            <img
+              className="rounded-full w-10 h-10"
+              src={userAvatar}
+              alt="user-profile"
+            />
+          </div>
+        </div>
       ) : (
-        <div
-          className="w-5/6 flex justify-between p-2 md:ml-6 md:mr-6 relative homeHeader"
-          // style={{backgroundColor: 'black'}}
-        >
+        <div className="w-5/6 flex justify-between p-2 md:ml-6 md:mr-6 relative homeHeader">
           <img
             className="w-15"
             src={avatar}
@@ -248,29 +293,20 @@ const Navbar = () => {
           </div>
           <div className="flex">
             <div className="flex items-center gap-2 cursor-pointer p-1 hover:bg-light-gray rounded-lg">
-              {/* <GoogleLogin
-                clientId={clientId}
-                buttonText="Login"
-                onSuccess={onLoginSuccess}
-                onFailure={onLoginFailure}
-                cookiePolicy="single_host_origin"
-                isSignedIn={true}
-                className="google-login-button rounded-full"
-              >
-                Log In
-              </GoogleLogin> */}
-              <div className="mr-[-8rem] z-10 opacity-0">
-                {<GoogleLoginComp ref={googleLoginBtn} />}
-              </div>
-              <div
+              <Link
                 className="text-lg mr-4 text-black py-2 px-5 rounded-full"
-                // to="/sign-up"
+                to="/sign-up"
                 style={{ backgroundColor: "#F2F2F2" }}
-                onClick={RegisterUser}
-                ref={appRegisterBtn}
               >
                 Register
-              </div>
+              </Link>
+              <Link
+                className="text-lg mr-4 text-black py-2 px-5 rounded-full"
+                to="/sign-in"
+                style={{ backgroundColor: "#F2F2F2" }}
+              >
+                Log In
+              </Link>
               <p>
                 <button
                   type="submit"
@@ -281,7 +317,6 @@ const Navbar = () => {
                 </button>
               </p>
             </div>
-            {/* {isClicked.userProfile && <PreviewKeyword />} */}
           </div>
         </div>
       )}

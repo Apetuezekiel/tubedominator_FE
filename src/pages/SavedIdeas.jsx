@@ -37,7 +37,7 @@ import { BiLoaderCircle } from "react-icons/bi";
 
 const SavedIdeas = () => {
   const decryptAndRetrieveData = (data) => {
-    const secretKey = process.env.REACT_APP_JWT_SECRET;
+    const secretKey = "+)()^77---<@#$>";
 
     if (data) {
       const decryptedBytes = CryptoJS.AES.decrypt(data, secretKey);
@@ -218,7 +218,7 @@ const SavedIdeas = () => {
     const selectedRowData = args.data;
     try {
       const responseDelete = await axios.delete(
-        `${process.env.REACT_APP_BASE_URL}/deleteSavedIdea/${selectedRowData.id}`,
+        `${process.env.REACT_APP_API_BASE_URL}/deleteSavedIdea/${selectedRowData.id}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -283,7 +283,7 @@ const SavedIdeas = () => {
   const deleteSavedKeyword = async (id) => {
     try {
       const responseDelete = await axios.delete(
-        `${process.env.REACT_APP_BASE_URL}/deleteSavedIdea/${id}`,
+        `${process.env.REACT_APP_API_BASE_URL}/deleteSavedIdea/${id}`,
         {
           headers: {
             "Content-Type": "application/json",

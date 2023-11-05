@@ -48,10 +48,10 @@ import { FiTrendingUp } from "react-icons/fi";
 import { BsArrowDownShort, BsArrowUpShort, BsDot } from "react-icons/bs";
 
 const Ideation = () => {
-  const apiUrl = process.env.REACT_APP_BASE_URL;
+  const apiUrl = process.env.REACT_APP_API_BASE_URL;
   console.log(apiUrl, apiUrl, apiUrl, apiUrl, apiUrl, apiUrl);
   const decryptAndRetrieveData = (data) => {
-    const secretKey = process.env.REACT_APP_JWT_SECRET;  
+    const secretKey = "+)()^77---<@#$>";
 
     if (data) {
       const decryptedBytes = CryptoJS.AES.decrypt(data, secretKey);
@@ -122,6 +122,15 @@ const Ideation = () => {
       setLoadedLocalStorage(true);
       setRelatedKeywordData(savedData.related_keywords);
       setExactKeywordData(savedData.exact_keyword);
+    }
+  }, []);
+
+  useEffect(() => {
+    const userLevel = localStorage.getItem("userLevel");
+    if (userLevel === "L1") {
+      alert(
+        "Connect your Youtube Account now to enjoy the cool features of Tubedominator",
+      );
     }
   }, []);
 
@@ -198,7 +207,7 @@ const Ideation = () => {
 
       if (save) {
         const response = await axios.post(
-          `${process.env.REACT_APP_BASE_URL}/addToSavedIdeas`,
+          `${process.env.REACT_APP_API_BASE_URL}/addToSavedIdeas`,
           {
             video_ideas: foundObject.keyword,
             search_volume: foundObject.monthlysearch,
@@ -227,7 +236,7 @@ const Ideation = () => {
       } else {
         try {
           const response = await axios.get(
-            `${process.env.REACT_APP_BASE_URL}/getAllSavedIdeas`,
+            `${process.env.REACT_APP_API_BASE_URL}/getAllSavedIdeas?email=${decryptedFullData.email}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -247,7 +256,7 @@ const Ideation = () => {
           console.log("decryptedFullData.email", decryptedFullData.email);
 
           const responseDelete = await axios.delete(
-            `${process.env.REACT_APP_BASE_URL}/deleteSavedIdea/${findFoundObjectInSaved.id}`,
+            `${process.env.REACT_APP_API_BASE_URL}/deleteSavedIdea/${findFoundObjectInSaved.id}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -293,7 +302,7 @@ const Ideation = () => {
       console.log("saved");
       // Use selectedRowData here instead of selectedRows
       await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/addToSavedIdeas`,
+        `${process.env.REACT_APP_API_BASE_URL}/addToSavedIdeas`,
         {
           video_ideas: args.data.keyword,
           search_volume: args.data.monthlysearch,
@@ -382,10 +391,6 @@ const Ideation = () => {
       </div>
     );
   };
-
-  // const chooseSavedIdeaCategory = (props) => {
-  //   setShowSavedIdeaCategoryPanel(true)
-  // }
 
   const IdeaCategoryPanel = async (props) => {
     setShowSavedIdeaCategoryPanel(true);
@@ -548,7 +553,7 @@ const Ideation = () => {
       console.log("handleGetIdeas", decryptedFullData.token);
 
       const response = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/fetchKeywordStat`,
+        `${process.env.REACT_APP_API_BASE_URL}/fetchKeywordStat`,
         postData,
         {
           headers: {

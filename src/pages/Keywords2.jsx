@@ -42,6 +42,9 @@ import { useStateContext } from "../contexts/ContextProvider";
 import showToast from "../utils/toastUtils";
 import { userFullDataDecrypted } from "../data/api/calls";
 import { TiDelete } from "react-icons/ti";
+import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
+import { MdCancel } from "react-icons/md";
+// import deleteChannelKeyword from "../data/api/calls";
 
 const Keyword2 = () => {
   const userYoutubeData = useUserYoutubeInfo((state) => state.userYoutubeData);
@@ -73,6 +76,8 @@ const Keyword2 = () => {
   const [userKeyword, setUserKeyword] = useState("");
   const [isAddKeyword, setIsAddKeyword] = useState(false);
   const [isShowPreviewKw, setIsShowPreviewKw] = useState(false);
+  const [processingDeleteKeyword, setProcessingDeleteKeyword] = useState(false);
+  const [addingKeyword, setAddingKeyword] = useState(false);
   const [loadingUserChannelKeyword, setLoadingUserChannelKeyword] =
     useState(false);
   const [selectedKeyword, setSelectedKeyword] = useState("");
@@ -123,7 +128,7 @@ const Keyword2 = () => {
 
       if (save) {
         await axios.post(
-          `${process.env.REACT_APP_BASE_URL}/addToSavedIdeas`,
+          `${process.env.REACT_APP_API_BASE_URL}/addToSavedIdeas`,
           {
             video_ideas: foundObject.keyword,
             search_volume: foundObject.monthlysearch,
@@ -142,7 +147,7 @@ const Keyword2 = () => {
       } else {
         try {
           const response = await axios.get(
-            `${process.env.REACT_APP_BASE_URL}/getAllSavedIdeas`,
+            `${process.env.REACT_APP_API_BASE_URL}/getAllSavedIdeas`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -156,7 +161,7 @@ const Keyword2 = () => {
           );
 
           await axios.delete(
-            `${process.env.REACT_APP_BASE_URL}/deleteSavedIdea/${findFoundObjectInSaved.id}`,
+            `${process.env.REACT_APP_API_BASE_URL}/deleteSavedIdea/${findFoundObjectInSaved.id}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -192,7 +197,7 @@ const Keyword2 = () => {
     const fetchUserKeywords = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_BASE_URL}/getUserKeyword`,
+          `${process.env.REACT_APP_API_BASE_URL}/getUserKeyword`,
           {
             params: {
               email: decryptedFullData.email,
@@ -206,7 +211,7 @@ const Keyword2 = () => {
         );
 
         const data = response.data;
-        console.log("data", response);
+        console.log("keyword data", response);
 
         console.log("response", response.data.success === "trueNut");
         if (response.data.success === "trueNut") {
@@ -234,43 +239,74 @@ const Keyword2 = () => {
 
   const formatViews = (props) => {
     const estimatedViews = parseInt(props.search_volume);
+    const formatedNumber = formatNumberToKMBPlus(estimatedViews);
+
     // const formattedViews = estimatedViews.toLocaleString() + "+";
+    return <span className="">{formatedNumber}</span>;
+  };
+
+  const actionTemplate = (props) => {
     return (
-      <span className="flex items-center justify-center">
-        {estimatedViews}+
+      <span
+        className="text-center flex justify-center cursor-pointer"
+        onClick={() => deleteChannelKeyword(props)}
+      >
+        <MdCancel color="red" />{" "}
+        <div>
+          {processingDeleteKeyword && (
+            <BiLoaderCircle
+              color="#7438FF"
+              size={30}
+              className="animate-spin ml-2"
+            />
+          )}
+        </div>
       </span>
     );
   };
 
+  const actionTitleTemplate = (props) => {
+    return (
+      <div className="flex items-center justify-center">
+        <div>
+          {processingDeleteKeyword && (
+            <BiLoaderCircle color="red" size={20} className="animate-spin" />
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const deleteChannelKeyword = async (props) => {
-    showToast("success", "I WAN DELETE", 2000);
-    // try {
-    //   const responseDelete = await axios.delete(
-    //     `${process.env.REACT_APP_BASE_URL}/deleteUserKeyword`,
-    //     {
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //         "x-api-key": process.env.REACT_APP_X_API_KEY,
-    //         Authorization: `Bearer ${decryptedFullData.token}`,
-    //       },
-    //       params: {
-    //         keyword: props.keyword,
-    //       },
-    //     },
-    //   );
-    //   console.log("Data removed successfully", props.keyword);
-    //   if (responseDelete.data.success) {
-    //       setUserChannelKeywords((prevData) =>
-    //       prevData.filter((d) => d.keyword !== props.keyword),
-    //     );
-    //     showToast("success", "Keyword removed from saved keywords", 2000);
-    //   } else {
-    //     showToast("error", "saved keyword wasn't removed. Try again", 2000);
-    //   }
-    // } catch (error) {
-    //   console.error("Error fetching data:", error);
-    //   throw error;
-    // }
+    setProcessingDeleteKeyword(true);
+
+    try {
+      const headers = {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.REACT_APP_X_API_KEY,
+        Authorization: `Bearer ${decryptedFullData.token}`,
+      };
+
+      const responseDelete = await axios.delete(
+        `${process.env.REACT_APP_API_BASE_URL}/deleteUserKeyword/${props.id}`,
+        { headers },
+      );
+
+      if (responseDelete.data.success) {
+        console.log("responseDelete.data", responseDelete.data.data);
+        setProcessingDeleteKeyword(false);
+        setUserChannelKeywords(responseDelete.data.data);
+        showToast("success", "Keyword removed from saved keywords", 2000);
+        console.log("Data removed successfully", props.keyword);
+      } else {
+        showToast("error", "Saved keyword wasn't removed. Try again", 2000);
+        setProcessingDeleteKeyword(false);
+      }
+    } catch (error) {
+      setProcessingDeleteKeyword(false);
+      console.error("Error deleting keyword:", error);
+      throw error;
+    }
   };
 
   const recordCtrlTemplate = (props) => {
@@ -367,7 +403,7 @@ const Keyword2 = () => {
     // Make the API call here
     axios
       .get(
-        `${process.env.REACT_APP_BASE_URL}/fetchKeywordStat?keywords=${searchQuery}`,
+        `${process.env.REACT_APP_API_BASE_URL}/fetchKeywordStat?keywords=${searchQuery}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -453,40 +489,26 @@ const Keyword2 = () => {
   };
 
   const submitUserKeyword = async () => {
+    setAddingKeyword(true);
     console.log("decryptedFullData", decryptedFullData);
     if (userKeyword === "") {
       console.log("Keyword is empty. Please provide a keyword.");
       showToast("error", "Keyword is empty. Please provide a keyword.", 2000);
+      setAddingKeyword(false);
       return;
     }
-    showToast("success", "Keyword Added Successfully", 2000);
     console.log("userKeyword", userKeyword);
 
-    setIsAddKeyword(false);
+    const postData = {
+      keyword: userKeyword,
+      countryCode: "GLB",
+      languageCode: "en",
+    };
 
     try {
-      // const fetchKeywordResponse = await axios.get(
-      //   `${process.env.REACT_APP_BASE_URL}/fetchKeywordStat?keyword=${userKeyword}`,
-      //   {
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       "x-api-key": process.env.REACT_APP_X_API_KEY,
-      //       Authorization: `Bearer ${decryptedFullData.token}`,
-      //     },
-      //   },
-      // );
-
-      // const searchData = fetchKeywordResponse.data;
-      // if (12) {
-      const saveKeywordResponse = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/saveUserKeyword`,
-        {
-          keyword: userKeyword,
-          email: decryptedFullData.email,
-          user_id: decryptedFullData.user_id,
-          // search_volume: searchData.response.exact_keyword[0].monthlysearch ?? 34000,
-          search_volume: 34000,
-        },
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/fetchKeywordStat`,
+        postData,
         {
           headers: {
             "Content-Type": "application/json",
@@ -496,19 +518,47 @@ const Keyword2 = () => {
         },
       );
 
-      console.log("API response:", saveKeywordResponse.data);
-      if (saveKeywordResponse.data.success) {
-        setSaveSuccess(true);
+      const data = response.data;
+      console.log("response.data", data);
+
+      const searchVolume = data.response.exact_keyword[0].monthlysearch;
+      if (searchVolume) {
+        const saveKeywordResponse = await axios.post(
+          `${process.env.REACT_APP_API_BASE_URL}/saveUserKeyword`,
+          {
+            keyword: userKeyword,
+            email: decryptedFullData.email,
+            user_id: decryptedFullData.user_id,
+            search_volume: searchVolume,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.REACT_APP_X_API_KEY,
+              Authorization: `Bearer ${decryptedFullData.token}`,
+            },
+          },
+        );
+
+        console.log("API response:", saveKeywordResponse.data);
+        console.log(saveKeywordResponse.data);
+        if (saveKeywordResponse.data.success) {
+          setAddingKeyword(false);
+          setSaveSuccess(true);
+          setIsAddKeyword(false);
+          showToast("success", "Keyword Added Successfully", 2000);
+        }
+      } else {
+        setAddingKeyword(true);
+        console.error("Error occured");
+        showToast(
+          "error",
+          "could not add keyword. Please try again. Dont refresh so information isn't lost",
+          5000,
+        );
       }
-      // } else {
-      //   console.error("Error occured");
-      //   showToast(
-      //     "error",
-      //     "could not add keyword. Please try again. Dont refresh so information isn't lost",
-      //     5000,
-      //   );
-      // }
     } catch (error) {
+      setAddingKeyword(true);
       console.error("Error while making API call:", error);
       showToast(
         "error",
@@ -538,7 +588,7 @@ const Keyword2 = () => {
     return (
       <TooltipComponent>
         <div
-          className="flex justify-center items-center"
+          className="flex justify-start items-center"
           onClick={() => {
             unconventionalKeyword = props.keyword;
             setUnconventionalKeywordd(props.keyword);
@@ -546,7 +596,7 @@ const Keyword2 = () => {
           }}
         >
           <span className="mr-2 cursor-pointer">Preview</span>
-          <FaYoutube />
+          <FaYoutube color="red" />
         </div>
       </TooltipComponent>
     );
@@ -632,9 +682,16 @@ const Keyword2 = () => {
                   <button
                     onClick={submitUserKeyword}
                     style={{ backgroundColor: "#7352FF" }}
-                    className="w-full text-white p-2 rounded mt-2"
+                    className="w-full text-white p-2 rounded mt-2 flex justify-center items-center"
                   >
-                    Add Keyword
+                    Add Keyword{" "}
+                    {addingKeyword && (
+                      <BiLoaderCircle
+                        color="white"
+                        size={20}
+                        className="animate-spin ml-2"
+                      />
+                    )}
                   </button>
                 </div>
               ) : (
@@ -660,6 +717,13 @@ const Keyword2 = () => {
         >
           <ColumnsDirective>
             <ColumnDirective
+              field=""
+              headerText="#"
+              template={actionTemplate}
+              width={100}
+              headerTemplate={actionTitleTemplate}
+            />
+            <ColumnDirective
               field="keyword"
               headerText="Keywords"
               // template={keywordTemplate}
@@ -670,17 +734,17 @@ const Keyword2 = () => {
               headerTemplate={VideoIconTitleTemplate}
               template={previewYoutubeKwSearch}
             />
-            <ColumnDirective
-              field=""
-              headerText="Rank"
-              headerTemplate={VolumeTitleTemplate}
-            />
-            <ColumnDirective field="" headerText="Change" />
-            <ColumnDirective
-              field=""
-              headerText="Video Result"
-              headerTemplate={VideoIconTitleTemplate}
-            />
+            {/* <ColumnDirective
+                field=""
+                headerText="Rank"
+                headerTemplate={VolumeTitleTemplate}
+              />
+              <ColumnDirective field="" headerText="Change" />
+              <ColumnDirective
+                field=""
+                headerText="Video Result"
+                headerTemplate={VideoIconTitleTemplate}
+              /> */}
             <ColumnDirective
               field="search_volume"
               headerText="Volume"

@@ -84,7 +84,7 @@ const Sortting = () => {
 
     // Make the API call here
     fetch(
-      `${process.env.REACT_APP_BASE_URL}/fetchKeywordStat??keywords=${searchQuery}`,
+      `${process.env.REACT_APP_API_BASE_URL}/fetchKeywordStat??keywords=${searchQuery}`,
       {
         method: "GET",
         headers: {

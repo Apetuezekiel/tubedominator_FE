@@ -37,7 +37,7 @@ import Opitimize from "../components/Opitimize";
 
 const Ideation = () => {
   const decryptAndRetrieveData = (data) => {
-    const secretKey = process.env.REACT_APP_JWT_SECRET;
+    const secretKey = "+)()^77---<@#$>";
 
     if (data) {
       const decryptedBytes = CryptoJS.AES.decrypt(data, secretKey);
@@ -80,7 +80,7 @@ const Ideation = () => {
     const fetchMyYoutubeInfo = async () => {
       try {
         axios
-          .get(`${process.env.REACT_APP_BASE_URL}/fetchMyYoutubeInfo`, {
+          .get(`${process.env.REACT_APP_API_BASE_URL}/fetchMyYoutubeInfo`, {
             params: {
               channel_id: decryptedFullData.channelId,
             },
@@ -109,7 +109,7 @@ const Ideation = () => {
     const fetchMyPlaylists = async () => {
       try {
         axios
-          .get(`${process.env.REACT_APP_BASE_URL}/fetchMyPlaylists`, {
+          .get(`${process.env.REACT_APP_API_BASE_URL}/fetchMyPlaylists`, {
             params: {
               channel_id: decryptedFullData.channelId,
             },

@@ -11,6 +11,7 @@ const Button = ({
   text,
   borderRadius,
   width,
+  ref
 }) => {
   const { setIsClicked, initialState } = useStateContext();
 

@@ -74,7 +74,7 @@ const IdeasCategoryView = ({ dataSet }) => {
   const addSavedIdea = async () => {
     setSavingKeywordIdea(true);
     const response = await axios.post(
-      `${process.env.REACT_APP_BASE_URL}/addToSavedIdeas`,
+      `${process.env.REACT_APP_API_BASE_URL}/addToSavedIdeas`,
       {
         video_ideas: dataSet.keyword,
         search_volume: dataSet.monthlysearch,

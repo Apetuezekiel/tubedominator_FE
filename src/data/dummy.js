@@ -10,6 +10,7 @@ import {
   AiOutlineStock,
   AiOutlineStar,
   AiFillStar,
+  AiFillWarning,
 } from "react-icons/ai";
 import {
   FiShoppingBag,
@@ -1218,6 +1219,11 @@ export const menuLinks = [
   {
     title: "",
     links: [
+      // {
+      //   name: "Connect Your Youtube",
+      //   link: "youtube",
+      //   icon: <AiFillWarning color="#F89C0E" />,
+      // },
       {
         name: "ideation",
         link: "ideation",
@@ -1225,7 +1231,7 @@ export const menuLinks = [
       },
       {
         name: "Saved Ideas",
-        link: "savedideas",
+        link: "saved-ideas",
         icon: <AiOutlineStar />,
       },
       {

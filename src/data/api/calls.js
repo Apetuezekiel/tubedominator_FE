@@ -1,15 +1,14 @@
 /* eslint-disable */
 import axios from "axios";
-// import { useUserAuthToken } from "../../state/state";
-// import { useUser } from "@clerk/clerk-react";
-import CryptoJS from "crypto-js";
 import { useUserAuthToken, useUserLoggedin } from "../../state/state";
+import showToast from "../../utils/toastUtils";
+import CryptoJS from "crypto-js";
 
 // import { getUserFromClerk } from "../../components/Navbar";
 
 // const userAuthToken = useUserAuthToken((state) => state.userAuthToken);
 export const decryptAndRetrieveData = (data) => {
-  const secretKey = process.env.REACT_APP_JWT_SECRET;
+  const secretKey = "+)()^77---<@#$>";
 
   if (data) {
     const decryptedBytes = CryptoJS.AES.decrypt(data, secretKey);
@@ -32,7 +31,7 @@ export const userFullDataDecrypted = () => {
 //   const decryptedFullData = userFullDataDecrypted();
 //   try {
 //     const response = await axios.get(
-//       "${process.env.REACT_APP_BASE_URL}/getAllSavedIdeas",
+//       "${process.env.REACT_APP_API_BASE_URL}/getAllSavedIdeas",
 //       {
 //         params: {
 //           email: decryptedFullData.email,
@@ -74,11 +73,8 @@ export async function getSavedIdeas() {
   const decryptedFullData = userFullDataDecrypted();
   try {
     const response = await axios.get(
-      `${process.env.REACT_APP_BASE_URL}/getAllSavedIdeas`,
+      `${process.env.REACT_APP_API_BASE_URL}/getAllSavedIdeas?email=${decryptedFullData.email}`,
       {
-        params: {
-          email: decryptedFullData.email,
-        },
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
@@ -127,7 +123,7 @@ export async function getSavedIdeas() {
 export async function getUserEncryptedDataFromDb(gId) {
   try {
     const response = await axios.get(
-      `${process.env.REACT_APP_BASE_URL}/getUserEncryptedData`,
+      `${process.env.REACT_APP_API_BASE_URL}/getUserEncryptedData`,
       {
         params: {
           user_id: `TUBE_${gId}`,
@@ -158,7 +154,7 @@ export async function getUserEncryptedData() {
   if (userLoggedIn) {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_BASE_URL}/getUserEncryptedData`,
+        `${process.env.REACT_APP_API_BASE_URL}/getUserEncryptedData`,
         {
           params: {
             // user_id: "user_2UlxAuRhXLeqwAQUhNMJFittkFD"
@@ -200,9 +196,78 @@ export async function getUserEncryptedData() {
   }
 }
 
+export const deleteChannelKeyword = async (props, setUserChannelKeywords) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  try {
+    setIsLoading(true);
+
+    const responseDelete = await axios.delete(
+      `${process.env.REACT_APP_API_BASE_URL}/deleteUserKeyword`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+          Authorization: `Bearer ${userFullDataDecrypted.token}`,
+        },
+        params: {
+          keyword: props.keyword,
+        },
+      },
+    );
+
+    console.log("Data removed successfully", props.keyword);
+
+    if (responseDelete.data.success) {
+      setUserChannelKeywords((prevData) =>
+        prevData.filter((d) => d.keyword !== props.keyword),
+      );
+      showToast("success", "Keyword removed from saved keywords", 2000);
+    } else {
+      showToast("error", "Saved keyword wasn't removed. Try again", 2000);
+    }
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    setError(error);
+  } finally {
+    setIsLoading(false);
+  }
+
+  return { isLoading, error };
+};
+
+export const isChannelRegistered = async (user_id) => {
+  try {
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_BASE_URL}/ischannelRegistered`,
+      {
+        params: {
+          user_id,
+        },
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+        },
+      },
+    );
+
+    return response.data.success;
+
+  } catch (error) {
+    showToast(
+      "error",
+      "Your network is unstable. We couldn't verify your channel details",
+      2000,
+    );
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
 // Helper Functions
 const encryptAndStoreData = (data) => {
-  const secretKey = process.env.REACT_APP_JWT_SECRET;
+  const secretKey = "+)()^77---<@#$>";
   const jsonData = JSON.stringify(data);
   const encryptedGData = CryptoJS.AES.encrypt(jsonData, secretKey).toString();
   localStorage.setItem("encryptedGData", encryptedGData);

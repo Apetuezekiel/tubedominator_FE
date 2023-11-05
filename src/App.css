@@ -236,3 +236,25 @@
     opacity: 1;
   }
 }
+
+/* CSS */
+.tooltip {
+  display: none;
+  position: absolute;
+  background: #ffffff;
+  border: 1px solid #ccc;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.nav-link-container {
+  position: relative;
+}
+
+.nav-link-container:hover .tooltip {
+  display: none;
+}
+
+.nav-link-container:hover .tooltip {
+  display: block;
+}

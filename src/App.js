@@ -34,6 +34,8 @@ import Opitimize from "./components/Opitimize";
 import SearchTerm from "./components/SearchTerm";
 import Tests from "./components/Tests";
 import IdeasCategoryView from "./components/IdeasCategoryView";
+import Register from "./pages/UserAuth/registration/Register";
+import SignUpPage2 from "./pages/UserAuth/registration/SignUpPage";
 
 import { useStateContext } from "./contexts/ContextProvider";
 import Home from "./pages/Home";
@@ -41,6 +43,8 @@ import { gapi } from "gapi-script";
 import Auth from "./components/Auth";
 import Insights from "./pages/keywords/Insights";
 import Competition from "./pages/keywords/Competition";
+import ConnectYoutube from "./pages/ConnectYoutube";
+import Testss from "./pages/Testss";
 const client_id =
   "372673946018-lu1u3llu6tqi6hmv8m2226ri9qev8bb8.apps.googleusercontent.com";
 const apiKey = "AIzaSyBhnxmlAowrcFI7owW40YrsqI3xPVVk0IU";
@@ -57,9 +61,12 @@ const App = () => {
     themeSettings,
     setThemeSettings,
   } = useStateContext();
-  // const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
-  // const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
-  const userLoggedIn = localStorage.getItem("userLoggedin");
+  const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
+  const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
+  // setUserLoggedIn(localStorage.getItem("userLoggedin"));
+  if (userLoggedIn === "" || null){
+    setUserLoggedIn(localStorage.getItem("userLoggedin"))
+   }
 
   function ProtectedRoute() {
     return userLoggedIn ? <Outlet /> : <Navigate to="/" />;
@@ -71,9 +78,6 @@ const App = () => {
         {/* Authentication */}
         <Route path="/auth" element={<Auth />} />
 
-        {/* Optimization */}
-        <Route path="/optimize" element={<Opitimize />} />
-
         {/* Home */}
         <Route path="/" element={<Home />} />
 
@@ -81,24 +85,60 @@ const App = () => {
         <Route path="/ideation" element={<ProtectedRoute />}>
           <Route path="/ideation" element={<Ideation />} />
         </Route>
-        <Route path="/optimization" element={<Optimization />} />
-        <Route path="/reporting" element={<Reporting />} />
+
+        <Route path="/optimization" element={<ProtectedRoute />}>
+          <Route path="/optimization" element={<Optimization />} />
+        </Route>
+
+        <Route path="/reporting" element={<ProtectedRoute />}>
+          <Route path="/reporting" element={<Reporting />} />
+        </Route>
+
+        <Route path="/saved-ideas" element={<ProtectedRoute />}>
+          <Route path="/saved-ideas" element={<SavedIdeas />} />
+        </Route>
+
+        <Route path="/keywords" element={<ProtectedRoute />}>
+          <Route path="/keywords" element={<Keywords />} />
+        </Route>
+
+        <Route path="/rankings" element={<ProtectedRoute />}>
+          <Route path="/rankings" element={<Rankings />} />
+        </Route>
+        
+        <Route path="/searchterm" element={<ProtectedRoute />}>
+          <Route path="/searchterm" element={<SearchTerm />} />
+        </Route>
+
+        <Route path="/competition" element={<ProtectedRoute />}>
+          <Route path="/competition" element={<Competition />} />
+        </Route>
+
+        <Route path="/insights" element={<ProtectedRoute />}>
+          <Route path="/insights" element={<Insights />} />
+        </Route>
+
+        <Route path="/optimize" element={<ProtectedRoute />}>
+          <Route path="/optimize" element={<Opitimize />} />
+        </Route>
+
+        <Route path="/channel" element={<ProtectedRoute />}>
+          <Route path="/channel" element={<RegistrationForm />} />
+        </Route>
+
+
+        
 
         {/* Navigation */}
         <Route path="/nav" element={<Navbar />} />
 
         {/* User-Specific Routes */}
-        <Route path="/savedideas" element={<SavedIdeas />} />
-        <Route path="/keywords" element={<Keywords />} />
-        <Route path="/rankings" element={<Rankings />} />
-        <Route path="/searchterm" element={<SearchTerm />} />
         <Route path="/ideascategory" element={<IdeasCategoryView />} />
-        <Route path="/competition" element={<Competition />} />
-        <Route path="/insights" element={<Insights />} />
-        <Route path="/tests" element={<Tests />} />
+        <Route path="/tests" element={<Testss />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/youtube" element={<ConnectYoutube />} />
 
-        {/* User Registration */}
-        <Route path="/channel" element={<RegistrationForm />} />
+
 
         {/* Sign-In and Sign-Up */}
         <Route path="/sign-in/*" element={<SignInPage />} />

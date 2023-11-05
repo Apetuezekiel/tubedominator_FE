@@ -7,26 +7,43 @@ import { Button } from ".";
 import { userProfileData } from "../data/dummy";
 import { useStateContext } from "../contexts/ContextProvider";
 import avatar from "../data/avatar.jpg";
-import { useUserData, useUserLoggedin } from "../state/state";
-import { SignOutButton } from "@clerk/clerk-react";
-import { useUser } from "@clerk/clerk-react";
-import { useClerk } from "@clerk/clerk-react";
+import { useUserAccessLevel, useUserData, useUserLoggedin } from "../state/state";
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogout } from "react-google-login";
+import { useRef } from "react";
 
 const UserProfile = () => {
   const clientId =
     "372673946018-lu1u3llu6tqi6hmv8m2226ri9qev8bb8.apps.googleusercontent.com";
   const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
+  const accessLevel = useUserAccessLevel((state) => state.accessLevel);
+  const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
   const { currentColor } = useStateContext();
   const userData = useUserData((state) => state.userData);
   const setUserData = useUserData((state) => state.setUserData);
   const navigate = useNavigate();
+  const logOutBtn = useRef(null);
+  const dismissProfileBtn = useRef(null)
+  const { setIsClicked, initialState } = useStateContext();
+
 
   const onLogoutSuccess = (res) => {
     console.log("Logout Success, res:", res);
     localStorage.clear();
     navigate("/");
+  };
+
+  const handleLogOut = () => {
+    setIsClicked(initialState)
+    console.log("Logout Success");
+    localStorage.clear();
+    navigate("/");
+    setUserLoggedIn('')
+    setAccessLevel('')
+  };
+
+  const handleLogOutClick = () => {
+    dismissProfileBtn.current.click();
   };
 
   return (
@@ -40,6 +57,7 @@ const UserProfile = () => {
           bgHoverColor="light-gray"
           size="2xl"
           borderRadius="50%"
+          // ref={dismissProfileBtn}
         />
       </div>
       <div className="flex gap-5 items-center mt-6 border-color border-b-1 pb-6">
@@ -89,26 +107,28 @@ const UserProfile = () => {
       </div>
       <div className="mt-5">
         <div id="signoutButton">
-          <GoogleLogout
+          {/* <GoogleLogout
             clientId={clientId}
             buttonText="Logout"
             onLogoutSuccess={onLogoutSuccess}
-          ></GoogleLogout>
+          ></GoogleLogout> */}
         </div>
-        <Link to="/channel">
-          <Button
+          {/* <Button
             color="white"
             bgColor={currentColor}
             text="Logout"
             borderRadius="10px"
             width="full"
-            // onClick={() => signOut()}
-          />
-        </Link>
-        {/* </SignOutButton> */}
-        {/* <SignOutButton>
-        <button>Sign in with Clerk</button>
-      </SignOutButton> */}
+          /> */}
+          <button
+          className="w-full rounded-md py-3 text-white"
+          style={{backgroundColor: "#7352FF"}}
+          onClick={() => {setIsClicked(initialState)
+            handleLogOut()}}
+          ref={logOutBtn}
+          >
+            Log Out
+          </button>
       </div>
     </div>
   );
