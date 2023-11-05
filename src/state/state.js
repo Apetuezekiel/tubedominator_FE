@@ -57,12 +57,12 @@ export const useDisplayPreviewKeyword = create((set) => ({
 }));
 
 export const useUserLoggedin = create((set) => ({
-  userLoggedIn: null,
+  userLoggedIn: localStorage.getItem("userLoggedin") || null,
   setUserLoggedIn: (data) => set({ userLoggedIn: data }),
 }));
 
 export const useUserAccessLevel = create((set) => ({
-  accessLevel: '',
+  accessLevel: localStorage.getItem("accessLevel") || '',
   setAccessLevel: (data) => set({ accessLevel: data }),
 }));
 
@@ -70,7 +70,7 @@ export const useSavedIdeasData = create((set) => ({
   savedIdeasData: [],
   setSavedIdeasData: (data) => set({ savedIdeasData: data }),
 }));
-
+  
 // export const useSavedIdeasData = create((set) => ({
 //   savedIdeasData: [],
 //   isLoading: false,

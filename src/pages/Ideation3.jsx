@@ -94,13 +94,14 @@ const Ideation = () => {
   const allUserDeets = useAllUserDeets((state) => state.allUserDeets);
   const setAllUserDeets = useAllUserDeets((state) => state.setAllUserDeets);
   const encryptedGData = localStorage.getItem("encryptedGData");
-  const decryptedFullData = decryptAndRetrieveData(encryptedGData);
+  const decryptedFullData = userFullDataDecrypted();
   const [keywordSuggestionRemark, setKeywordSuggestionRemark] = useState("");
   const initialCountry = {
     countryCode: "GLB",
     languageCode: "en",
   };
   const [selectedCountry, setSelectedCountry] = useState(initialCountry);
+  console.log(decryptedFullData);
 
   let savedData;
   // !userLoggedIn && setUserLoggedIn(true);
@@ -126,7 +127,7 @@ const Ideation = () => {
   }, []);
 
   useEffect(() => {
-    const userLevel = localStorage.getItem("userLevel");
+    const userLevel = localStorage.getItem("accessLevel");
     if (userLevel === "L1") {
       alert(
         "Connect your Youtube Account now to enjoy the cool features of Tubedominator",

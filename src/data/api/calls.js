@@ -70,6 +70,7 @@ export const userFullDataDecrypted = () => {
 // }
 
 export async function getSavedIdeas() {
+
   const decryptedFullData = userFullDataDecrypted();
   try {
     const response = await axios.get(
@@ -135,7 +136,7 @@ export async function getUserEncryptedDataFromDb(gId) {
       },
     );
     const data = response.data.data.encryptedData;
-    encryptAndStoreData(data);
+    localStorage.setItem("encryptedGData", data);
     return decryptAndRetrieveData(data);
   } catch (error) {
     console.error("Error fetching data:", error);

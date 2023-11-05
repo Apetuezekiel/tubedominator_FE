@@ -138,7 +138,7 @@ const GoogleLoginComp = forwardRef((props, ref) => {
 
       const data = response.data;
       if (data.success) {
-        localStorage.setItem("userAcess", "L2");
+        localStorage.setItem("accessLevel", "L2");
         navigate("/ideation");
       } else {
         console.log("Error occurred with adding user ID");

@@ -7,7 +7,7 @@ import axios from "axios";
 import { BiLoaderCircle } from "react-icons/bi";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserAccessLevel, useUserLoggedin } from "../../state/state";
-import { isChannelRegistered } from "../../data/api/calls";
+import { getUserEncryptedDataFromDb, isChannelRegistered } from "../../data/api/calls";
 
 const SignInPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -50,8 +50,6 @@ const SignInPage = () => {
       return;
     }
 
-    
-
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}/sign-in`,
@@ -69,10 +67,14 @@ const SignInPage = () => {
         showToast("success", data.message, 3000);
         setIsLoading(false);
         console.log("Data0", data);
+        const gId = data.user_id.split('_')[1];
+        
+        await getUserEncryptedDataFromDb(gId);
+
         const channelRegistered = await isChannelRegistered(data.user_id);
-        channelRegistered ? localStorage.setItem("userAcess", "L2") : localStorage.setItem("userAcess", data.accessLevel)
+        channelRegistered ? localStorage.setItem("accessLevel", "L2") : localStorage.setItem("accessLevel", data.accessLevel)
         localStorage.setItem("userLoggedin", true);
-        setAccessLevel(localStorage.getItem("userAcess"))
+        setAccessLevel(localStorage.getItem("accessLevel"))
         
         setUserLoggedIn(true)
         navigate("/ideation");
