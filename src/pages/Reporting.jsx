@@ -321,7 +321,7 @@ const Reporting = () => {
         <div className="w-1/2 flex flex-col">
           <div
             className="flex items-center justify-start"
-            style={{ fontSize: "30px", fontWeight: "900" }}
+            style={{ fontSize: "25px", fontWeight: "900" }}
           >
             {" "}
             <FaYoutube className="mr-3" style={{ color: "red" }} />
@@ -488,7 +488,7 @@ const Reporting = () => {
       <div className="w-full">
         <div className="flex justify-between items-center w-full mt-10">
           <div
-            className="flex flex-col rankingStatBoxes border-1 w-1/3 mr-8 border-gray-300 rounded px-10 py-10"
+            className="flex flex-col rankingStatBoxes border-1 w-1/2 mr-8 border-gray-300 rounded px-10 py-10"
             style={{ backgroundColor: "#FBFCFE", height: "600px" }}
           >
             <div className="text-lg mb-3" style={{ fontSize: "20px" }}>
@@ -521,7 +521,7 @@ const Reporting = () => {
             </div> */}
           </div>
           <div
-            className="flex flex-col justify-start items-center rankingStatBoxes border-1 w-1/3 mr-8 border-gray-300 rounded py-10"
+            className="flex flex-col justify-start items-center rankingStatBoxes border-1 w-1/2 mr-8 border-gray-300 rounded py-10"
             style={{ backgroundColor: "#FBFCFE", height: "600px" }}
           >
             <div className="flex items-center justify-center">

@@ -2,7 +2,7 @@
 
 import { React, useEffect, useState } from "react";
 import { MdCancel, MdOutlineCancel } from "react-icons/md";
-import { BiLinkExternal } from "react-icons/bi";
+import { BiLinkExternal, BiLoaderCircle } from "react-icons/bi";
 import { Button } from ".";
 import { userProfileData } from "../data/dummy";
 import { useStateContext } from "../contexts/ContextProvider";
@@ -32,8 +32,10 @@ import { Link } from "react-router-dom";
 import { userFullDataDecrypted } from "../data/api/calls";
 import Spinner from "./Spinner";
 import showToast from "../utils/toastUtils";
+import { FaYoutube } from "react-icons/fa";
+import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
 
-const PreviewKeyword = ({ keywordd }) => {
+const PreviewKeyword = ({ keywordd, setDisplayPreviewKeyword }) => {
   showToast("warning", `keyword ${keywordd}`, 2000);
   const { currentColor } = useStateContext();
   const userData = useUserData((state) => state.userData);
@@ -61,12 +63,12 @@ const PreviewKeyword = ({ keywordd }) => {
     allowDeleting: true,
     mode: "Normal",
   };
-  const displayPreviewKeyword = useDisplayPreviewKeyword(
-    (state) => state.displayPreviewKeyword,
-  );
-  const setDisplayPreviewKeyword = useDisplayPreviewKeyword(
-    (state) => state.setDisplayPreviewKeyword,
-  );
+  // const displayPreviewKeyword = useDisplayPreviewKeyword(
+  //   (state) => state.displayPreviewKeyword,
+  // );
+  // const setDisplayPreviewKeyword = useDisplayPreviewKeyword(
+  //   (state) => state.setDisplayPreviewKeyword,
+  // );
   const settings = { persistSelection: true };
 
   useEffect(() => {
@@ -74,7 +76,7 @@ const PreviewKeyword = ({ keywordd }) => {
     // Define the API URL you want to fetch data from
     console.log("keyword", keywordd);
     axios
-      .get(`https://hq.tubedominator.com/api/fetchMyYoutubeVideos`, {
+      .get(`${process.env.REACT_APP_API_BASE_URL}/fetchSerpYoutubeVideos`, {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
@@ -82,7 +84,6 @@ const PreviewKeyword = ({ keywordd }) => {
         },
         params: {
           keyword: keywordd ?? "Football",
-          channel_id: decryptedFullData.channelId,
         },
       })
       .then((response) => {
@@ -102,7 +103,6 @@ const PreviewKeyword = ({ keywordd }) => {
       });
 
     return () => {
-      // Cleanup function to be called when the component is unmounted
       isMounted = false;
     };
   }, []);
@@ -122,15 +122,15 @@ const PreviewKeyword = ({ keywordd }) => {
     return (
       <div className="flex">
         <img
-          src={props.thumbnails.url}
+          src={props.thumbnail.static}
           alt="Thumbnail"
           style={{ width: "100px", height: "80px" }}
           className="ml-5 rounded"
         />
-        <Link to={props.videoLink}>
-          <div className="ml-4 cursor-pointer whitespace-normal underline flex items-top justify-start">
+        <Link to={props.link}>
+          <div className="ml-4 cursor-pointer whitespace-normal underline flex items-top">
             {props.title}{" "}
-            <BiLinkExternal className="ml-1" color="#7352FF" size={10} />
+            {/* <BiLinkExternal className="ml-1" color="#7352FF" size={10} /> */}
           </div>
         </Link>
       </div>
@@ -149,14 +149,24 @@ const PreviewKeyword = ({ keywordd }) => {
 
   const videoChannelTemplate = (props) => {
     return (
-      <Link to={props.channelLink}>
+      <Link to={props.link}>
         <div className="ml-4 cursor-pointer underline flex items-top justify-start">
-          {props.channelTitle}{" "}
-          <BiLinkExternal className="ml-1" color="#7352FF" size={10} />{" "}
+          {props.channel.name}{" "}
+          {/* <BiLinkExternal className="ml-1" color="#7352FF" size={10} />{" "} */}
         </div>
       </Link>
     );
   };
+
+  const formatViews = (props) => {
+    const estimatedViews = parseInt(props.views);
+    const formatedNumber = formatNumberToKMBPlus(estimatedViews);
+    // const formattedViews = estimatedViews.toLocaleString() + "+";
+    return (
+      <span className="flex items-center justify-start">{formatedNumber}</span>
+    );
+  };
+
 
   const gridOrderOptimizationLevel = (props) => {
     return (
@@ -185,12 +195,13 @@ const PreviewKeyword = ({ keywordd }) => {
   return (
     // <div className="flex justify-center items-center w-full" style={{backgroundColor: "black"}}>
     // <div className="nav-item absolute left-1/2 top-52 bg-white dark:bg-[#42464D] p-8 rounded-lg w-4/6 transform -translate-x-1/2">
-    <div className="nav-item fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-60 z-50">
-      <div className="bg-white dark:bg-[#42464D] p-8 my-20 rounded-lg w-4/6">
-        <div className="flex justify-between items-center">
-          <p className="font-semibold text-lg dark:text-gray-200">
-            Search Result from Youtube {keywordd}
-          </p>
+    <div className={`nav-item fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-60 z-50 overflow-auto ${isSearchLoaded === false && "pt-96"}`}>
+      <div className={`bg-white dark:bg-[#42464D] p-8 my-20 rounded-lg w-5/6 ${isSearchLoaded === false && "pt-40"} `}>
+        <div className="flex justify-between items-center mb-5">
+          <div className="font-semibold text-lg dark:text-gray-200">
+            <div className="flex items-center gap-3">Search Result from Youtube <FaYoutube color="red"/> </div> 
+            <div className="text-sm capitalize underline">{keywordd}</div>
+          </div>
           {/* <Button
             icon={<MdOutlineCancel />}
             color="rgb(153, 171, 180)"
@@ -199,12 +210,17 @@ const PreviewKeyword = ({ keywordd }) => {
             borderRadius="50%"
             
           /> */}
-          <MdCancel onClick={setDisplayPreviewKeyword(false)} size={20} />
+          <MdCancel onClick={() => setDisplayPreviewKeyword(false)} size={20} color="red" className="cursor-pointer"/>
         </div>
         {isSearchLoaded ? (
-          <div className="loading-container my-10">
-            <Spinner />
-          </div>
+          <div className="flex flex-col justify-center items-center w-full mt-20">
+          <BiLoaderCircle
+            className="animate-spin text-center"
+            color="#7352FF"
+            size={30}
+          />
+          <div>Loading up Keyword Insights for you</div>
+        </div>
         ) : (
           <GridComponent
             dataSource={keywordVideosInfo}
@@ -216,10 +232,10 @@ const PreviewKeyword = ({ keywordd }) => {
             // contextMenuItems={contextMenuItems}
             // editSettings={editing}
             // ref={gridInstance}
-            toolbar={toolbarOptions}
-            editSettings={editSettings}
-            selectionSettings={settings}
-            filterSettings={filterOptions}
+            // toolbar={toolbarOptions}
+            // editSettings={editSettings}
+            // selectionSettings={settings}
+            // filterSettings={filterOptions}
           >
             <ColumnsDirective>
               <ColumnDirective field="index" headerText="Rank" width="100" />
@@ -236,8 +252,14 @@ const PreviewKeyword = ({ keywordd }) => {
                 // width="200"
               />
               <ColumnDirective
-                field="viewCount"
+                field="views"
                 headerText="Views"
+                // width="150"
+                template={formatViews}
+              />
+              <ColumnDirective
+                field="published_date"
+                headerText="Date published"
                 // width="150"
                 // template={formatDate}
               />

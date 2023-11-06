@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MdAccountCircle } from "react-icons/md";
 import appLogo from "../../assets/images/TubeDominator 1000x1000.png";
-import loginIcon from "../../assets/images/Mobile login-pana.png";
+import loginIcon from "../../assets/images/Mobile-login-pana.png";
 import showToast from "../../utils/toastUtils";
 import axios from "axios";
 import { BiLoaderCircle } from "react-icons/bi";
@@ -83,8 +83,8 @@ const SignInPage = () => {
         setIsLoading(false);
       }
     } catch (error) {
-      console.error("Error Registering User:", error);
-      showToast("error", `Couldn't Sign you up`, 3000);
+      console.error("Error Logging User in:", error);
+      showToast("error", `Couldn't Log you in`, 3000);
       setIsLoading(false);
     }
   };

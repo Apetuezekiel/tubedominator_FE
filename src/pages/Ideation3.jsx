@@ -47,6 +47,7 @@ import countriesWithLanguages from "../data/countries";
 import { FiTrendingUp } from "react-icons/fi";
 import { BsArrowDownShort, BsArrowUpShort, BsDot } from "react-icons/bs";
 import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
+import Insights from "./keywords/Insights";
 
 const Ideation = () => {
   const apiUrl = process.env.REACT_APP_API_BASE_URL;
@@ -91,6 +92,7 @@ const Ideation = () => {
   const [showSavedIdeaCategoryPanel, setShowSavedIdeaCategoryPanel] =
     useState(false);
   const [savingKeywordIdea, setSavingKeywordIdea] = useState(false);
+  const [showInsights, setShowInsights] = useState(false);
   const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
   const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
   const allUserDeets = useAllUserDeets((state) => state.allUserDeets);
@@ -506,11 +508,24 @@ const Ideation = () => {
 
   const VideoIconTitleTemplate = (props) => {
     return (
-      <div className="tooltip-container flex items-center justify-center">
+      <div className="tooltip-container flex items-center justify-center break-words">
         <IconsWithTitle title={props.headerText} icons={videoIcon} />
         <div className="tooltip-text text-black">
           Information about potential views
         </div>
+      </div>
+    );
+  };
+
+  const VideoIconTemplate = (props) => {
+    console.log("props", props);
+    return (
+      <div className="flex flex-col break-words" onClick={()=>{
+        setShowInsights(true)
+        setIdeasDataSet(props)
+        }}>
+        <span className="text-md capitalize">{props.keyword}</span>
+        <span className="text-xs text cursor-pointer" style={{color: "#7352FF"}}>More Insights</span>
       </div>
     );
   };
@@ -753,6 +768,7 @@ const Ideation = () => {
               field="keyword"
               headerText="Video ideas"
               headerTemplate={VideoIconTitleTemplate}
+              template={VideoIconTemplate}
             />
             <ColumnDirective
               field="monthlysearch"
@@ -849,6 +865,7 @@ const Ideation = () => {
               field="keyword"
               headerText="Video ideas"
               headerTemplate={VideoIconTitleTemplate}
+              template={VideoIconTemplate}
             />
             <ColumnDirective
               field="monthlysearch"
@@ -888,6 +905,7 @@ const Ideation = () => {
           />
         </GridComponent>
         {showSavedIdeaCategoryPanel &&  <IdeasCategoryView dataSet={ideasDataSet} setShowSavedIdeaCategoryPanel={setShowSavedIdeaCategoryPanel}/>}
+        {showInsights &&  <Insights dataSet={ideasDataSet} setShowInsights={setShowInsights}/>}
         {/* {showSavedIdeaCategoryPanel && IdeaCategoryPanel()} */}
       </div>
     </div>

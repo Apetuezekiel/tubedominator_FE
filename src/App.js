@@ -9,6 +9,7 @@ import {
   Navigate,
   Outlet,
 } from "react-router-dom";
+
 import { FiSettings } from "react-icons/fi";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 import { ToastContainer } from "react-toastify";
@@ -27,6 +28,7 @@ import Rankings from "./pages/Rankings";
 import "./App.css";
 import Sort from "./data/Sortting";
 import RegistrationForm from "./pages/UserAuth/registration/index2";
+
 import { useSavedIdeasData, useUserLoggedin } from "./state/state";
 import SignInPage from "./pages/UserAuth/SignInPage";
 import SignUpPage from "./pages/UserAuth/SignUpPage";
@@ -36,6 +38,7 @@ import Tests from "./components/Tests";
 import IdeasCategoryView from "./components/IdeasCategoryView";
 import Register from "./pages/UserAuth/registration/Register";
 import SignUpPage2 from "./pages/UserAuth/registration/SignUpPage";
+import PreviewKeyword from "./components/PreviewKeyword";
 
 import { useStateContext } from "./contexts/ContextProvider";
 import Home from "./pages/Home";
@@ -134,6 +137,7 @@ const App = () => {
 
         {/* User-Specific Routes */}
         <Route path="/ideascategory" element={<IdeasCategoryView />} />
+        <Route path="/preview" element={<PreviewKeyword />} />
         <Route path="/tests" element={<Testss />} />
         <Route path="/register" element={<Register />} />
         <Route path="/youtube" element={<ConnectYoutube />} />

@@ -226,8 +226,8 @@ const Navbar = () => {
             
           /> */}
           <div className="ml-5">
-            <div className="pageTitle text-4xl font-semibold">{pageTitle}</div>
-            <div className="tag text-lg mt-2">{pageTag}</div>
+            <div className="pageTitle text-3xl font-semibold">{pageTitle}</div>
+            <div className="tag text-md mt-2">{pageTag}</div>
           </div>
           <div className="flex">
             <TooltipComponent content="Profile" position="BottomCenter">

@@ -66,12 +66,12 @@ const Keyword2 = () => {
   const setExactKeywordData = useKeywordStore(
     (state) => state.setExactKeywordData,
   );
-  const displayPreviewKeyword = useDisplayPreviewKeyword(
-    (state) => state.displayPreviewKeyword,
-  );
-  const setDisplayPreviewKeyword = useDisplayPreviewKeyword(
-    (state) => state.setDisplayPreviewKeyword,
-  );
+  // const displayPreviewKeyword = useDisplayPreviewKeyword(
+  //   (state) => state.displayPreviewKeyword,
+  // );
+  // const setDisplayPreviewKeyword = useDisplayPreviewKeyword(
+  //   (state) => state.setDisplayPreviewKeyword,
+  // );
   const relatedKeywordData = useKeywordStore(
     (state) => state.relatedKeywordData,
   );
@@ -81,6 +81,8 @@ const Keyword2 = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(null);
   const [loadedLocalStorage, setLoadedLocalStorage] = useState(false);
+  const [displayPreviewKeyword, setDisplayPreviewKeyword] = useState(false);
+
   const userChannelKeywords = useUserChannelKeywords(
     (state) => state.userChannelKeywords,
   );
@@ -473,7 +475,8 @@ const Keyword2 = () => {
         <div
           className="flex justify-start items-center"
           onClick={() => {
-            callEM(props);
+            setUnconventionalKeywordd(props.keyword);
+            setDisplayPreviewKeyword(true);
           }}
         >
           <span className="mr-2 cursor-pointer">Preview</span>
@@ -572,13 +575,6 @@ const Keyword2 = () => {
 
   return (
     <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
-      {/* {displayPreviewKeyword == false && (<div>
-        <div className="flex justify-center z-10">  
-        <MdCancel onClick={() => setDisplayPreviewKeyword(false)} size={20} />
-      </div>
-        <PreviewKeyword keywordd={"hot"}/>
-      </div>)} */}
-      {isClicked.previewKw && <PreviewKeyword keywordd={"hot"} />}
       {isLoading ? (
         <div className="loading-container">
           <Spinner />
@@ -616,7 +612,7 @@ const Keyword2 = () => {
         <div className="flex justify-between items-center w-full mt-10">
           <div className="h-30 flex flex-col justify-start items-center rankingStatBoxes border-1 w-1/3 py-20 px-5 mr-8 border-gray-300 rounded">
             <div>Average Position</div>
-            <div className="text-gray-500 text-sm">{dateRange}</div>
+            <div className="text-gray-500 text-xs">{dateRange}</div>
             <div>n/a</div>
             <div className="w-full bg-gray-300 h-5 mt-3">
               {/* <input
@@ -630,12 +626,12 @@ const Keyword2 = () => {
           </div>
           <div className="h-30 flex flex-col justify-start items-center rankingStatBoxes border-1 w-1/3 py-8 mr-8 border-gray-300 rounded">
             <div>Keyword Distribution</div>
-            <div className="text-gray-500 text-sm">{dateRange}</div>
+            <div className="text-gray-500 text-xs">{dateRange}</div>
             <div className="flex items-center mt-5">
-              <div className="mr-20">
+              <div className="mr-10">
                 <img src={donought} alt="" />
               </div>
-              <div className="mr-20">
+              <div className="mr-10 text-xs">
                 <div className="flex items-center mb-3">
                   <BsFillSquareFill className="mr-2" color="Purple" />
                   <span>Top 3</span>
@@ -653,33 +649,33 @@ const Keyword2 = () => {
                   <span>No Rank</span>
                 </div>
               </div>
-              <div>
+              <div className="text-xs">
                 <div className="flex items-center mb-3">
                   <span className="mr-2">0</span>
                   <AiOutlineArrowRight />
-                  <span>0</span>
+                  <span className="ml-1">0</span>
                 </div>
                 <div className="flex items-center mb-3">
                   <span className="mr-2">0</span>
                   <AiOutlineArrowRight />
-                  <span>0</span>
+                  <span className="ml-1">0</span>
                 </div>
                 <div className="flex items-center mb-3">
                   <span className="mr-2">0</span>
                   <AiOutlineArrowRight />
-                  <span>0</span>
+                  <span className="ml-1">0</span>
                 </div>
                 <div className="flex items-center mb-3">
                   <span className="mr-2">0</span>
                   <AiOutlineArrowRight />
-                  <span>0</span>
+                  <span className="ml-1">0</span>
                 </div>
               </div>
             </div>
           </div>
           <div className="h-30 flex flex-col justify-start items-center rankingStatBoxes border-1 w-1/3 py-20 px-5 border-gray-300 rounded">
             <div>Keyword Rank Up/Down</div>
-            <div className="text-gray-500 text-sm">{dateRange}</div>
+            <div className="text-gray-500 text-xs">{dateRange}</div>
             <div className="flex items-center">
               <span className="flex items-center mr-5 text-lg">
                 0 <AiOutlineArrowUp className="ml-1" color="green" />
@@ -783,8 +779,7 @@ const Keyword2 = () => {
               : "View All Keywords"}
           </span>
         </Link>
-        {/* {displayPreviewKeyword && <PreviewKeyword keywordd={unconventionalKeywordd} />} */}
-        {/* {<PreviewKeyword keywordd={"hot"}/>} */}
+        {displayPreviewKeyword && <PreviewKeyword keywordd={unconventionalKeywordd} setDisplayPreviewKeyword={setDisplayPreviewKeyword}/>}
       </div>
     </div>
   );

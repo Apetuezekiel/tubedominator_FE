@@ -11,7 +11,7 @@ import { MdCancel } from "react-icons/md";
 import { BiArrowBack } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 
-function Insights() {
+function Insights({ideasDataSet}) {
   const navigate = useNavigate();
 
   return (
@@ -27,13 +27,13 @@ function Insights() {
         </div>
         <div className="flex items-center">
           <span className="mr-3">Your idea:</span>
-          <span className="text-3xl font-bold mb-2">
-            extreme weight loss methods
+          <span className="text-3xl font-bold mb-2 capitalize">
+            {ideasDataSet.keyword}
           </span>
         </div>
         <div className="flex mt-3">
           <span className="mr-3">Search volume:</span>
-          <span>18k | Language: English (Global)</span>
+          <span>{ideasDataSet.volume} | Language: English (Global)</span>
         </div>
         <div className="flex mt-10">
           <span
@@ -59,7 +59,7 @@ function Insights() {
             <AiOutlineInfoCircle size={20} />
           </div>
           <div className="mt-8">
-            <div className="text-5xl font-bold">40K</div>
+            <div className="text-4xl font-bold">40K</div>
             <div>per month</div>
           </div>
           <div style={{ color: "#7438FF" }} className="mt-20">

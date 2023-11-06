@@ -82,7 +82,7 @@ const Keyword2 = () => {
     useState(false);
   const [selectedKeyword, setSelectedKeyword] = useState("");
   const [unconventionalKeywordd, setUnconventionalKeywordd] =
-    useState("Holy Ghost");
+    useState("");
   const {
     currentColor,
     activeMenu,
@@ -114,6 +114,8 @@ const Keyword2 = () => {
   };
   const settings = { persistSelection: true };
   let unconventionalKeyword = "God";
+  const [displayPreviewKeyword, setDisplayPreviewKeyword] = useState(false);
+
 
   const toggleSave = async (keyword, save) => {
     // fetchSavedIdeasData()
@@ -590,9 +592,8 @@ const Keyword2 = () => {
         <div
           className="flex justify-start items-center"
           onClick={() => {
-            unconventionalKeyword = props.keyword;
             setUnconventionalKeywordd(props.keyword);
-            showPreviewKeyword(props.keyword);
+            setDisplayPreviewKeyword(true);
           }}
         >
           <span className="mr-2 cursor-pointer">Preview</span>
@@ -604,9 +605,6 @@ const Keyword2 = () => {
 
   return (
     <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
-      {isClicked.previewKw && (
-        <PreviewKeyword keywordd={unconventionalKeywordd} />
-      )}
       {isLoading ? (
         <div className="loading-container">
           <Spinner />
@@ -768,6 +766,7 @@ const Keyword2 = () => {
             ]}
           />
         </GridComponent>
+        {displayPreviewKeyword && <PreviewKeyword keywordd={unconventionalKeywordd} setDisplayPreviewKeyword={setDisplayPreviewKeyword}/>}
       </div>
     </div>
   );
