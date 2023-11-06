@@ -51,6 +51,7 @@ import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 import { MdCancel } from "react-icons/md";
 import { BsFillSquareFill } from "react-icons/bs";
 import donought from "../data/donought2.png";
+import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
 
 const Keyword2 = () => {
   const decryptedFullData = userFullDataDecrypted();
@@ -301,9 +302,10 @@ const Keyword2 = () => {
 
   const formatViews = (props) => {
     const estimatedViews = parseInt(props.search_volume);
+    const formatedNumber = formatNumberToKMBPlus(estimatedViews);
     // const formattedViews = estimatedViews.toLocaleString() + "+";
     return (
-      <span className="flex items-center justify-start">{estimatedViews}+</span>
+      <span className="flex items-center justify-start">{formatedNumber}</span>
     );
   };
 
@@ -474,7 +476,7 @@ const Keyword2 = () => {
             callEM(props);
           }}
         >
-          <span className="mr-2 cursor-pointer underline">Preview</span>
+          <span className="mr-2 cursor-pointer">Preview</span>
           <FaYoutube color="red" />
         </div>
       </TooltipComponent>
@@ -587,12 +589,12 @@ const Keyword2 = () => {
       <div>
         <div className="flex items-center mb-5 w-full border-b border-solid border-gray-300">
           <NavLink to="/rankings">
-            <div className="flex justify-between items-center mr-5 pr-5 selectedMenuKwPg">
+            <div className="flex justify-between items-center mr-5 pr-5 pb-2 selectedMenuKwPg">
               Rankings
             </div>
           </NavLink>
           <NavLink to="/keywords">
-            <div className="flex justify-between items-center">Keywords</div>
+            <div className="flex justify-between items-center pb-2">Keywords</div>
           </NavLink>
         </div>
         <div className="flex items-center mb-5">

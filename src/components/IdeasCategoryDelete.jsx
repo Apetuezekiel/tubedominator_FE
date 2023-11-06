@@ -7,7 +7,7 @@ import { AiFillCheckCircle } from "react-icons/ai";
 import axios from "axios";
 import showToast from "../utils/toastUtils";
 
-const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
+const IdeasCategoryDelete = ({ dataSet, setShowSavedIdeaCategoryPanel, setUpdatedSavedIdea }) => {
   console.log('dataSet', dataSet);
   const [categories, setCategories] = useState(["Uncategorized Ideas"]);
   const [fetchedSavedIdeas, setFetchedSavedIdeas] = useState(false);
@@ -15,8 +15,9 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
   const [showInputTag, setShowInputTag] = useState(false);
   const [addingNewFolder, setAddingNewFolder] = useState(false);
   const [addedNewFolder, setAddedNewFolder] = useState(false);
+  const [deletingKeywordIdea, setDeletingKeywordIdea] = useState(false);
   const [savingKeywordIdea, setSavingKeywordIdea] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(dataSet.category);
   const decryptedFullData = userFullDataDecrypted();
 
   //   const [fetchingSavedIdeas, setFetchingSavedIdeas] = useState(true);
@@ -72,15 +73,43 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
     setShowInputTag(false);
   };
 
+  const removeSavedIdea = async () => {
+    setDeletingKeywordIdea(true);
+    const responseDelete = await axios.delete(
+      `${process.env.REACT_APP_API_BASE_URL}/deleteSavedIdea/${dataSet.id}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+          Authorization: `Bearer ${decryptedFullData.token}`,
+        },
+        params: {
+          email: decryptedFullData.email,
+        },
+      },
+    );
+    console.log(" and response:", responseDelete);
+    if (responseDelete.data.success) {
+      setUpdatedSavedIdea(prevState => !prevState);
+      setDeletingKeywordIdea(false);
+      showToast("success", "Idea removed successfully", 2000);
+      setShowSavedIdeaCategoryPanel(false)
+    } else {
+      setDeletingKeywordIdea(false);
+      showToast("error", "Idea wasn't removed. Try again", 2000);
+      setShowSavedIdeaCategoryPanel(false)
+    }
+  };
+
   const addSavedIdea = async () => {
     setSavingKeywordIdea(true);
     const response = await axios.post(
       `${process.env.REACT_APP_API_BASE_URL}/addToSavedIdeas`,
       {
-        video_ideas: dataSet.keyword,
-        search_volume: dataSet.monthlysearch,
-        keyword_diff: dataSet.difficulty,
-        potential_views: dataSet.estimated_views,
+        video_ideas: dataSet.video_ideas,
+        search_volume: dataSet.search_volume,
+        keyword_diff: dataSet.keyword_diff,
+        potential_views: dataSet.potential_views,
         trend: dataSet.trend,
         email: decryptedFullData.email,
         category: selectedCategory,
@@ -96,6 +125,7 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
 
     console.log(" and response:", response);
     if (response.data.success) {
+      setUpdatedSavedIdea(prevState => !prevState);
       setSavingKeywordIdea(false);
       showToast("success", "Idea saved successfully", 2000);
       setShowSavedIdeaCategoryPanel(false)
@@ -113,7 +143,7 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
           <MdCancel color="red" size={20} />
         </button>
         <h2 className="text-lg font-semibold mb-3">
-          Categorize ideas for easy access
+          Manage Saved Ideas
         </h2>
         <div className="flex items-center justify-center">
           {fetchedSavedIdeas === false && (
@@ -131,7 +161,7 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
         </div>
         <div className="flex mt-3">
           <span className="w-1/3">Idea:</span>
-          <span className="w-2/3 pl-20 font-semibold ml-2 text-lg capitalize break-words">{dataSet.string}</span>
+          <span className="w-2/3 pl-20 font-semibold ml-2 text-lg capitalize break-words">{dataSet.video_ideas}</span>
         </div>
         <div className="flex mt-3">
           <span className="w-1/3">Folder:</span>
@@ -177,13 +207,22 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
             )}
           </div>
           <div className="w-1/2 text-right ml-3 flex items-center">
-            <button
-              style={{ border: "1px solid #CC0000", color: "#CC0000" }}
-              className="mr-3 py-2 px-5 rounded-full text-md"
-              onClick={() => setShowSavedIdeaCategoryPanel(false)}
-            >
-              Cancel
-            </button>
+            <div className="flex items-center">
+              <button
+                style={{ border: "1px solid #CC0000", color: "#CC0000" }}
+                className="mr-3 py-2 px-5 rounded-full text-md"
+                onClick={removeSavedIdea}
+              >
+                Remove Idea
+              </button>
+              {deletingKeywordIdea && (
+                  <BiLoaderCircle
+                    className="animate-spin ml-2"
+                    color="#7352FF"
+                    size={20}
+                  />
+                )}
+            </div>
             <div className="flex items-center">
               <button
                 style={{
@@ -211,4 +250,4 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
   );
 };
 
-export default IdeasCategoryView;
+export default IdeasCategoryDelete;

@@ -617,12 +617,12 @@ const Keyword2 = () => {
       <div>
         <div className="flex items-center mb-5 w-full border-b border-solid border-gray-300">
           <NavLink to="/rankings">
-            <div className="flex justify-between items-center mr-5 pr-5">
+            <div className="flex justify-between items-center mr-5 pr-5 pb-2">
               Rankings
             </div>
           </NavLink>
           <NavLink to="/keywords">
-            <div className="flex justify-between items-center selectedMenuKwPg">
+            <div className="flex justify-between items-center selectedMenuKwPg pb-2">
               Keywords
             </div>
           </NavLink>

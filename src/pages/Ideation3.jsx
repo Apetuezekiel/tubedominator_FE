@@ -46,6 +46,7 @@ import { getSavedIdeas, userFullDataDecrypted } from "../data/api/calls";
 import countriesWithLanguages from "../data/countries";
 import { FiTrendingUp } from "react-icons/fi";
 import { BsArrowDownShort, BsArrowUpShort, BsDot } from "react-icons/bs";
+import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
 
 const Ideation = () => {
   const apiUrl = process.env.REACT_APP_API_BASE_URL;
@@ -86,6 +87,7 @@ const Ideation = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(null);
   const [loadedLocalStorage, setLoadedLocalStorage] = useState(false);
+  const [ideasDataSet, setIdeasDataSet] = useState(false);
   const [showSavedIdeaCategoryPanel, setShowSavedIdeaCategoryPanel] =
     useState(false);
   const [savingKeywordIdea, setSavingKeywordIdea] = useState(false);
@@ -195,7 +197,7 @@ const Ideation = () => {
         );
         // console.log("Yo Bro. I am about to delete the exact Keyword. You sure about this bro?. This shit is irreversible bro. You gotta be sure bro. Click okay if you sure, but think hard bro!!");
         alert(
-          "Yo Bro. I am about to delete the exact Keyword. You sure about this bro?. This shit is irreversible bro. You gotta be sure bro. Click okay if you sure, but think hard bro!!",
+          "Are you sure you want to delete?",
         );
       } else {
         foundObject = savedData.related_keywords.find(
@@ -213,6 +215,7 @@ const Ideation = () => {
             video_ideas: foundObject.keyword,
             search_volume: foundObject.monthlysearch,
             keyword_diff: foundObject.difficulty,
+            trends: foundObject.trends,
             potential_views: foundObject.estimated_views,
             email: decryptedFullData.email,
           },
@@ -372,7 +375,7 @@ const Ideation = () => {
 
     const toggleFavorite = () => {
       setIsFavorite((prevIsFavorite) => !prevIsFavorite);
-      toggleSave(keyword, !isFavorite);
+      // toggleSave(keyword, !isFavorite);
     };
 
     const starIcon = savingKeywordIdea ? (
@@ -386,7 +389,10 @@ const Ideation = () => {
     return (
       <div
         className="flex items-center justify-center"
-        onClick={toggleFavorite}
+        onClick={()=> {
+          setShowSavedIdeaCategoryPanel(true)
+          setIdeasDataSet(props)
+        }}
       >
         {starIcon}
       </div>
@@ -394,7 +400,7 @@ const Ideation = () => {
   };
 
   const IdeaCategoryPanel = async (props) => {
-    setShowSavedIdeaCategoryPanel(true);
+    // setShowSavedIdeaCategoryPanel(true);
     console.log("props", props);
     return <IdeasCategoryView dataSet={props} />;
   };
@@ -405,21 +411,6 @@ const Ideation = () => {
       return formattedNumber + "k+";
     } else {
       return number.toString();
-    }
-  }
-
-  function formatNumberToKMBPlus(number) {
-    if (number >= 1000000000) {
-      const formattedNumber = Math.floor(number / 1000000000);
-      return formattedNumber + "B+";
-    } else if (number >= 1000000) {
-      const formattedNumber = Math.floor(number / 1000000);
-      return formattedNumber + "M+";
-    } else if (number >= 1000) {
-      const formattedNumber = Math.floor(number / 1000);
-      return formattedNumber + "K+";
-    } else {
-      return number.toString() + "+";
     }
   }
 
@@ -575,8 +566,6 @@ const Ideation = () => {
       setRelatedKeywordData(data.response.related_keywords);
       localStorage.setItem("lastVideoIdeas", JSON.stringify(data.response));
       setLoadedLocalStorage(false);
-
-      console.log(keywordData);
     } catch (error) {
       console.error("Error fetching data:", error);
       showToast(
@@ -898,7 +887,8 @@ const Ideation = () => {
             ]}
           />
         </GridComponent>
-        {showSavedIdeaCategoryPanel && IdeaCategoryPanel()}
+        {showSavedIdeaCategoryPanel &&  <IdeasCategoryView dataSet={ideasDataSet} setShowSavedIdeaCategoryPanel={setShowSavedIdeaCategoryPanel}/>}
+        {/* {showSavedIdeaCategoryPanel && IdeaCategoryPanel()} */}
       </div>
     </div>
   );

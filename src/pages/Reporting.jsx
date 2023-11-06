@@ -313,7 +313,7 @@ const Reporting = () => {
   };
 
   return (
-    <div className="py-5 px-10 mt-20">
+    <div className="py-5 px-10 mt-5">
       <div
         className="flex rankingStatBoxes py-10"
         style={{ backgroundColor: "#FBFCFE" }}

@@ -34,6 +34,11 @@ import CryptoJS from "crypto-js";
 import showToast from "../utils/toastUtils";
 import { getSavedIdeas, userFullDataDecrypted } from "../data/api/calls";
 import { BiLoaderCircle } from "react-icons/bi";
+import { FiTrendingUp } from "react-icons/fi";
+import { BsArrowDownShort, BsArrowUpShort, BsDot } from "react-icons/bs";
+import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
+import IdeasCategoryDelete from "../components/IdeasCategoryDelete";
+
 
 const SavedIdeas = () => {
   const decryptAndRetrieveData = (data) => {
@@ -62,6 +67,7 @@ const SavedIdeas = () => {
   const [favorites, setFavorites] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [fetchedSavedIdeas, setFetchedSavedIdeas] = useState("");
+  const [processingDeleteSavedIdea, setProcessingDeleteSavedIdea] = useState(false);
   const [filteredData, setFilteredData] = useState(savedIdeasData);
   const userEncryptedData = localStorage.getItem("encryptedFullData");
   const decryptedFullData = userFullDataDecrypted();
@@ -73,6 +79,10 @@ const SavedIdeas = () => {
   );
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [showSavedIdeaCategoryPanel, setShowSavedIdeaCategoryPanel] =
+  useState(false);
+  const [ideasDataSet, setIdeasDataSet] = useState(false);
+  const [updatedSavedIdea, setUpdatedSavedIdea] = useState(false);
 
   useEffect(() => {
     setFetchedSavedIdeas(true);
@@ -112,7 +122,7 @@ const SavedIdeas = () => {
     };
 
     fetchSavedIdeas();
-  }, []);
+  }, [updatedSavedIdea]);
 
   useEffect(() => {
     console.log("savedIdeasData", "savedIdeasData");
@@ -147,7 +157,7 @@ const SavedIdeas = () => {
     };
 
     fetchData(); // Call the fetchData function when the component mounts
-  }, []);
+  }, [updatedSavedIdea]);
 
   const handleCategoryChange = (event) => {
     console.log("savedIdeasData from saved Ideas", savedIdeasData);
@@ -281,6 +291,7 @@ const SavedIdeas = () => {
   }
 
   const deleteSavedKeyword = async (id) => {
+    setProcessingDeleteSavedIdea(true)
     try {
       const responseDelete = await axios.delete(
         `${process.env.REACT_APP_API_BASE_URL}/deleteSavedIdea/${id}`,
@@ -297,12 +308,15 @@ const SavedIdeas = () => {
       );
       if (responseDelete.data.success) {
         showToast("success", "Idea removed from Saved Ideas", 2000);
+        setProcessingDeleteSavedIdea(false)
         // fetchSavedIdeasData();
       } else {
         showToast("error", "Idea wasn't removed. Try again", 2000);
+        setProcessingDeleteSavedIdea(false)
       }
     } catch (error) {
       console.error("Error fetching data:", error);
+      setProcessingDeleteSavedIdea(false)
       throw error; // Rethrow the error to handle it in the component if needed
     }
   };
@@ -325,26 +339,14 @@ const SavedIdeas = () => {
     );
 
     return (
-      <div onClick={makeFavorite}>
+      <div         onClick={()=> {
+        setShowSavedIdeaCategoryPanel(true)
+        setIdeasDataSet(props)
+      }}>
         {<AiFillStar color="#7352FF" size={20} />}
       </div>
     );
   };
-
-  function formatNumberToKMBPlus(number) {
-    if (number >= 1000000000) {
-      const formattedNumber = Math.floor(number / 1000000000);
-      return formattedNumber + "B+";
-    } else if (number >= 1000000) {
-      const formattedNumber = Math.floor(number / 1000000);
-      return formattedNumber + "M+";
-    } else if (number >= 1000) {
-      const formattedNumber = Math.floor(number / 1000);
-      return formattedNumber + "K+";
-    } else {
-      return number.toString() + "+";
-    }
-  }
 
   const formatViews = (props) => {
     const estimatedViews = parseInt(props.potential_views);
@@ -358,6 +360,19 @@ const SavedIdeas = () => {
     const formattedViews = formatNumberToKMBPlus(estimatedViews);
     return <span>{formattedViews}</span>;
   };
+
+  const actionTitleTemplate = (props) => {
+    return (
+      <div className="flex items-center justify-center">
+        <div>
+          {processingDeleteSavedIdea && (
+            <BiLoaderCircle color="red" size={20} className="animate-spin" />
+          )}
+        </div>
+      </div>
+    );
+  };
+
 
   const youtubeGooglePlusIcons = [FaYoutube, FaGoogle, FaPlus];
   const videoIcon = [FaYoutube];
@@ -397,6 +412,53 @@ const SavedIdeas = () => {
     );
   };
 
+  const TrendsTitleTemplate = (props) => {
+    const trendIcon = <FiTrendingUp size={20} />;
+    return (
+      <div className="flex items-center justify-center">
+        {props.headerText}
+        <div className="ml-2">{trendIcon}</div>
+      </div>
+    );
+  };
+
+  const TrendsDataRowTemplate = (props) => {
+    const renderTrend = () => {
+      const trend = Math.ceil(parseFloat(props.trend));
+
+      if (trend > 0) {
+        return (
+          <span className="flex items-center justify-center">
+            <span className="mr-1">
+              <BsArrowUpShort color="green" size={20} />
+            </span>{" "}
+            {trend}% {/* Up arrow */}
+          </span>
+        );
+      } else if (trend < 0) {
+        return (
+          <span className="flex items-center justify-center">
+            <span className="mr-1">
+              <BsArrowDownShort color="red" size={20} />
+            </span>{" "}
+            {trend}% {/* Down arrow */}
+          </span>
+        );
+      } else {
+        return (
+          <span className="flex items-center justify-center">
+            <span className="mr-1">
+              <BsDot size={20} />
+            </span>{" "}
+            {props.trend}% {/* Circle or Zero */}
+          </span>
+        );
+      }
+    };
+
+    return <div>{renderTrend()}</div>;
+  };
+
   return (
     <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
       <div className="w-full flex">
@@ -417,12 +479,12 @@ const SavedIdeas = () => {
                 ))}
               </select>
             </div>
-            <div className="bg-white rounded-tl-full rounded-bl-full border border-gray-300 px-4 py-2 flex items-center">
+            {/* <div className="bg-white rounded-tl-full rounded-bl-full border border-gray-300 px-4 py-2 flex items-center">
               <span className="mr-2 text-xs">All ideas</span>
             </div>
             <div className="bg-white rounded-tr-full rounded-br-full border border-gray-300 px-4 py-2 flex items-center">
               <span className="mr-2 text-xs">Ideas with script</span>
-            </div>
+            </div> */}
           </div>
         </div>
         <div className="w-1/2 flex justify-end py-2">
@@ -491,6 +553,7 @@ const SavedIdeas = () => {
                 width="80"
                 template={gridOrderStars}
                 tooltip="Hover over for more information"
+                headerTemplate={actionTitleTemplate}
               />
               <ColumnDirective
                 field="video_ideas"
@@ -504,6 +567,12 @@ const SavedIdeas = () => {
                 template={searchVolumeFormat}
                 headerTemplate={VolumeTitleTemplate}
                 tooltip="Hover over for more information"
+              />
+              <ColumnDirective
+                field="trend"
+                headerText="Trends"
+                headerTemplate={TrendsTitleTemplate}
+                template={TrendsDataRowTemplate}
               />
               <ColumnDirective
                 field="keyword_diff"
@@ -532,6 +601,7 @@ const SavedIdeas = () => {
               ]}
             />
           </GridComponent>
+        {showSavedIdeaCategoryPanel &&  <IdeasCategoryDelete dataSet={ideasDataSet} setUpdatedSavedIdea={setUpdatedSavedIdea} setShowSavedIdeaCategoryPanel={setShowSavedIdeaCategoryPanel}/>}
         </div>
       )}
     </div>
