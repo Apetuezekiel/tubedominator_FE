@@ -266,6 +266,25 @@ export const isChannelRegistered = async (user_id) => {
   }
 };
 
+export const findCountryAndLanguage = (dataSet, array) => {
+  const defaultCountry = 'Global';
+  const defaultLanguage = 'English';
+
+  const foundItem = array.find(item => item.countryCode === dataSet.countryCode && item.languageCode === dataSet.languageCode);
+
+  if (foundItem) {
+    return {
+      country: foundItem.country,
+      language: foundItem.language
+    };
+  } else {
+    return {
+      country: defaultCountry,
+      language: defaultLanguage
+    };
+  }
+}
+
 // Helper Functions
 const encryptAndStoreData = (data) => {
   const secretKey = "+)()^77---<@#$>";

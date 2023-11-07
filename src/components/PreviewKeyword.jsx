@@ -87,7 +87,7 @@ const PreviewKeyword = ({ keywordd, setDisplayPreviewKeyword }) => {
         },
       })
       .then((response) => {
-        console.log("@££££££££££££££££", response);
+        
         if (isMounted) {
           const keywordVideosInfo = response.data.map((item, index) => ({
             ...item,

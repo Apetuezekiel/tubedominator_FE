@@ -48,6 +48,7 @@ import { FiTrendingUp } from "react-icons/fi";
 import { BsArrowDownShort, BsArrowUpShort, BsDot } from "react-icons/bs";
 import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
 import Insights from "./keywords/Insights";
+import Competition from "./keywords/Competition";
 
 const Ideation = () => {
   const apiUrl = process.env.REACT_APP_API_BASE_URL;
@@ -100,6 +101,8 @@ const Ideation = () => {
   const encryptedGData = localStorage.getItem("encryptedGData");
   const decryptedFullData = userFullDataDecrypted();
   const [keywordSuggestionRemark, setKeywordSuggestionRemark] = useState("");
+  const [showCompetition, setShowCompetition] = useState(false);
+
   const initialCountry = {
     countryCode: "GLB",
     languageCode: "en",
@@ -518,11 +521,11 @@ const Ideation = () => {
   };
 
   const VideoIconTemplate = (props) => {
-    console.log("props", props);
+    // console.log("props", props);
     return (
       <div className="flex flex-col break-words" onClick={()=>{
-        setShowInsights(true)
-        setIdeasDataSet(props)
+        setShowInsights(true);
+        setIdeasDataSet(props);
         }}>
         <span className="text-md capitalize">{props.keyword}</span>
         <span className="text-xs text cursor-pointer" style={{color: "#7352FF"}}>More Insights</span>
@@ -672,7 +675,8 @@ const Ideation = () => {
   const isSearchEmpty = searchQuery.trim() === "";
 
   return (
-    <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
+    <section>
+          <div className={`m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl ${showInsights && 'hidden'}`}>
       <div className="flex items-center justify-center h-full mb-5">
         <div className="flex items-center flex-col ">
           <div className="w-full max-w-xs flex items-center p-2 pl-4 pr-4 border border-gray-300 bg-white rounded-full">
@@ -905,10 +909,13 @@ const Ideation = () => {
           />
         </GridComponent>
         {showSavedIdeaCategoryPanel &&  <IdeasCategoryView dataSet={ideasDataSet} setShowSavedIdeaCategoryPanel={setShowSavedIdeaCategoryPanel}/>}
-        {showInsights &&  <Insights dataSet={ideasDataSet} setShowInsights={setShowInsights}/>}
         {/* {showSavedIdeaCategoryPanel && IdeaCategoryPanel()} */}
       </div>
     </div>
+        {showInsights &&  <Insights dataSet={ideasDataSet} setShowInsights={setShowInsights} setShowCompetition={setShowCompetition}/>}
+        {showCompetition &&  <Competition dataSet={ideasDataSet} setShowInsights={setShowInsights} setShowCompetition={setShowCompetition} />}
+
+    </section>
   );
 };
 

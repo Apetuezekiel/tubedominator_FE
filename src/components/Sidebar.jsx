@@ -87,13 +87,13 @@ const Sidebar = () => {
             ) : (
               ""
             )}
-            {menuLinks.map((item) => (
-              <div key={item.title}>
+            {menuLinks.map((item, index) => (
+              <div key={index}>
                 <p className="text-gray-400 dark:text-gray-400 m-3 mt-4 uppercase">
                   {item.title}
                 </p>
-                {item.links.map((link) => (
-                  <div className="nav-link-container">
+                {item.links.map((link, index) => (
+                  <div className="nav-link-container" key={index}>
                     <NavLink
                       to={`/${link.link}`}
                       key={link.name}
