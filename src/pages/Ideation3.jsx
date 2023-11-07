@@ -52,7 +52,6 @@ import Competition from "./keywords/Competition";
 
 const Ideation = () => {
   const apiUrl = process.env.REACT_APP_API_BASE_URL;
-  console.log(apiUrl, apiUrl, apiUrl, apiUrl, apiUrl, apiUrl);
   const decryptAndRetrieveData = (data) => {
     const secretKey = "+)()^77---<@#$>";
 
@@ -108,7 +107,7 @@ const Ideation = () => {
     languageCode: "en",
   };
   const [selectedCountry, setSelectedCountry] = useState(initialCountry);
-  console.log(decryptedFullData);
+  // console.log(decryptedFullData);
 
   let savedData;
   // !userLoggedIn && setUserLoggedIn(true);
@@ -530,7 +529,7 @@ const Ideation = () => {
       //   }}
         >
         <span className="text-md capitalize">{props.keyword}</span>
-        <span className="text-xs text cursor-pointer" style={{color: "#7352FF"}}>More Insights</span>
+        {/* <span className="text-xs text cursor-pointer" style={{color: "#7352FF"}}>More Insights</span> */}
       </div>
     );
   };

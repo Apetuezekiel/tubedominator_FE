@@ -78,6 +78,9 @@ const GoogleLoginComp = forwardRef((props, ref) => {
             );
             console.log("userDataFromDb", userDataFromDb);
             encryptAndStoreData(userDataFromDb);
+            localStorage.setItem("accessLevel", "L2");
+            setAccessLevel(localStorage.getItem("accessLevel"))
+            navigate("/ideation")
           } catch (error) {
             encryptAndStoreData(GUserData);
             console.error("Error fetching user data:", error);
@@ -93,11 +96,15 @@ const GoogleLoginComp = forwardRef((props, ref) => {
           const currentURL = window.location.href;
           console.log("I got here and will redirect", currentURL);
           if (pageName === `channel`) {
+            localStorage.setItem("accessLevel", "L2");
+            setAccessLevel(localStorage.getItem("accessLevel"))
             navigate("/ideation");
           } else if (
             currentURL === process.env.REACT_APP_BASE_URL ||
             currentURL === `${process.env.REACT_APP_BASE_URL}/`
           ) {
+            localStorage.setItem("accessLevel", "L2");
+            setAccessLevel(localStorage.getItem("accessLevel"))
             navigate("/ideation");
           } else {
             return null;
