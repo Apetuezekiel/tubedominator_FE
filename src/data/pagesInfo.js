@@ -7,7 +7,7 @@ export const pagesInfo = [
   {
     index: 1,
     page: "Saved-Ideas",
-    tag: "Search and generate ideas for your next video!",
+    tag: "Find here all your video ideas and briefings",
   },
   {
     index: 2,
@@ -22,7 +22,7 @@ export const pagesInfo = [
   {
     index: 4,
     page: "Optimization",
-    tag: "Search and generate ideas for your next video!",
+    tag: "Implement our optimization recommendations to increase your organic reach",
   },
   {
     index: 5,
@@ -32,17 +32,17 @@ export const pagesInfo = [
   {
     index: 6,
     page: "Reporting",
-    tag: "Search and generate ideas for your next video!",
+    tag: "Your Channel Report",
   },
   {
     index: 7,
     page: "Ranking",
-    tag: "Search and generate ideas for your next video!",
+    tag: "Monitor your Keyword Ranks",
   },
   {
     index: 8,
     page: "Keywords",
-    tag: "Search and generate ideas for your next video!",
+    tag: "Set up and manage your channel keywords",
   },
   {
     index: 9,
