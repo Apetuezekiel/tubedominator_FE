@@ -34,6 +34,7 @@ import showToast from "../utils/toastUtils";
 import { BiChevronDown, BiEdit, BiTrendingUp } from "react-icons/bi";
 import { AiOutlineSearch } from "react-icons/ai";
 import Opitimize from "../components/Opitimize";
+import Loader from "../components/Loader";
 
 const Ideation = () => {
   const decryptAndRetrieveData = (data) => {
@@ -207,7 +208,7 @@ const Ideation = () => {
             onClick={() => optimizeVideo(props)}
           >
             <span className="text-gray-500 hover:text-black">Optimize</span>
-            <span className="ml-2 text-purple-600">
+            <span className="ml-1 text-purple-600">
               <BiEdit />
             </span>
           </span>
@@ -216,7 +217,7 @@ const Ideation = () => {
             className="flex justify-center items-center cursor-pointer"
           >
             <span className="text-gray-500 hover:text-black">Reportings</span>
-            <span className="ml-2 text-purple-600">
+            <span className="ml-1 text-purple-600">
               <BiTrendingUp />
             </span>
           </Link>
@@ -225,7 +226,7 @@ const Ideation = () => {
             className="flex justify-center items-center cursor-pointer"
           >
             <span className="text-gray-500 hover:text-black">View on YT</span>
-            <span className="ml-2 text-red-600">
+            <span className="ml-1 text-red-600">
               <FaYoutube />
             </span>
           </Link>
@@ -329,7 +330,6 @@ const Ideation = () => {
 
   const formatViews = (props) => {
     const estimatedViews = parseInt(props.estimated_views);
-    // const formattedViews = estimatedViews.toLocaleString() + "+";
     return <span>{estimatedViews}+</span>;
   };
 
@@ -359,8 +359,8 @@ const Ideation = () => {
       {isOptimizeVideo ? (
         selectedVideoId && <Opitimize videoId={selectedVideoId} />
       ) : (
-        <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl w-8/9">
-          <div className="w-full flex">
+        <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl overflow-hidden">
+          <div className="flex justify-between">
             <div className="w-3/4 flex py-2">
               <div className="flex justify-start items-center">
                 <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
@@ -481,34 +481,29 @@ const Ideation = () => {
                   </select>
                 </div>
 
-                <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
+                {/* <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
                   <span className="mr-2 text-xs">Updated on YT</span>
                   <HiOutlineChevronDown />
                 </div>
                 <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
                   <span className="mr-2 text-xs">Drafts</span>
                   <HiOutlineChevronDown />
-                </div>
+                </div> */}
               </div>
             </div>
             <div className="w-1/4 flex justify-end py-2">
-              <div className="flex items-center w-2/4 border border-gray-300 bg-white rounded-full px-4 py-2">
+              {/* <div className="flex items-center w-2/4 border border-gray-300 bg-white rounded-full px-4 py-2">
                 <input
                   type="text"
                   placeholder="Search"
                   className="flex-grow bg-transparent pr-2 text-xs"
                 />
                 <HiSearch className="text-gray-500 text-xs" />
-              </div>
+              </div> */}
             </div>
           </div>
           {!isUserDataLoaded ? (
-            // <div className="flex justify-center items-center h-20">
-            //   <HiOutlineRefresh className="animate-spin text-gray-500 text-4xl" />
-            // </div>
-            <div className="loading-container">
-              <Spinner />
-            </div>
+            <Loader message={"Loading your channel Videos. Hold tight"} />
           ) : (
             ""
           )}
@@ -525,8 +520,6 @@ const Ideation = () => {
               // contextMenuItems={contextMenuItems}
               editSettings={editing}
               rowSelected={handleRowSelected}
-
-              // ref={gridInstance}
             >
               <ColumnsDirective>
                 <ColumnDirective
@@ -539,24 +532,24 @@ const Ideation = () => {
                   field="optimizationLevel"
                   headerText="Optimization level"
                   template={gridOrderOptimizationLevel}
-                  width="300"
+                  // width="300"
                 />
                 <ColumnDirective
                   field="optimizationImpact"
                   headerText="Optimization impact"
                   template={gridOrderOptimizationImpact}
-                  width="300"
+                  // width="300"
                 />
                 <ColumnDirective
                   field="viewCount"
                   headerText="View Count"
                   template={viewCountTemplate}
-                  width="150"
+                  // width="150"
                 />
                 <ColumnDirective
                   field="publishedAt"
                   headerText="Published At"
-                  width="150"
+                  // width="150"
                   template={formatDate}
                 />
               </ColumnsDirective>

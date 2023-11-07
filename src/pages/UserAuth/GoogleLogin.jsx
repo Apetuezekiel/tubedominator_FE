@@ -21,7 +21,6 @@ import showToast from "../../utils/toastUtils";
 import CryptoJS from "crypto-js";
 import { Link, useNavigate } from "react-router-dom";
 
-
 const clientId =
   "372673946018-lu1u3llu6tqi6hmv8m2226ri9qev8bb8.apps.googleusercontent.com";
 const apiKey = "AIzaSyBhnxmlAowrcFI7owW40YrsqI3xPVVk0IU";
@@ -69,11 +68,11 @@ const GoogleLoginComp = forwardRef((props, ref) => {
             const userDataFromDb = await getUserEncryptedDataFromDb(
               GUserData.gId,
             );
-            console.log("userDataFromDb", userDataFromDb);  
+            console.log("userDataFromDb", userDataFromDb);
             encryptAndStoreData(userDataFromDb);
             localStorage.setItem("accessLevel", "L2");
-            setAccessLevel(localStorage.getItem("accessLevel"))
-            navigate("/ideation")
+            setAccessLevel(localStorage.getItem("accessLevel"));
+            navigate("/ideation");
           } catch (error) {
             encryptAndStoreData(GUserData);
             console.error("Error fetching user data:", error);
@@ -90,14 +89,14 @@ const GoogleLoginComp = forwardRef((props, ref) => {
           console.log("I got here and will redirect", currentURL);
           if (pageName === `channel`) {
             localStorage.setItem("accessLevel", "L2");
-            setAccessLevel(localStorage.getItem("accessLevel"))
+            setAccessLevel(localStorage.getItem("accessLevel"));
             navigate("/ideation");
           } else if (
             currentURL === process.env.REACT_APP_BASE_URL ||
             currentURL === `${process.env.REACT_APP_BASE_URL}/`
           ) {
             localStorage.setItem("accessLevel", "L2");
-            setAccessLevel(localStorage.getItem("accessLevel"))
+            setAccessLevel(localStorage.getItem("accessLevel"));
             navigate("/ideation");
           } else {
             return null;
@@ -106,7 +105,7 @@ const GoogleLoginComp = forwardRef((props, ref) => {
       } else {
         encryptAndStoreData(GUserData);
         // setTimeout(async () => {
-          navigate("/channel");
+        navigate("/channel");
         // }, 1000);
       }
     } catch (error) {

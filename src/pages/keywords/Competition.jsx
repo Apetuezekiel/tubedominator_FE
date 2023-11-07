@@ -11,25 +11,31 @@ import { MdCancel } from "react-icons/md";
 import { BiArrowBack } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import { formatNumberToKMBPlus } from "../../data/helper-funtions/helper";
-import { findCountryAndLanguage, userFullDataDecrypted } from "../../data/api/calls";
+import {
+  findCountryAndLanguage,
+  userFullDataDecrypted,
+} from "../../data/api/calls";
 import countriesWithLanguages from "../../data/countries";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Loader from "../../components/Loader";
 
-function Competition({dataSet, setShowInsights, setShowCompetition}) {
+function Competition({ dataSet, setShowInsights, setShowCompetition }) {
   const decryptedFullData = userFullDataDecrypted();
   const [keywordVideosInfo, setKeywordVideosInfo] = useState([]);
   const [isResultLoaded, setIsResultLoaded] = useState(false);
 
-
   useEffect(() => {
     let isMounted = true;
-    let ideaKeywordSerpData = JSON.parse(localStorage.getItem(`${decryptedFullData.gid}-${dataSet.index}-keywordVideosInfo`));
+    let ideaKeywordSerpData = JSON.parse(
+      localStorage.getItem(
+        `${decryptedFullData.gid}-${dataSet.index}-keywordVideosInfo`,
+      ),
+    );
     if (ideaKeywordSerpData !== null || ideaKeywordSerpData !== undefined) {
-        setKeywordVideosInfo(ideaKeywordSerpData);
-        setIsResultLoaded(true);
-        console.log("Loaded from Local storage");
+      setKeywordVideosInfo(ideaKeywordSerpData);
+      setIsResultLoaded(true);
+      console.log("Loaded from Local storage");
     } else {
       axios
         .get(`${process.env.REACT_APP_API_BASE_URL}/fetchSerpYoutubeVideos`, {
@@ -43,14 +49,16 @@ function Competition({dataSet, setShowInsights, setShowCompetition}) {
           },
         })
         .then((response) => {
-          
           if (isMounted) {
             const keywordVideosInfo = response.data.map((item, index) => ({
               ...item,
               index: index + 1,
             }));
             setKeywordVideosInfo(keywordVideosInfo);
-            localStorage.setItem(`${decryptedFullData.gid}-${dataSet.index}-keywordVideosInfo`, JSON.stringify(keywordVideosInfo));
+            localStorage.setItem(
+              `${decryptedFullData.gid}-${dataSet.index}-keywordVideosInfo`,
+              JSON.stringify(keywordVideosInfo),
+            );
             setIsResultLoaded(true);
           }
         })
@@ -71,11 +79,17 @@ function Competition({dataSet, setShowInsights, setShowCompetition}) {
     <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl z-50">
       <header>
         <div className="flex items-center justify-between mb-5">
-          <span className="mr-3 flex items-center cursor-pointer" onClick={()=> setShowCompetition(false)}>
+          <span
+            className="mr-3 flex items-center cursor-pointer"
+            onClick={() => setShowCompetition(false)}
+          >
             <BiArrowBack color="#7438FF" className="mr-2" /> Back to list
           </span>
-          <span className="text-3xl font-bold mb-2 cursor-pointer" onClick={()=> setShowCompetition(false)}>
-            <MdCancel color="red"/>
+          <span
+            className="text-3xl font-bold mb-2 cursor-pointer"
+            onClick={() => setShowCompetition(false)}
+          >
+            <MdCancel color="red" />
           </span>
         </div>
         <div className="flex items-center">
@@ -86,19 +100,18 @@ function Competition({dataSet, setShowInsights, setShowCompetition}) {
         </div>
         <div className="flex mt-3">
           <span className="mr-3">Search volume:</span>
-          <span>{formatNumberToKMBPlus(dataSet.volume)} | Language: {locationData.country} ({locationData.language  })</span>
+          <span>
+            {formatNumberToKMBPlus(dataSet.volume)} | Language:{" "}
+            {locationData.country} ({locationData.language})
+          </span>
         </div>
         <div className="flex mt-10">
-          <span
-            className="mr-3 pb-3 px-5 cursor-pointer"
-          >
-            Insights
-          </span>
+          <span className="mr-3 pb-3 px-5 cursor-pointer">Insights</span>
           <span
             className="mr-3 pb-3 px-5 cursor-pointer"
             onClick={() => {
-              setShowCompetition(false)
-              setShowInsights(true)
+              setShowCompetition(false);
+              setShowInsights(true);
             }}
             style={{ borderBottom: "#7438FF 2px solid", color: "#7438FF" }}
           >
@@ -119,51 +132,54 @@ function Competition({dataSet, setShowInsights, setShowCompetition}) {
               <span className="font-bold">Competitor's videos</span>
             </header>
             <hr className="mt-5 mb-5" />
-            {
-              isResultLoaded ? (
-                keywordVideosInfo.map((item, index) => {
-                  return <div key={index}>
-                  <div className="flex items-center">
-                    <span className="mr-10">1</span>
-                    <div className="mt-5 flex items-start">
-                      <img
-                        src={item.thumbnail.static}
-                        alt="Thumnail"
-                        className="rounded-md h-32 mr-3"
-                      />
-                      <div>
-                        <div className="text-lg text-gray-800 capitalize">
-                          {item.title}
-                        </div>
-                        <div className="text-md text-gray-800 flex items-center mt-3">
-                          <img
-                            src={item.channel.thumbnail}
-                            alt=""
-                            className="h-10 w-10 rounded-full mr-3"
-                          />{" "}
-                          ABC News <BsDot size={20} /> 15M Subscribers
-                        </div>
-                        <div className="text-gray-800 flex items-center mt-3 text-xs">
-                          Uploaded {item.published_date} <BsDot size={20} /> Views: {formatNumberToKMBPlus(item.views).replace('+', '')}{" "}
-                          <BsDot size={20} /> Likes: {formatNumberToKMBPlus(item.views).replace('+', '')} <BsDot size={20} />{" "}
-                          Comments: 2.6K
-                        </div>
-                        <div
-                          className="rounded-full flex items-center justify-center py-2 mt-3"
-                          style={{ backgroundColor: "#E8EBED" }}
-                        >
-                          Easy there dog
+            {isResultLoaded ? (
+              keywordVideosInfo.map((item, index) => {
+                return (
+                  <div key={index}>
+                    <div className="flex items-center">
+                      <span className="mr-10">1</span>
+                      <div className="mt-5 flex items-start">
+                        <img
+                          src={item.thumbnail.static}
+                          alt="Thumnail"
+                          className="rounded-md h-32 mr-3"
+                        />
+                        <div>
+                          <div className="text-lg text-gray-800 capitalize">
+                            {item.title}
+                          </div>
+                          <div className="text-md text-gray-800 flex items-center mt-3">
+                            <img
+                              src={item.channel.thumbnail}
+                              alt=""
+                              className="h-10 w-10 rounded-full mr-3"
+                            />{" "}
+                            ABC News <BsDot size={20} /> 15M Subscribers
+                          </div>
+                          <div className="text-gray-800 flex items-center mt-3 text-xs">
+                            Uploaded {item.published_date} <BsDot size={20} />{" "}
+                            Views:{" "}
+                            {formatNumberToKMBPlus(item.views).replace("+", "")}{" "}
+                            <BsDot size={20} /> Likes:{" "}
+                            {formatNumberToKMBPlus(item.views).replace("+", "")}{" "}
+                            <BsDot size={20} /> Comments: 2.6K
+                          </div>
+                          <div
+                            className="rounded-full flex items-center justify-center py-2 mt-3"
+                            style={{ backgroundColor: "#E8EBED" }}
+                          >
+                            Easy there dog
+                          </div>
                         </div>
                       </div>
                     </div>
+                    <hr className="mt-5 mb-5" />
                   </div>
-                  <hr className="mt-5 mb-5" />
-                </div>
-                })
-              ) : (
-                <Loader />
-              )
-            }
+                );
+              })
+            ) : (
+              <Loader />
+            )}
           </div>
           <div className="w-1/4 border-2 p-10 rounded-md mt-5">
             <div className="flex flex-col gap-5 mt-8">

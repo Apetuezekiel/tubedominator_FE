@@ -7,7 +7,11 @@ import { Button } from ".";
 import { userProfileData } from "../data/dummy";
 import { useStateContext } from "../contexts/ContextProvider";
 import avatar from "../data/avatar.jpg";
-import { useUserAccessLevel, useUserData, useUserLoggedin } from "../state/state";
+import {
+  useUserAccessLevel,
+  useUserData,
+  useUserLoggedin,
+} from "../state/state";
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogout } from "react-google-login";
 import { useRef } from "react";
@@ -23,9 +27,8 @@ const UserProfile = () => {
   const setUserData = useUserData((state) => state.setUserData);
   const navigate = useNavigate();
   const logOutBtn = useRef(null);
-  const dismissProfileBtn = useRef(null)
+  const dismissProfileBtn = useRef(null);
   const { setIsClicked, initialState } = useStateContext();
-
 
   const onLogoutSuccess = (res) => {
     console.log("Logout Success, res:", res);
@@ -34,13 +37,13 @@ const UserProfile = () => {
   };
 
   const handleLogOut = () => {
-    setIsClicked(initialState)
+    setIsClicked(initialState);
     console.log("Logout Success");
     setUserData(null);
     localStorage.clear();
     navigate("/");
-    setUserLoggedIn('')
-    setAccessLevel('')
+    setUserLoggedIn("");
+    setAccessLevel("");
   };
 
   const handleLogOutClick = () => {
@@ -114,22 +117,24 @@ const UserProfile = () => {
             onLogoutSuccess={onLogoutSuccess}
           ></GoogleLogout> */}
         </div>
-          {/* <Button
+        {/* <Button
             color="white"
             bgColor={currentColor}
             text="Logout"
             borderRadius="10px"
             width="full"
           /> */}
-          <button
+        <button
           className="w-full rounded-md py-3 text-white"
-          style={{backgroundColor: "#7352FF"}}
-          onClick={() => {setIsClicked(initialState)
-            handleLogOut()}}
+          style={{ backgroundColor: "#7352FF" }}
+          onClick={() => {
+            setIsClicked(initialState);
+            handleLogOut();
+          }}
           ref={logOutBtn}
-          >
-            Log Out
-          </button>
+        >
+          Log Out
+        </button>
       </div>
     </div>
   );

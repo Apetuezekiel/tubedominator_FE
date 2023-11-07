@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef } from "react";
 
 const Testss = () => {
   const firstElementRef = useRef(null);
@@ -14,7 +14,10 @@ const Testss = () => {
       <button ref={firstElementRef} onClick={handleFirstElementClick}>
         First Element
       </button>
-      <button ref={secondElementRef} onClick={() => console.log('Second Element clicked')}>
+      <button
+        ref={secondElementRef}
+        onClick={() => console.log("Second Element clicked")}
+      >
         Second Element
       </button>
     </div>

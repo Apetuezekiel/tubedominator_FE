@@ -12,7 +12,7 @@ const GoogleLogOut = () => {
   const onLogoutSuccess = (res) => {
     console.log("Logout Success, res:", res);
     localStorage.clear();
-    setUserLoggedIn(false)
+    setUserLoggedIn(false);
     navigate("/");
   };
   return (

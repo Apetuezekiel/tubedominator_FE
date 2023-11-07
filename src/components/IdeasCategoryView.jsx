@@ -8,7 +8,7 @@ import axios from "axios";
 import showToast from "../utils/toastUtils";
 
 const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
-  console.log('dataSet', dataSet);
+  console.log("dataSet", dataSet);
   const [categories, setCategories] = useState(["Uncategorized Ideas"]);
   const [fetchedSavedIdeas, setFetchedSavedIdeas] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
@@ -98,18 +98,24 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
     if (response.data.success) {
       setSavingKeywordIdea(false);
       showToast("success", "Idea saved successfully", 2000);
-      setShowSavedIdeaCategoryPanel(false)
+      setShowSavedIdeaCategoryPanel(false);
     } else {
       setSavingKeywordIdea(false);
       showToast("error", "Idea wasn't saved. Try again", 2000);
-      setShowSavedIdeaCategoryPanel(false)
+      setShowSavedIdeaCategoryPanel(false);
     }
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
-      <div className="w-1/3 border border-gray-200 rounded-lg p-4 bg-white relative">
-        <button className="absolute top-0 right-0 m-3 text-gray-500 hover:text-gray-700 cursor-pointer" onClick={() => setShowSavedIdeaCategoryPanel(false)}>
+    <div
+      className="fixed top-0 left-0 w-full h-full flex justify-center items-center z-50"
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
+    >
+      <div className="w-2/4 border border-gray-200 rounded-lg p-4 bg-white relative">
+        <button
+          className="absolute top-0 right-0 m-3 text-gray-500 hover:text-gray-700 cursor-pointer"
+          onClick={() => setShowSavedIdeaCategoryPanel(false)}
+        >
           <MdCancel color="red" size={20} />
         </button>
         <h2 className="text-lg font-semibold mb-3">
@@ -131,7 +137,9 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
         </div>
         <div className="flex mt-3">
           <span className="w-1/3">Idea:</span>
-          <span className="w-2/3 pl-20 font-semibold ml-2 text-lg capitalize break-words">{dataSet.string}</span>
+          <span className="w-2/3 pl-20 font-semibold ml-2 text-lg capitalize break-words">
+            {dataSet.string}
+          </span>
         </div>
         <div className="flex mt-3">
           <span className="w-1/3">Folder:</span>

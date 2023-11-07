@@ -62,7 +62,7 @@ export const useUserLoggedin = create((set) => ({
 }));
 
 export const useUserAccessLevel = create((set) => ({
-  accessLevel: localStorage.getItem("accessLevel") || '',
+  accessLevel: localStorage.getItem("accessLevel") || "",
   setAccessLevel: (data) => set({ accessLevel: data }),
 }));
 
@@ -70,7 +70,7 @@ export const useSavedIdeasData = create((set) => ({
   savedIdeasData: [],
   setSavedIdeasData: (data) => set({ savedIdeasData: data }),
 }));
-  
+
 // export const useSavedIdeasData = create((set) => ({
 //   savedIdeasData: [],
 //   isLoading: false,

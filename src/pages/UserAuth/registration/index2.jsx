@@ -17,7 +17,10 @@ import {
 } from "../../../state/state";
 import { useStateContext } from "../../../contexts/ContextProvider";
 import CryptoJS from "crypto-js";
-import { fetchUserYoutubeInfo, userFullDataDecrypted } from "../../../data/api/calls";
+import {
+  fetchUserYoutubeInfo,
+  userFullDataDecrypted,
+} from "../../../data/api/calls";
 import countriesWithLanguages from "../../../data/countries";
 import Loader from "../../../components/Loader";
 import { BiLoaderCircle } from "react-icons/bi";
@@ -70,10 +73,10 @@ const RegistrationForm = () => {
   const userRecordId = localStorage.getItem("userRecordId");
   console.log(userRecordId, userRecordId, userRecordId);
 
-  useEffect(()=>{
+  useEffect(() => {
     if (!userRecordId || userRecordId.trim() === "" || userRecordId === null) {
       showToast("error", "Error occurred. Kindly login again", 2000);
-  
+
       // Redirect to sign-in after 2 seconds
       setTimeout(() => {
         setAccessLevel("");
@@ -82,7 +85,7 @@ const RegistrationForm = () => {
         navigate("/sign-in");
       }, 2000);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     const fetchChannel = () => {
@@ -154,7 +157,6 @@ const RegistrationForm = () => {
   };
 
   const saveUserToken = async (token, updatedFormData) => {
-    
     const updatedGUserData = {
       ...decryptedFullData,
       token,
@@ -165,7 +167,7 @@ const RegistrationForm = () => {
     };
     const encryptedFullData = encryptAndStoreData(updatedGUserData);
     console.log("updatyed encryptedFullData:", updatedGUserData);
-    // await fetchUserYoutubeInfo();  
+    // await fetchUserYoutubeInfo();
 
     await axios
       .post(
@@ -184,13 +186,13 @@ const RegistrationForm = () => {
       .then(async (response) => {
         console.log("Token stored successfully", response.data.message);
         // await fetchUserYoutubeInfo();
-        setConnectingChannel(false)
+        setConnectingChannel(false);
         setUserData(updatedFormData);
         setUserLoggedIn(true);
         navigate("/ideation");
       })
       .catch((error) => {
-        setConnectingChannel(false)
+        setConnectingChannel(false);
         console.error("Error storing token:", error);
         console.error("-----------------------", error.response.data.message);
         showToast("error", "Error saving token. Try again", 5000);
@@ -247,9 +249,9 @@ const RegistrationForm = () => {
       );
 
       console.log(response, response);
-      if (response.data.success){
-        localStorage.setItem("accessLevel", "L2")
-        setAccessLevel("L2")
+      if (response.data.success) {
+        localStorage.setItem("accessLevel", "L2");
+        setAccessLevel("L2");
         console.log("Channel details stored successfully", response.data.token);
         const token = response.data.token;
         setTimeout(() => {
@@ -259,7 +261,7 @@ const RegistrationForm = () => {
     } catch (error) {
       console.error("-----------------------", error.response.data.message);
       showToast("error", "Error saving channel. Try again", 5000);
-    setConnectingChannel(false);
+      setConnectingChannel(false);
     }
   };
 
@@ -273,17 +275,22 @@ const RegistrationForm = () => {
     window.location.href = "http://localhost:3000/";
   }
 
-    const renderCapsules = () => {
+  const renderCapsules = () => {
     if (formData.keywords) {
-      const keywordsArray = formData.keywords.split(',').map(keyword => keyword.trim());
+      const keywordsArray = formData.keywords
+        .split(",")
+        .map((keyword) => keyword.trim());
 
       return keywordsArray.map((keyword, index) => (
-        <div key={index} className="inline-block bg-gray-200 text-gray-700 rounded-full px-2 py-1 m-1">
+        <div
+          key={index}
+          className="inline-block bg-gray-200 text-gray-700 rounded-full px-2 py-1 m-1"
+        >
           {keyword}
         </div>
       ));
     }
-  }
+  };
 
   const handleCountryChange = (event) => {
     const selectedValue = event.target.value;
@@ -297,8 +304,6 @@ const RegistrationForm = () => {
     });
     // }
   };
-
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 ">
@@ -411,7 +416,7 @@ const RegistrationForm = () => {
               </div>
             </div>
             {isLoading ? (
-              <Loader message={"Searching for your channel"} marginTop={3}/>
+              <Loader message={"Searching for your channel"} marginTop={3} />
             ) : (
               <div className=""></div>
             )}
@@ -440,26 +445,26 @@ const RegistrationForm = () => {
             </select>
           </div> */}
           <div className="mb-4">
-          <label
-            htmlFor="keywords"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Channel Keywords (optional)
-          </label>
-          <input
-            type="text"
-            id="keywords"
-            name="keywords"
-            value={formData.keywords}
-            onChange={handleChange}
-            className="mt-1 p-2 border rounded w-full"
-            placeholder="keywords your channel focuses on"
-          />
-          <div className="mt-2">
-            {/* Render the capsules */}
-            {renderCapsules()}
+            <label
+              htmlFor="keywords"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Channel Keywords (optional)
+            </label>
+            <input
+              type="text"
+              id="keywords"
+              name="keywords"
+              value={formData.keywords}
+              onChange={handleChange}
+              className="mt-1 p-2 border rounded w-full"
+              placeholder="keywords your channel focuses on"
+            />
+            <div className="mt-2">
+              {/* Render the capsules */}
+              {renderCapsules()}
+            </div>
           </div>
-        </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">
               <input
@@ -478,13 +483,13 @@ const RegistrationForm = () => {
             className="w-full text-white p-2 rounded flex items-center cursor-pointer justify-center"
           >
             Connect Channel
-            {
-              connectingChannel && (            <BiLoaderCircle
+            {connectingChannel && (
+              <BiLoaderCircle
                 className="animate-spin text-center ml-2"
                 color="white"
                 size={20}
-              />)
-            }
+              />
+            )}
           </button>
         </form>
       </div>

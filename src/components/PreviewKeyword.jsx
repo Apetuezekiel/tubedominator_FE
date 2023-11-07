@@ -87,7 +87,6 @@ const PreviewKeyword = ({ keywordd, setDisplayPreviewKeyword }) => {
         },
       })
       .then((response) => {
-        
         if (isMounted) {
           const keywordVideosInfo = response.data.map((item, index) => ({
             ...item,
@@ -167,7 +166,6 @@ const PreviewKeyword = ({ keywordd, setDisplayPreviewKeyword }) => {
     );
   };
 
-
   const gridOrderOptimizationLevel = (props) => {
     return (
       <div className="h-2 w-full rounded-full flex flex-row items-center justify-between">
@@ -195,11 +193,21 @@ const PreviewKeyword = ({ keywordd, setDisplayPreviewKeyword }) => {
   return (
     // <div className="flex justify-center items-center w-full" style={{backgroundColor: "black"}}>
     // <div className="nav-item absolute left-1/2 top-52 bg-white dark:bg-[#42464D] p-8 rounded-lg w-4/6 transform -translate-x-1/2">
-    <div className={`nav-item fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-60 z-50 overflow-auto ${isSearchLoaded === false && "pt-96"}`}>
-      <div className={`bg-white dark:bg-[#42464D] p-8 my-20 rounded-lg w-5/6 ${isSearchLoaded === false && "pt-40"} `}>
+    <div
+      className={`nav-item fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-60 z-50 overflow-auto ${
+        isSearchLoaded === false && "pt-96"
+      }`}
+    >
+      <div
+        className={`bg-white dark:bg-[#42464D] p-8 my-20 rounded-lg w-5/6 ${
+          isSearchLoaded === false && "pt-40"
+        } `}
+      >
         <div className="flex justify-between items-center mb-5">
           <div className="font-semibold text-lg dark:text-gray-200">
-            <div className="flex items-center gap-3">Search Result from Youtube <FaYoutube color="red"/> </div> 
+            <div className="flex items-center gap-3">
+              Search Result from Youtube <FaYoutube color="red" />{" "}
+            </div>
             <div className="text-sm capitalize underline">{keywordd}</div>
           </div>
           {/* <Button
@@ -210,17 +218,22 @@ const PreviewKeyword = ({ keywordd, setDisplayPreviewKeyword }) => {
             borderRadius="50%"
             
           /> */}
-          <MdCancel onClick={() => setDisplayPreviewKeyword(false)} size={20} color="red" className="cursor-pointer"/>
+          <MdCancel
+            onClick={() => setDisplayPreviewKeyword(false)}
+            size={20}
+            color="red"
+            className="cursor-pointer"
+          />
         </div>
         {isSearchLoaded ? (
           <div className="flex flex-col justify-center items-center w-full mt-20">
-          <BiLoaderCircle
-            className="animate-spin text-center"
-            color="#7352FF"
-            size={30}
-          />
-          <div>Loading up Keyword Insights for you</div>
-        </div>
+            <BiLoaderCircle
+              className="animate-spin text-center"
+              color="#7352FF"
+              size={30}
+            />
+            <div>Loading up Keyword Insights for you</div>
+          </div>
         ) : (
           <GridComponent
             dataSource={keywordVideosInfo}

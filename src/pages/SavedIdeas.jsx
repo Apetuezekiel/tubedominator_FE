@@ -38,7 +38,7 @@ import { FiTrendingUp } from "react-icons/fi";
 import { BsArrowDownShort, BsArrowUpShort, BsDot } from "react-icons/bs";
 import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
 import IdeasCategoryDelete from "../components/IdeasCategoryDelete";
-
+import Loader from "../components/Loader";
 
 const SavedIdeas = () => {
   const decryptAndRetrieveData = (data) => {
@@ -67,7 +67,8 @@ const SavedIdeas = () => {
   const [favorites, setFavorites] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [fetchedSavedIdeas, setFetchedSavedIdeas] = useState("");
-  const [processingDeleteSavedIdea, setProcessingDeleteSavedIdea] = useState(false);
+  const [processingDeleteSavedIdea, setProcessingDeleteSavedIdea] =
+    useState(false);
   const [filteredData, setFilteredData] = useState(savedIdeasData);
   const userEncryptedData = localStorage.getItem("encryptedFullData");
   const decryptedFullData = userFullDataDecrypted();
@@ -80,7 +81,7 @@ const SavedIdeas = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [showSavedIdeaCategoryPanel, setShowSavedIdeaCategoryPanel] =
-  useState(false);
+    useState(false);
   const [ideasDataSet, setIdeasDataSet] = useState(false);
   const [updatedSavedIdea, setUpdatedSavedIdea] = useState(false);
 
@@ -291,7 +292,7 @@ const SavedIdeas = () => {
   }
 
   const deleteSavedKeyword = async (id) => {
-    setProcessingDeleteSavedIdea(true)
+    setProcessingDeleteSavedIdea(true);
     try {
       const responseDelete = await axios.delete(
         `${process.env.REACT_APP_API_BASE_URL}/deleteSavedIdea/${id}`,
@@ -308,15 +309,15 @@ const SavedIdeas = () => {
       );
       if (responseDelete.data.success) {
         showToast("success", "Idea removed from Saved Ideas", 2000);
-        setProcessingDeleteSavedIdea(false)
+        setProcessingDeleteSavedIdea(false);
         // fetchSavedIdeasData();
       } else {
         showToast("error", "Idea wasn't removed. Try again", 2000);
-        setProcessingDeleteSavedIdea(false)
+        setProcessingDeleteSavedIdea(false);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
-      setProcessingDeleteSavedIdea(false)
+      setProcessingDeleteSavedIdea(false);
       throw error; // Rethrow the error to handle it in the component if needed
     }
   };
@@ -339,10 +340,13 @@ const SavedIdeas = () => {
     );
 
     return (
-      <div         onClick={()=> {
-        setShowSavedIdeaCategoryPanel(true)
-        setIdeasDataSet(props)
-      }}>
+      <div
+        onClick={() => {
+          setShowSavedIdeaCategoryPanel(true);
+          setIdeasDataSet(props);
+        }}
+        className="cursor-pointer"
+      >
         {<AiFillStar color="#7352FF" size={20} />}
       </div>
     );
@@ -372,7 +376,6 @@ const SavedIdeas = () => {
       </div>
     );
   };
-
 
   const youtubeGooglePlusIcons = [FaYoutube, FaGoogle, FaPlus];
   const videoIcon = [FaYoutube];
@@ -516,9 +519,7 @@ const SavedIdeas = () => {
         </div>
       </div>
       {!filterableSavedIdeasData ? (
-        <div className="loading-container">
-          <Spinner />
-        </div>
+        <Loader marginTop={10} />
       ) : (
         <div>
           <Header
@@ -528,13 +529,9 @@ const SavedIdeas = () => {
             size="text-1xl"
           />
           {fetchedSavedIdeas && (
-            <div className="flex w-full items-center justify-center mb-5">
-              <span className="mr-2">Loading Saved Ideas </span>
-              <span className={"animate-spin ml-2"}>
-                <BiLoaderCircle color="#7438FF" size={20} />
-              </span>
-            </div>
+            <Loader message={"Loading your Saved Ideas. Hang on"} />
           )}
+          <br />
           <GridComponent
             // id="gridcomp"
             dataSource={filterableSavedIdeasData}
@@ -601,7 +598,13 @@ const SavedIdeas = () => {
               ]}
             />
           </GridComponent>
-        {showSavedIdeaCategoryPanel &&  <IdeasCategoryDelete dataSet={ideasDataSet} setUpdatedSavedIdea={setUpdatedSavedIdea} setShowSavedIdeaCategoryPanel={setShowSavedIdeaCategoryPanel}/>}
+          {showSavedIdeaCategoryPanel && (
+            <IdeasCategoryDelete
+              dataSet={ideasDataSet}
+              setUpdatedSavedIdea={setUpdatedSavedIdea}
+              setShowSavedIdeaCategoryPanel={setShowSavedIdeaCategoryPanel}
+            />
+          )}
         </div>
       )}
     </div>

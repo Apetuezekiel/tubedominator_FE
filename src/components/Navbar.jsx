@@ -16,7 +16,12 @@ import PreviewKeyword from "./PreviewKeyword";
 import { useStateContext } from "../contexts/ContextProvider";
 // import { useUser, SignOutButton } from "@clerk/clerk-react";
 import axios from "axios";
-import { useUserData, useUserAuthToken, useUserLoggedin, useUserAccessLevel } from "../state/state";
+import {
+  useUserData,
+  useUserAuthToken,
+  useUserLoggedin,
+  useUserAccessLevel,
+} from "../state/state";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 // import {
 //   getUserEncryptedData,
@@ -30,6 +35,7 @@ import { BiLoaderCircle } from "react-icons/bi";
 import { useRef } from "react";
 import { pagesInfo } from "../data/pagesInfo";
 import userAvatar from "../assets/images/man-avatar-profile-picture-vector-illustration_268834-538.avif";
+import Loader from "./Loader";
 
 const clientId =
   "372673946018-lu1u3llu6tqi6hmv8m2226ri9qev8bb8.apps.googleusercontent.com";
@@ -76,15 +82,15 @@ const Navbar = () => {
   const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
   const accessLevel = useUserAccessLevel((state) => state.accessLevel);
   const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
-  // 
-//  if (accessLevel === "" || null){
-//   setAccessLevel(localStorage.getItem("accessLevel"))
-//  }
-//  if (userLoggedIn === "" || null){
-//   setUserLoggedIn(localStorage.getItem("userLoggedin"));
-//  }
-//  console.log('localStorage.getItem("accessLevel")', localStorage.getItem("accessLevel"));
-//  console.log('localStorage.getItem("userLoggedin")', localStorage.getItem("userLoggedin"));
+  //
+  //  if (accessLevel === "" || null){
+  //   setAccessLevel(localStorage.getItem("accessLevel"))
+  //  }
+  //  if (userLoggedIn === "" || null){
+  //   setUserLoggedIn(localStorage.getItem("userLoggedin"));
+  //  }
+  //  console.log('localStorage.getItem("accessLevel")', localStorage.getItem("accessLevel"));
+  //  console.log('localStorage.getItem("userLoggedin")', localStorage.getItem("userLoggedin"));
 
   const decryptAndRetrieveData = (data) => {
     const secretKey = "+)()^77---<@#$>";
@@ -174,7 +180,7 @@ const Navbar = () => {
   }, [screenSize]);
 
   // useEffect(()=>{
-    
+
   // })
 
   // useEffect(() => {
@@ -198,7 +204,7 @@ const Navbar = () => {
   // useEffect(() => {
   //   const fetchUserYoutubeData = async () => {
   //     const fetchUserData = await fetchUserYoutubeInfo();
-    
+
   //     setUserData(fetchUserData);
   //     setLoadeduserData(true);
   //   }
@@ -244,14 +250,7 @@ const Navbar = () => {
       }`}
     >
       {userLoggedIn && accessLevel === "L2" && !userData ? (
-        <div className="flex flex-col justify-center items-center w-full mt-20">
-          <BiLoaderCircle
-            className="animate-spin text-center"
-            color="#7352FF"
-            size={30}
-          />
-          <div>Give us a minute to load up your account data</div>
-        </div>
+        <Loader message={"Give us a minute to load up your account data"} />
       ) : userLoggedIn && userData ? (
         <>
           {/* <NavButton
@@ -263,7 +262,7 @@ const Navbar = () => {
           /> */}
           <div className="ml-5">
             <div className="pageTitle text-3xl font-semibold">{pageTitle}</div>
-            <div className="tag text-md mt-2">{pageTag}</div>
+            <div className="tag text-md mt-2 text-xs">{pageTag}</div>
           </div>
           <div className="flex">
             <TooltipComponent content="Profile" position="BottomCenter">
@@ -291,7 +290,10 @@ const Navbar = () => {
       ) : userLoggedIn && accessLevel === "L1" ? (
         <div className="w-5/6 flex justify-between p-2 md:ml-6 md:mr-6 relative homeHeader">
           <div className="navbar-nav ms-auto py-0 flex justify-between items-center text-lg">
-            Welcome, <span className="text-2xl ml-2 font-semibold">{localStorage.getItem("userFirstName")}</span>
+            Welcome,{" "}
+            <span className="text-2xl ml-2 font-semibold">
+              {localStorage.getItem("userFirstName")}
+            </span>
           </div>
           <div className="flex">
             <img

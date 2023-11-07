@@ -7,8 +7,12 @@ import { AiFillCheckCircle } from "react-icons/ai";
 import axios from "axios";
 import showToast from "../utils/toastUtils";
 
-const IdeasCategoryDelete = ({ dataSet, setShowSavedIdeaCategoryPanel, setUpdatedSavedIdea }) => {
-  console.log('dataSet', dataSet);
+const IdeasCategoryDelete = ({
+  dataSet,
+  setShowSavedIdeaCategoryPanel,
+  setUpdatedSavedIdea,
+}) => {
+  console.log("dataSet", dataSet);
   const [categories, setCategories] = useState(["Uncategorized Ideas"]);
   const [fetchedSavedIdeas, setFetchedSavedIdeas] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
@@ -90,14 +94,15 @@ const IdeasCategoryDelete = ({ dataSet, setShowSavedIdeaCategoryPanel, setUpdate
     );
     console.log(" and response:", responseDelete);
     if (responseDelete.data.success) {
-      setUpdatedSavedIdea(prevState => !prevState);
+      setUpdatedSavedIdea((prevState) => !prevState);
       setDeletingKeywordIdea(false);
+      localStorage.removeItem('savedIdeasData');
       showToast("success", "Idea removed successfully", 2000);
-      setShowSavedIdeaCategoryPanel(false)
+      setShowSavedIdeaCategoryPanel(false);
     } else {
       setDeletingKeywordIdea(false);
       showToast("error", "Idea wasn't removed. Try again", 2000);
-      setShowSavedIdeaCategoryPanel(false)
+      setShowSavedIdeaCategoryPanel(false);
     }
   };
 
@@ -125,26 +130,31 @@ const IdeasCategoryDelete = ({ dataSet, setShowSavedIdeaCategoryPanel, setUpdate
 
     console.log(" and response:", response);
     if (response.data.success) {
-      setUpdatedSavedIdea(prevState => !prevState);
+      localStorage.removeItem('savedIdeasData');
+      setUpdatedSavedIdea((prevState) => !prevState);
       setSavingKeywordIdea(false);
       showToast("success", "Idea saved successfully", 2000);
-      setShowSavedIdeaCategoryPanel(false)
+      setShowSavedIdeaCategoryPanel(false);
     } else {
       setSavingKeywordIdea(false);
       showToast("error", "Idea wasn't saved. Try again", 2000);
-      setShowSavedIdeaCategoryPanel(false)
+      setShowSavedIdeaCategoryPanel(false);
     }
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
-      <div className="w-1/3 border border-gray-200 rounded-lg p-4 bg-white relative">
-        <button className="absolute top-0 right-0 m-3 text-gray-500 hover:text-gray-700 cursor-pointer" onClick={() => setShowSavedIdeaCategoryPanel(false)}>
+    <div
+      className="fixed top-0 left-0 w-full h-full flex justify-center items-center z-50"
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
+    >
+      <div className="w-2/4 border border-gray-200 rounded-lg p-4 bg-white relative">
+        <button
+          className="absolute top-0 right-0 m-3 text-gray-500 hover:text-gray-700 cursor-pointer"
+          onClick={() => setShowSavedIdeaCategoryPanel(false)}
+        >
           <MdCancel color="red" size={20} />
         </button>
-        <h2 className="text-lg font-semibold mb-3">
-          Manage Saved Ideas
-        </h2>
+        <h2 className="text-lg font-semibold mb-3">Manage Saved Ideas</h2>
         <div className="flex items-center justify-center">
           {fetchedSavedIdeas === false && (
             <div className="ml-2 text-center">
@@ -161,7 +171,9 @@ const IdeasCategoryDelete = ({ dataSet, setShowSavedIdeaCategoryPanel, setUpdate
         </div>
         <div className="flex mt-3">
           <span className="w-1/3">Idea:</span>
-          <span className="w-2/3 pl-20 font-semibold ml-2 text-lg capitalize break-words">{dataSet.video_ideas}</span>
+          <span className="w-2/3 pl-20 font-semibold ml-2 text-lg capitalize break-words">
+            {dataSet.video_ideas}
+          </span>
         </div>
         <div className="flex mt-3">
           <span className="w-1/3">Folder:</span>
@@ -207,23 +219,23 @@ const IdeasCategoryDelete = ({ dataSet, setShowSavedIdeaCategoryPanel, setUpdate
             )}
           </div>
           <div className="w-1/2 text-right ml-3 flex items-center">
-            <div className="flex items-center">
+            <div className="flex items-center mr-2">
               <button
                 style={{ border: "1px solid #CC0000", color: "#CC0000" }}
-                className="mr-3 py-2 px-5 rounded-full text-md"
+                className=" py-2 px-5 rounded-full text-md"
                 onClick={removeSavedIdea}
               >
                 Remove Idea
               </button>
               {deletingKeywordIdea && (
-                  <BiLoaderCircle
-                    className="animate-spin ml-2"
-                    color="#7352FF"
-                    size={20}
-                  />
-                )}
+                <BiLoaderCircle
+                  className="animate-spin ml-1"
+                  color="red"
+                  size={20}
+                />
+              )}
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center ml-2">
               <button
                 style={{
                   backgroundColor:

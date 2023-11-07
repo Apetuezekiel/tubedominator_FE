@@ -29,7 +29,12 @@ import "./App.css";
 import Sort from "./data/Sortting";
 import RegistrationForm from "./pages/UserAuth/registration/index2";
 
-import { useSavedIdeasData, useUserAccessLevel, useUserData, useUserLoggedin } from "./state/state";
+import {
+  useSavedIdeasData,
+  useUserAccessLevel,
+  useUserData,
+  useUserLoggedin,
+} from "./state/state";
 import SignInPage from "./pages/UserAuth/SignInPage";
 import SignUpPage from "./pages/UserAuth/SignUpPage";
 import Opitimize from "./components/Opitimize";
@@ -74,7 +79,11 @@ const App = () => {
   const userData = useUserData((state) => state.userData);
   const setUserData = useUserData((state) => state.setUserData);
   function ProtectedRoute() {
-    return userLoggedIn && accessLevel === 'L2' ? <Outlet /> : <Navigate to="/" />;
+    return userLoggedIn && accessLevel === "L2" ? (
+      <Outlet />
+    ) : (
+      <Navigate to="/" />
+    );
   }
 
   function AppRoutes() {
@@ -110,7 +119,7 @@ const App = () => {
         <Route path="/rankings" element={<ProtectedRoute />}>
           <Route path="/rankings" element={<Rankings />} />
         </Route>
-        
+
         <Route path="/searchterm" element={<ProtectedRoute />}>
           <Route path="/searchterm" element={<SearchTerm />} />
         </Route>
@@ -128,7 +137,7 @@ const App = () => {
         </Route>
 
         {/* <Route path="/channel" element={<ProtectedRoute />}> */}
-          <Route path="/channel" element={<RegistrationForm />} />
+        <Route path="/channel" element={<RegistrationForm />} />
         {/* </Route> */}
 
         {/* Navigation */}
@@ -141,14 +150,12 @@ const App = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/youtube" element={<ConnectYoutube />} />
 
-
-
         {/* Sign-In and Sign-Up */}
         <Route path="/sign-in/*" element={<SignInPage />} />
         <Route path="/sign-up/*" element={<SignUpPage />} />
       </Routes>
     );
-  } 
+  }
   useEffect(() => {
     // console.log("R--------------------", process.env.REACT_APP_YOUTUBE_API_KEY);
     const currentThemeColor = localStorage.getItem("colorMode");
@@ -159,7 +166,7 @@ const App = () => {
     }
   }, []);
 
-  useEffect(()=>{
+  useEffect(() => {
     const fetchUserYoutubeInfo = async () => {
       // const { isLoaded, isSignedIn, user } = useUser();
       try {
@@ -173,7 +180,7 @@ const App = () => {
             },
           },
         );
-  
+
         setUserData(response.data.data);
         // setLoadeduserData(true);
         console.log(
@@ -187,10 +194,10 @@ const App = () => {
     };
 
     console.log("is user logged in from App.js:", userLoggedIn);
-    if (userLoggedIn){
+    if (userLoggedIn) {
       fetchUserYoutubeInfo();
     }
-  }, [userLoggedIn])
+  }, [userLoggedIn]);
 
   // useEffect(() => {
   //   gapi.load("client:auth2", () => {

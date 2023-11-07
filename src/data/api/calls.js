@@ -1,6 +1,10 @@
 /* eslint-disable */
 import axios from "axios";
-import { useUserAuthToken, useUserData, useUserLoggedin } from "../../state/state";
+import {
+  useUserAuthToken,
+  useUserData,
+  useUserLoggedin,
+} from "../../state/state";
 import showToast from "../../utils/toastUtils";
 import CryptoJS from "crypto-js";
 
@@ -70,7 +74,6 @@ export const userFullDataDecrypted = () => {
 // }
 
 export async function getSavedIdeas() {
-
   const decryptedFullData = userFullDataDecrypted();
   try {
     const response = await axios.get(
@@ -255,7 +258,6 @@ export const isChannelRegistered = async (user_id) => {
     );
 
     return response.data.success;
-
   } catch (error) {
     showToast(
       "error",
@@ -268,23 +270,27 @@ export const isChannelRegistered = async (user_id) => {
 };
 
 export const findCountryAndLanguage = (dataSet, array) => {
-  const defaultCountry = 'Global';
-  const defaultLanguage = 'English';
+  const defaultCountry = "Global";
+  const defaultLanguage = "English";
 
-  const foundItem = array.find(item => item.countryCode === dataSet.countryCode && item.languageCode === dataSet.languageCode);
+  const foundItem = array.find(
+    (item) =>
+      item.countryCode === dataSet.countryCode &&
+      item.languageCode === dataSet.languageCode,
+  );
 
   if (foundItem) {
     return {
       country: foundItem.country,
-      language: foundItem.language
+      language: foundItem.language,
     };
   } else {
     return {
       country: defaultCountry,
-      language: defaultLanguage
+      language: defaultLanguage,
     };
   }
-}
+};
 
 // export const fetchUserYoutubeInfo = async () => {
 //   try {

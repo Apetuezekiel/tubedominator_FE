@@ -18,11 +18,11 @@ import { useUserAccessLevel } from "../state/state";
 const Sidebar = () => {
   const { currentColor, activeMenu, setActiveMenu, screenSize } =
     useStateContext();
-    const accessLevel = useUserAccessLevel((state) => state.accessLevel);
-    const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
-    if (accessLevel === "" || null){
-      setAccessLevel(localStorage.getItem("accessLevel"))
-     }
+  const accessLevel = useUserAccessLevel((state) => state.accessLevel);
+  const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
+  if (accessLevel === "" || null) {
+    setAccessLevel(localStorage.getItem("accessLevel"));
+  }
 
   const handleCloseSideBar = () => {
     if (activeMenu !== undefined && screenSize <= 900) {
@@ -119,9 +119,7 @@ const Sidebar = () => {
                 ))}
               </div>
             ))}
-            <div className="">
-              {/* <GoogleLogOut /> */}
-            </div>
+            <div className="">{/* <GoogleLogOut /> */}</div>
           </div>
         </>
       )}

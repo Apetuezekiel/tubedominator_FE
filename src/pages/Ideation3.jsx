@@ -49,6 +49,7 @@ import { BsArrowDownShort, BsArrowUpShort, BsDot } from "react-icons/bs";
 import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
 import Insights from "./keywords/Insights";
 import Competition from "./keywords/Competition";
+import Loader from "../components/Loader";
 
 const Ideation = () => {
   const apiUrl = process.env.REACT_APP_API_BASE_URL;
@@ -200,9 +201,7 @@ const Ideation = () => {
           (item) => item.keyword === keyword,
         );
         // console.log("Yo Bro. I am about to delete the exact Keyword. You sure about this bro?. This shit is irreversible bro. You gotta be sure bro. Click okay if you sure, but think hard bro!!");
-        alert(
-          "Are you sure you want to delete?",
-        );
+        alert("Are you sure you want to delete?");
       } else {
         foundObject = savedData.related_keywords.find(
           (item) => item.keyword === keyword,
@@ -393,9 +392,9 @@ const Ideation = () => {
     return (
       <div
         className="flex items-center justify-center"
-        onClick={()=> {
-          setShowSavedIdeaCategoryPanel(true)
-          setIdeasDataSet(props)
+        onClick={() => {
+          setShowSavedIdeaCategoryPanel(true);
+          setIdeasDataSet(props);
         }}
       >
         {starIcon}
@@ -522,12 +521,13 @@ const Ideation = () => {
   const VideoIconTemplate = (props) => {
     // console.log("props", props);
     return (
-      <div className="flex flex-col break-words"
-      // onClick={()=>{
-      //   setShowInsights(true);
-      //   setIdeasDataSet(props);
-      //   }}
-        >
+      <div
+        className="flex flex-col break-words"
+        // onClick={()=>{
+        //   setShowInsights(true);
+        //   setIdeasDataSet(props);
+        //   }}
+      >
         <span className="text-md capitalize">{props.keyword}</span>
         {/* <span className="text-xs text cursor-pointer" style={{color: "#7352FF"}}>More Insights</span> */}
       </div>
@@ -677,22 +677,26 @@ const Ideation = () => {
 
   return (
     <section>
-          <div className={`m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl ${showInsights && 'hidden'}`}>
-      <div className="flex items-center justify-center h-full mb-5">
-        <div className="flex items-center flex-col ">
-          <div className="w-full max-w-xs flex items-center p-2 pl-4 pr-4 border border-gray-300 bg-white rounded-full">
-            <input
-              type="text"
-              placeholder="Enter a topic, brand, or product"
-              className="flex-grow bg-transparent outline-none pr-2 text-xs"
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
-            <BiSearch className="text-gray-500 text-xs" />
+      <div
+        className={`m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl ${
+          showInsights && "hidden"
+        }`}
+      >
+        <div className="flex items-center justify-center h-full mb-5">
+          <div className="flex items-center flex-col ">
+            <div className="w-full max-w-xs flex items-center p-2 pl-4 pr-4 border border-gray-300 bg-white rounded-full">
+              <input
+                type="text"
+                placeholder="Enter a topic, brand, or product"
+                className="flex-grow bg-transparent outline-none pr-2 text-xs"
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
+              <BiSearch className="text-gray-500 text-xs" />
+            </div>
           </div>
-        </div>
 
-        {/* <div className="relative ml-4">
+          {/* <div className="relative ml-4">
           <select className="rounded-full py-2 pl-4 pr-8 border border-gray-300 bg-white text-xs">
             <option value="en">Global (English)</option>
             <option value="es">Español </option>
@@ -701,221 +705,234 @@ const Ideation = () => {
           </select>
         </div> */}
 
-        <div className="relative ml-4">
-          <select
-            id="countrySelect"
-            className="rounded-full py-2 pl-4 pr-8 border border-gray-300 bg-white text-xs"
-            value={`${selectedCountry.countryCode}:${selectedCountry.languageCode}`}
-            onChange={handleCountryChange}
+          <div className="relative ml-4">
+            <select
+              id="countrySelect"
+              className="rounded-full py-2 pl-4 pr-8 border border-gray-300 bg-white text-xs"
+              value={`${selectedCountry.countryCode}:${selectedCountry.languageCode}`}
+              onChange={handleCountryChange}
+            >
+              <option value="GLB:en">Global (English)</option>
+              {countriesWithLanguages.map((item, index) => (
+                <option
+                  key={index}
+                  value={`${item.countryCode}:${item.languageCode}`}
+                >
+                  {`${item.country} (${item.language})`}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            className={`text-white rounded-full px-4 py-2 ml-4 text-xs ${
+              isSearchEmpty
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-purple-500 cursor-pointer"
+            }`}
+            onClick={handleGetIdeas}
+            disabled={isSearchEmpty}
           >
-            <option value="GLB:en">Global (English)</option>
-            {countriesWithLanguages.map((item, index) => (
-              <option
-                key={index}
-                value={`${item.countryCode}:${item.languageCode}`}
-              >
-                {`${item.country} (${item.language})`}
-              </option>
-            ))}
-          </select>
+            GET IDEAS
+          </button>
         </div>
+        {isLoading ? (
+          <Loader message={"Gathering Insights for your Keyword."} />
+        ) : (
+          <div className=""></div>
+        )}
+        <div>
+          <div className="flex justify-start items-center">
+            <Header title="Keyword you provided" size="text-1xl" />
+            <span className="mt-5 ml-4 text-xs">
+              {loadedLocalStorage && "(Results loaded from your last query)"}
+            </span>
+          </div>
+          <GridComponent
+            // id="gridcomp"
+            dataSource={exactKeywordData}
+            allowExcelExport
+            allowPdfExport
+            allowPaging
+            allowSorting
+            // contextMenuItems={contextMenuItems}
+            // editSettings={editing}
+            // rowSelected={handleRowSelected}
+          >
+            <ColumnsDirective>
+              <ColumnDirective
+                field="isFavorite"
+                headerText=""
+                width="80"
+                template={gridOrderStars}
+              />
+              <ColumnDirective
+                field="keyword"
+                headerText="Video ideas"
+                headerTemplate={VideoIconTitleTemplate}
+                template={VideoIconTemplate}
+              />
+              <ColumnDirective
+                field="monthlysearch"
+                headerText="Search Volume on youtube"
+                headerTemplate={VolumeTitleTemplate}
+                template={searchVolumeDataRowTemplate}
+              />
+              <ColumnDirective
+                field="trend"
+                headerText="Trends"
+                headerTemplate={TrendsTitleTemplate}
+                template={TrendsDataRowTemplate}
+              />
+              <ColumnDirective
+                field="difficulty"
+                headerText="Keyword Difficulty"
+                template={keywordDiffTemplate}
+              />
+              <ColumnDirective
+                field="estimated_views"
+                headerText="Potential views on youtube"
+                headerTemplate={VideoIconTitleTemplate}
+                template={formatViews}
+              />
+            </ColumnsDirective>
+            <Inject
+              services={[
+                Resize,
+                Sort,
+                ContextMenu,
+                Filter,
+                Page,
+                ExcelExport,
+                Edit,
+                PdfExport,
+              ]}
+            />
+          </GridComponent>
 
-        <button
-          className={`text-white rounded-full px-4 py-2 ml-4 text-xs ${
-            isSearchEmpty
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-purple-500 cursor-pointer"
-          }`}
-          onClick={handleGetIdeas}
-          disabled={isSearchEmpty}
-        >
-          GET IDEAS
-        </button>
-      </div>
-      {isLoading ? (
-        <div className="flex flex-col justify-center items-center w-full mt-20">
-          <BiLoaderCircle
-            className="animate-spin text-center"
-            color="#7352FF"
-            size={30}
+          <Header
+            title="Keyword Suggestions"
+            size="text-1xl"
+            className="mt-4"
           />
-          <div>Gathering Insights for your Keyword.</div>
-        </div>
-      ) : (
-        <div className=""></div>
-      )}
-      <div>
-        <div className="flex justify-start items-center">
-          <Header title="Keyword you provided" size="text-1xl" />
-          <span className="mt-5 ml-4 text-xs">
-            {loadedLocalStorage && "(Results loaded from your last query)"}
-          </span>
-        </div>
-        <GridComponent
-          // id="gridcomp"
-          dataSource={exactKeywordData}
-          allowExcelExport
-          allowPdfExport
-          allowPaging
-          allowSorting
-          // contextMenuItems={contextMenuItems}
-          // editSettings={editing}
-          // rowSelected={handleRowSelected}
-        >
-          <ColumnsDirective>
-            <ColumnDirective
-              field="isFavorite"
-              headerText=""
-              width="80"
-              template={gridOrderStars}
-            />
-            <ColumnDirective
-              field="keyword"
-              headerText="Video ideas"
-              headerTemplate={VideoIconTitleTemplate}
-              template={VideoIconTemplate}
-            />
-            <ColumnDirective
-              field="monthlysearch"
-              headerText="Search Volume on youtube"
-              headerTemplate={VolumeTitleTemplate}
-              template={searchVolumeDataRowTemplate}
-            />
-            <ColumnDirective
-              field="trend"
-              headerText="Trends"
-              headerTemplate={TrendsTitleTemplate}
-              template={TrendsDataRowTemplate}
-            />
-            <ColumnDirective
-              field="difficulty"
-              headerText="Keyword Difficulty"
-              template={keywordDiffTemplate}
-            />
-            <ColumnDirective
-              field="estimated_views"
-              headerText="Potential views on youtube"
-              headerTemplate={VideoIconTitleTemplate}
-              template={formatViews}
-            />
-          </ColumnsDirective>
-          <Inject
-            services={[
-              Resize,
-              Sort,
-              ContextMenu,
-              Filter,
-              Page,
-              ExcelExport,
-              Edit,
-              PdfExport,
-            ]}
-          />
-        </GridComponent>
-
-        <Header title="Keyword Suggestions" size="text-1xl" className="mt-4" />
-        <div className="w-full flex">
-          <div className="w-1/2 flex py-2">
-            <div className="flex justify-start items-center">
-              <div
-                className="bg-white rounded-tl-full rounded-bl-full border border-gray-300 px-4 py-2 flex items-center w-24"
-                onClick={serveAllVideoIdeas}
-                style={{ cursor: "pointer" }}
-              >
-                <span className="mr-2 text-xs">All</span>
-              </div>
-              <div
-                className="bg-white border border-gray-300 px-4 py-2 flex items-center"
-                onClick={() => findQuestions(relatedKeywordData)}
-                style={{ cursor: "pointer" }}
-              >
-                <span className="mr-2 text-xs">Questions Only</span>
-              </div>
-              <div
-                className="bg-white rounded-tr-full rounded-br-full border border-gray-300 px-4 py-2 flex items-center"
-                onClick={() =>
-                  filterBySearchQuery(relatedKeywordData, searchQuery)
-                }
-                style={{ cursor: "pointer" }}
-              >
-                <span className="mr-2 text-xs">Keywords Only</span>
-              </div>
-              <div>
-                <span className="ml-4 text-xs">{`${relatedKeywordData.length} video ideas found ${keywordSuggestionRemark}`}</span>
+          <div className="w-full flex">
+            <div className="w-1/2 flex py-2">
+              <div className="flex justify-start items-center">
+                <div
+                  className="bg-white rounded-tl-full rounded-bl-full border border-gray-300 px-4 py-2 flex items-center w-24"
+                  onClick={serveAllVideoIdeas}
+                  style={{ cursor: "pointer" }}
+                >
+                  <span className="mr-2 text-xs">All</span>
+                </div>
+                <div
+                  className="bg-white border border-gray-300 px-4 py-2 flex items-center"
+                  onClick={() => findQuestions(relatedKeywordData)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <span className="mr-2 text-xs">Questions Only</span>
+                </div>
+                <div
+                  className="bg-white rounded-tr-full rounded-br-full border border-gray-300 px-4 py-2 flex items-center"
+                  onClick={() =>
+                    filterBySearchQuery(relatedKeywordData, searchQuery)
+                  }
+                  style={{ cursor: "pointer" }}
+                >
+                  <span className="mr-2 text-xs">Keywords Only</span>
+                </div>
+                <div>
+                  <span className="ml-4 text-xs">{`${relatedKeywordData.length} video ideas found ${keywordSuggestionRemark}`}</span>
+                </div>
               </div>
             </div>
+            <div className="w-1/2 flex justify-end py-2"></div>
           </div>
-          <div className="w-1/2 flex justify-end py-2"></div>
+          <GridComponent
+            // id="gridcomp"
+            dataSource={relatedKeywordData}
+            allowExcelExport
+            allowPdfExport
+            allowPaging
+            allowSorting
+            selectionSettings={{ type: "Multiple" }}
+            // contextMenuItems={contextMenuItems}
+            // editSettings={editing}
+            // rowSelected={handleRowSelected}
+          >
+            <ColumnsDirective>
+              <ColumnDirective
+                field="isFavorite"
+                headerText=""
+                width="80"
+                template={gridOrderStars}
+              />
+              <ColumnDirective
+                field="keyword"
+                headerText="Video ideas"
+                headerTemplate={VideoIconTitleTemplate}
+                template={VideoIconTemplate}
+              />
+              <ColumnDirective
+                field="monthlysearch"
+                headerText="Search Volume on youtube"
+                headerTemplate={VolumeTitleTemplate}
+                template={searchVolumeDataRowTemplate}
+              />
+              <ColumnDirective
+                field="trend"
+                headerText="Trends"
+                headerTemplate={TrendsTitleTemplate}
+                template={TrendsDataRowTemplate}
+              />
+              <ColumnDirective
+                field="difficulty"
+                headerText="Keyword Difficulty"
+                template={keywordDiffTemplate}
+              />
+              <ColumnDirective
+                field="estimated_views"
+                headerText="Potential views on youtube"
+                headerTemplate={VideoIconTitleTemplate}
+                template={formatViews}
+              />
+            </ColumnsDirective>
+            <Inject
+              services={[
+                Resize,
+                Sort,
+                ContextMenu,
+                Filter,
+                Page,
+                ExcelExport,
+                Edit,
+                PdfExport,
+              ]}
+            />
+          </GridComponent>
+          {showSavedIdeaCategoryPanel && (
+            <IdeasCategoryView
+              dataSet={ideasDataSet}
+              setShowSavedIdeaCategoryPanel={setShowSavedIdeaCategoryPanel}
+            />
+          )}
+          {/* {showSavedIdeaCategoryPanel && IdeaCategoryPanel()} */}
         </div>
-        <GridComponent
-          // id="gridcomp"
-          dataSource={relatedKeywordData}
-          allowExcelExport
-          allowPdfExport
-          allowPaging
-          allowSorting
-          selectionSettings={{ type: "Multiple" }}
-          // contextMenuItems={contextMenuItems}
-          // editSettings={editing}
-          // rowSelected={handleRowSelected}
-        >
-          <ColumnsDirective>
-            <ColumnDirective
-              field="isFavorite"
-              headerText=""
-              width="80"
-              template={gridOrderStars}
-            />
-            <ColumnDirective
-              field="keyword"
-              headerText="Video ideas"
-              headerTemplate={VideoIconTitleTemplate}
-              template={VideoIconTemplate}
-            />
-            <ColumnDirective
-              field="monthlysearch"
-              headerText="Search Volume on youtube"
-              headerTemplate={VolumeTitleTemplate}
-              template={searchVolumeDataRowTemplate}
-            />
-            <ColumnDirective
-              field="trend"
-              headerText="Trends"
-              headerTemplate={TrendsTitleTemplate}
-              template={TrendsDataRowTemplate}
-            />
-            <ColumnDirective
-              field="difficulty"
-              headerText="Keyword Difficulty"
-              template={keywordDiffTemplate}
-            />
-            <ColumnDirective
-              field="estimated_views"
-              headerText="Potential views on youtube"
-              headerTemplate={VideoIconTitleTemplate}
-              template={formatViews}
-            />
-          </ColumnsDirective>
-          <Inject
-            services={[
-              Resize,
-              Sort,
-              ContextMenu,
-              Filter,
-              Page,
-              ExcelExport,
-              Edit,
-              PdfExport,
-            ]}
-          />
-        </GridComponent>
-        {showSavedIdeaCategoryPanel &&  <IdeasCategoryView dataSet={ideasDataSet} setShowSavedIdeaCategoryPanel={setShowSavedIdeaCategoryPanel}/>}
-        {/* {showSavedIdeaCategoryPanel && IdeaCategoryPanel()} */}
       </div>
-    </div>
-        {showInsights &&  <Insights dataSet={ideasDataSet} setShowInsights={setShowInsights} setShowCompetition={setShowCompetition}/>}
-        {showCompetition &&  <Competition dataSet={ideasDataSet} setShowInsights={setShowInsights} setShowCompetition={setShowCompetition} />}
-
+      {showInsights && (
+        <Insights
+          dataSet={ideasDataSet}
+          setShowInsights={setShowInsights}
+          setShowCompetition={setShowCompetition}
+        />
+      )}
+      {showCompetition && (
+        <Competition
+          dataSet={ideasDataSet}
+          setShowInsights={setShowInsights}
+          setShowCompetition={setShowCompetition}
+        />
+      )}
     </section>
   );
 };

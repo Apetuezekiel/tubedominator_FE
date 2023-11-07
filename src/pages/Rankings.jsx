@@ -52,6 +52,7 @@ import { MdCancel } from "react-icons/md";
 import { BsFillSquareFill } from "react-icons/bs";
 import donought from "../data/donought2.png";
 import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
+import Loader from "../components/Loader";
 
 const Keyword2 = () => {
   const decryptedFullData = userFullDataDecrypted();
@@ -590,7 +591,9 @@ const Keyword2 = () => {
             </div>
           </NavLink>
           <NavLink to="/keywords">
-            <div className="flex justify-between items-center pb-2">Keywords</div>
+            <div className="flex justify-between items-center pb-2">
+              Keywords
+            </div>
           </NavLink>
         </div>
         <div className="flex items-center mb-5">
@@ -708,13 +711,9 @@ const Keyword2 = () => {
           <div className="w-1/2 flex justify-end py-2"></div>
         </div>
         {loadingUserChannelKeyword && (
-          <div className="blinking flex w-full items-center justify-center mb-5">
-            <span className="mr-2">Loading your saved Keywords </span>
-            <span className={"animate-spin ml-2"}>
-              <BiLoaderCircle color="#7438FF" size={30} />
-            </span>
-          </div>
+          <Loader message={"Loading your saved Keywords. Hold Tight"} />
         )}
+        <br />
         <GridComponent
           dataSource={userChannelKeywords}
           allowExcelExport
@@ -779,7 +778,12 @@ const Keyword2 = () => {
               : "View All Keywords"}
           </span>
         </Link>
-        {displayPreviewKeyword && <PreviewKeyword keywordd={unconventionalKeywordd} setDisplayPreviewKeyword={setDisplayPreviewKeyword}/>}
+        {displayPreviewKeyword && (
+          <PreviewKeyword
+            keywordd={unconventionalKeywordd}
+            setDisplayPreviewKeyword={setDisplayPreviewKeyword}
+          />
+        )}
       </div>
     </div>
   );

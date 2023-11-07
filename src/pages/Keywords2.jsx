@@ -44,6 +44,7 @@ import { userFullDataDecrypted } from "../data/api/calls";
 import { TiDelete } from "react-icons/ti";
 import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
 import { MdCancel } from "react-icons/md";
+import Loader from "../components/Loader";
 // import deleteChannelKeyword from "../data/api/calls";
 
 const Keyword2 = () => {
@@ -81,8 +82,7 @@ const Keyword2 = () => {
   const [loadingUserChannelKeyword, setLoadingUserChannelKeyword] =
     useState(false);
   const [selectedKeyword, setSelectedKeyword] = useState("");
-  const [unconventionalKeywordd, setUnconventionalKeywordd] =
-    useState("");
+  const [unconventionalKeywordd, setUnconventionalKeywordd] = useState("");
   const {
     currentColor,
     activeMenu,
@@ -115,7 +115,6 @@ const Keyword2 = () => {
   const settings = { persistSelection: true };
   let unconventionalKeyword = "God";
   const [displayPreviewKeyword, setDisplayPreviewKeyword] = useState(false);
-
 
   const toggleSave = async (keyword, save) => {
     // fetchSavedIdeasData()
@@ -699,13 +698,12 @@ const Keyword2 = () => {
           </div>
         </div>
         {loadingUserChannelKeyword && (
-          <div className="blinking flex w-full items-center justify-center mb-5">
-            <span className="mr-2">Loading your saved Keywords </span>
-            <span className={"animate-spin ml-2"}>
-              <BiLoaderCircle color="#7438FF" size={30} />
-            </span>
-          </div>
+          <Loader
+            message={"Loading your saved Keywords. Hold Tight"}
+            marginBottom={20}
+          />
         )}
+        <br />
         <GridComponent
           dataSource={userChannelKeywords}
           allowExcelExport
@@ -766,7 +764,12 @@ const Keyword2 = () => {
             ]}
           />
         </GridComponent>
-        {displayPreviewKeyword && <PreviewKeyword keywordd={unconventionalKeywordd} setDisplayPreviewKeyword={setDisplayPreviewKeyword}/>}
+        {displayPreviewKeyword && (
+          <PreviewKeyword
+            keywordd={unconventionalKeywordd}
+            setDisplayPreviewKeyword={setDisplayPreviewKeyword}
+          />
+        )}
       </div>
     </div>
   );

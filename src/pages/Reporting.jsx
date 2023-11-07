@@ -48,6 +48,7 @@ import axios from "axios";
 import { useUserYoutubeInfo } from "../state/state";
 import Spinner from "../components/Spinner";
 import donought from "../data/donought3.png";
+import Loader from "../components/Loader";
 
 const DropDown = ({ currentMode }) => (
   <div className="w-28 border-1 border-color px-2 py-1 rounded-md">
@@ -574,7 +575,9 @@ const Reporting = () => {
                   />
                 </GridComponent>
               ) : (
-                <Spinner />
+                <Loader
+                  message={"Loading Insights from your Youtube account"}
+                />
               )}
             </div>
           </div>
