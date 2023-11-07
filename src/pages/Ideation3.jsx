@@ -523,10 +523,12 @@ const Ideation = () => {
   const VideoIconTemplate = (props) => {
     // console.log("props", props);
     return (
-      <div className="flex flex-col break-words" onClick={()=>{
-        setShowInsights(true);
-        setIdeasDataSet(props);
-        }}>
+      <div className="flex flex-col break-words"
+      // onClick={()=>{
+      //   setShowInsights(true);
+      //   setIdeasDataSet(props);
+      //   }}
+        >
         <span className="text-md capitalize">{props.keyword}</span>
         <span className="text-xs text cursor-pointer" style={{color: "#7352FF"}}>More Insights</span>
       </div>

@@ -29,7 +29,7 @@ import "./App.css";
 import Sort from "./data/Sortting";
 import RegistrationForm from "./pages/UserAuth/registration/index2";
 
-import { useSavedIdeasData, useUserLoggedin } from "./state/state";
+import { useSavedIdeasData, useUserAccessLevel, useUserLoggedin } from "./state/state";
 import SignInPage from "./pages/UserAuth/SignInPage";
 import SignUpPage from "./pages/UserAuth/SignUpPage";
 import Opitimize from "./components/Opitimize";
@@ -66,13 +66,11 @@ const App = () => {
   } = useStateContext();
   const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
   const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
-  // setUserLoggedIn(localStorage.getItem("userLoggedin"));
-  if (userLoggedIn === "" || null){
-    setUserLoggedIn(localStorage.getItem("userLoggedin"))
-   }
+  const accessLevel = useUserAccessLevel((state) => state.accessLevel);
+  const setAccessLevel = useUserLoggedin((state) => state.setAccessLevel);
 
   function ProtectedRoute() {
-    return userLoggedIn ? <Outlet /> : <Navigate to="/" />;
+    return userLoggedIn && accessLevel === 'L2' ? <Outlet /> : <Navigate to="/" />;
   }
 
   function AppRoutes() {
