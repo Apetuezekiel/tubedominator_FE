@@ -74,8 +74,8 @@ const SignInPage = () => {
         const channelRegistered = data.user_id ? await isChannelRegistered(data.user_id) : null;
         channelRegistered ? localStorage.setItem("accessLevel", "L2") : localStorage.setItem("accessLevel", data.accessLevel)
         localStorage.setItem("userLoggedin", true);
+        localStorage.setItem("userRecordId", data.userRecordId);
         setAccessLevel(localStorage.getItem("accessLevel"))
-        
         setUserLoggedIn(true)
         navigate("/ideation");
       } else {

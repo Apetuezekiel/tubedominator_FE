@@ -1,9 +1,9 @@
 import { BiLoaderCircle } from "react-icons/bi";
 
-const Loader = ({message, size, iconColor, messageColor}) => {
+const Loader = ({message, size, iconColor, messageColor, marginTop}) => {
 
     return (
-        <div className="flex flex-col items-center justify-center w-full mt-20 animate-pulse">
+        <div className={`flex flex-col items-center justify-center w-full mt-${marginTop || 20} animate-pulse`}>
         <BiLoaderCircle
           className="animate-spin text-center"
           color={`${iconColor || "#7352FF"}`}

@@ -12,6 +12,7 @@ import { GoogleLogin } from "react-google-login";
 import GoogleApiInitializer from "../../utils/GoogleApiInitializer";
 import axios from "axios";
 import {
+  encryptAndStoreData,
   getUserEncryptedDataFromDb,
   userFullDataDecrypted,
 } from "../../data/api/calls";
@@ -41,14 +42,6 @@ const GoogleLoginComp = forwardRef((props, ref) => {
   // const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
   // const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
 
-  const encryptAndStoreData = (data) => {
-    const secretKey = "+)()^77---<@#$>";
-    const jsonData = JSON.stringify(data);
-    const encryptedGData = CryptoJS.AES.encrypt(jsonData, secretKey).toString();
-    localStorage.setItem("encryptedGData", encryptedGData);
-    return encryptedGData;
-  };
-
   const isChannelRegistered = async (user_id, GUserData) => {
     try {
       const response = await axios.get(
@@ -64,7 +57,7 @@ const GoogleLoginComp = forwardRef((props, ref) => {
         },
       );
 
-      console.log("is channel registered", response);
+      console.log("is channel registered", response.data.success);
       if (response.data.success) {
         // addUserId(`TUBE_${GUserData.gId}`);
         const decryptedFullData = userFullDataDecrypted();
@@ -76,7 +69,7 @@ const GoogleLoginComp = forwardRef((props, ref) => {
             const userDataFromDb = await getUserEncryptedDataFromDb(
               GUserData.gId,
             );
-            console.log("userDataFromDb", userDataFromDb);
+            console.log("userDataFromDb", userDataFromDb);  
             encryptAndStoreData(userDataFromDb);
             localStorage.setItem("accessLevel", "L2");
             setAccessLevel(localStorage.getItem("accessLevel"))
@@ -112,9 +105,9 @@ const GoogleLoginComp = forwardRef((props, ref) => {
         }, 3000);
       } else {
         encryptAndStoreData(GUserData);
-        setTimeout(async () => {
+        // setTimeout(async () => {
           navigate("/channel");
-        }, 3000);
+        // }, 1000);
       }
     } catch (error) {
       showToast(
@@ -182,7 +175,6 @@ const GoogleLoginComp = forwardRef((props, ref) => {
   };
 
   const handleLoginClick = () => {
-    console.log("Second element clicked");
     setInitialized(true);
   };
 

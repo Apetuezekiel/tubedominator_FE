@@ -29,7 +29,7 @@ import "./App.css";
 import Sort from "./data/Sortting";
 import RegistrationForm from "./pages/UserAuth/registration/index2";
 
-import { useSavedIdeasData, useUserAccessLevel, useUserLoggedin } from "./state/state";
+import { useSavedIdeasData, useUserAccessLevel, useUserData, useUserLoggedin } from "./state/state";
 import SignInPage from "./pages/UserAuth/SignInPage";
 import SignUpPage from "./pages/UserAuth/SignUpPage";
 import Opitimize from "./components/Opitimize";
@@ -48,12 +48,15 @@ import Insights from "./pages/keywords/Insights";
 import Competition from "./pages/keywords/Competition";
 import ConnectYoutube from "./pages/ConnectYoutube";
 import Testss from "./pages/Testss";
+import axios from "axios";
+import { userFullDataDecrypted } from "./data/api/calls";
 const client_id =
   "372673946018-lu1u3llu6tqi6hmv8m2226ri9qev8bb8.apps.googleusercontent.com";
 const apiKey = "AIzaSyBhnxmlAowrcFI7owW40YrsqI3xPVVk0IU";
 
 const App = () => {
   // const { fetchSavedIdeasData } = useSavedIdeasData();
+  const decryptedFullData = userFullDataDecrypted();
 
   const {
     setCurrentColor,
@@ -68,7 +71,8 @@ const App = () => {
   const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
   const accessLevel = useUserAccessLevel((state) => state.accessLevel);
   const setAccessLevel = useUserLoggedin((state) => state.setAccessLevel);
-
+  const userData = useUserData((state) => state.userData);
+  const setUserData = useUserData((state) => state.setUserData);
   function ProtectedRoute() {
     return userLoggedIn && accessLevel === 'L2' ? <Outlet /> : <Navigate to="/" />;
   }
@@ -123,12 +127,9 @@ const App = () => {
           <Route path="/optimize" element={<Opitimize />} />
         </Route>
 
-        <Route path="/channel" element={<ProtectedRoute />}>
+        {/* <Route path="/channel" element={<ProtectedRoute />}> */}
           <Route path="/channel" element={<RegistrationForm />} />
-        </Route>
-
-
-        
+        {/* </Route> */}
 
         {/* Navigation */}
         <Route path="/nav" element={<Navbar />} />
@@ -147,7 +148,7 @@ const App = () => {
         <Route path="/sign-up/*" element={<SignUpPage />} />
       </Routes>
     );
-  }
+  } 
   useEffect(() => {
     // console.log("R--------------------", process.env.REACT_APP_YOUTUBE_API_KEY);
     const currentThemeColor = localStorage.getItem("colorMode");
@@ -157,6 +158,39 @@ const App = () => {
       setCurrentMode(currentThemeMode);
     }
   }, []);
+
+  useEffect(()=>{
+    const fetchUserYoutubeInfo = async () => {
+      // const { isLoaded, isSignedIn, user } = useUser();
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_BASE_URL}/getSavedUserYoutubeInfo`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.REACT_APP_X_API_KEY,
+              Authorization: `Bearer ${decryptedFullData.token}`,
+            },
+          },
+        );
+  
+        setUserData(response.data.data);
+        // setLoadeduserData(true);
+        console.log(
+          "getSavedUserYoutubeInfo:",
+          response.data,
+          decryptedFullData.token,
+        );
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    console.log("is user logged in from App.js:", userLoggedIn);
+    if (userLoggedIn){
+      fetchUserYoutubeInfo();
+    }
+  }, [userLoggedIn])
 
   // useEffect(() => {
   //   gapi.load("client:auth2", () => {

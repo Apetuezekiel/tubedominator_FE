@@ -77,14 +77,14 @@ const Navbar = () => {
   const accessLevel = useUserAccessLevel((state) => state.accessLevel);
   const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
   // 
- if (accessLevel === "" || null){
-  setAccessLevel(localStorage.getItem("accessLevel"))
- }
- if (userLoggedIn === "" || null){
-  setUserLoggedIn(localStorage.getItem("userLoggedin"));
- }
- console.log('localStorage.getItem("accessLevel")', localStorage.getItem("accessLevel"));
- console.log('localStorage.getItem("userLoggedin")', localStorage.getItem("userLoggedin"));
+//  if (accessLevel === "" || null){
+//   setAccessLevel(localStorage.getItem("accessLevel"))
+//  }
+//  if (userLoggedIn === "" || null){
+//   setUserLoggedIn(localStorage.getItem("userLoggedin"));
+//  }
+//  console.log('localStorage.getItem("accessLevel")', localStorage.getItem("accessLevel"));
+//  console.log('localStorage.getItem("userLoggedin")', localStorage.getItem("userLoggedin"));
 
   const decryptAndRetrieveData = (data) => {
     const secretKey = "+)()^77---<@#$>";
@@ -129,31 +129,32 @@ const Navbar = () => {
   const [pageTag, setPageTag] = useState("");
   const location = useLocation();
 
-  const fetchUserYoutubeInfo = async () => {
-    // const { isLoaded, isSignedIn, user } = useUser();
-    try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_BASE_URL}/getSavedUserYoutubeInfo`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": process.env.REACT_APP_X_API_KEY,
-            Authorization: `Bearer ${decryptedFullData.token}`,
-          },
-        },
-      );
+  // const fetchUserYoutubeInfo = async () => {
+  //   // const { isLoaded, isSignedIn, user } = useUser();
+  //   try {
+  //     const response = await axios.get(
+  //       `${process.env.REACT_APP_API_BASE_URL}/getSavedUserYoutubeInfo`,
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           "x-api-key": process.env.REACT_APP_X_API_KEY,
+  //           Authorization: `Bearer ${decryptedFullData.token}`,
+  //         },
+  //       },
+  //     );
 
-      setUserData(response.data);
-      setLoadeduserData(true);
-      console.log(
-        "getSavedUserYoutubeInfo:",
-        response.data,
-        decryptedFullData.token,
-      );
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+  //     setUserData(response.data);
+  //     setLoadeduserData(true);
+  //     alert("got here too ran the code too")
+  //     console.log(
+  //       "getSavedUserYoutubeInfo:",
+  //       response.data,
+  //       decryptedFullData.token,
+  //     );
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
 
   // fetchUserYoutubeInfo();
 
@@ -172,11 +173,46 @@ const Navbar = () => {
     }
   }, [screenSize]);
 
-  useEffect(() => {
-    if (userLoggedIn) {
-      fetchUserYoutubeInfo();
-    }
-  }, [userLoggedIn]);
+  // useEffect(()=>{
+    
+  // })
+
+  // useEffect(() => {
+  //   if (userLoggedIn) {
+  //     alert("got here ran the code")
+  //     fetchUserYoutubeInfo();
+  //   }
+  // }, [userLoggedIn]);
+
+  // useEffect(() => {
+  //   const savedUserData = JSON.parse(localStorage.getItem("userData"));
+  //   console.log('savedUserData', savedUserData);
+  //   if (userLoggedIn && savedUserData === null) {
+  //     fetchUserYoutubeInfo();
+  //   } else {
+  //     setUserData(savedUserData);
+  //     setLoadeduserData(true);
+  //   }
+  // }, [userLoggedIn]);
+
+  // useEffect(() => {
+  //   const fetchUserYoutubeData = async () => {
+  //     const fetchUserData = await fetchUserYoutubeInfo();
+    
+  //     setUserData(fetchUserData);
+  //     setLoadeduserData(true);
+  //   }
+
+  //   if (userLoggedIn) {
+  //     const fetchUserYoutubeDataLocal = JSON.parse(localStorage.getItem("userData"));
+  //     console.log("fetchUserYoutubeDataLocal", fetchUserYoutubeDataLocal);
+  //     if (!fetchUserYoutubeDataLocal || fetchUserYoutubeDataLocal === null || fetchUserYoutubeDataLocal === undefined){
+  //       fetchUserYoutubeData()
+  //     } else {
+  //       setUserData(fetchUserYoutubeDataLocal)
+  //     }
+  //   }
+  // }, [userLoggedIn])
 
   useEffect(() => {
     const path = location.pathname;
@@ -237,13 +273,13 @@ const Navbar = () => {
               >
                 <img
                   className="rounded-full w-10 h-10"
-                  src={userData.data.channel_image_link}
+                  src={userData.channel_image_link}
                   alt="user-profile"
                 />
                 <p>
                   <span className="text-gray-400 text-14">Hi,</span>{" "}
                   <span className="text-gray-400 font-bold ml-1 text-14">
-                    {userData.data.firstName}
+                    {userData.firstName}
                   </span>
                 </p>
                 <MdKeyboardArrowDown className="text-gray-400 text-14" />

@@ -36,6 +36,7 @@ const UserProfile = () => {
   const handleLogOut = () => {
     setIsClicked(initialState)
     console.log("Logout Success");
+    setUserData(null);
     localStorage.clear();
     navigate("/");
     setUserLoggedIn('')
@@ -63,13 +64,13 @@ const UserProfile = () => {
       <div className="flex gap-5 items-center mt-6 border-color border-b-1 pb-6">
         <img
           className="rounded-full h-24 w-24"
-          src={userData.data.channel_image_link}
+          src={userData.channel_image_link}
           alt="user-profile"
         />
         <div>
           <p className="font-semibold text-xl dark:text-gray-200">
             {" "}
-            {userData.data.fullName}{" "}
+            {userData.fullName}{" "}
           </p>
           <p className="text-gray-500 text-sm dark:text-gray-400">
             {" "}
@@ -77,7 +78,7 @@ const UserProfile = () => {
           </p>
           <p className="text-gray-500 text-sm font-semibold dark:text-gray-400">
             {" "}
-            {userData.data.business_email}{" "}
+            {userData.business_email}{" "}
           </p>
         </div>
       </div>

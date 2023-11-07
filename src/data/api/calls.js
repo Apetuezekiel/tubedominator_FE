@@ -1,6 +1,6 @@
 /* eslint-disable */
 import axios from "axios";
-import { useUserAuthToken, useUserLoggedin } from "../../state/state";
+import { useUserAuthToken, useUserData, useUserLoggedin } from "../../state/state";
 import showToast from "../../utils/toastUtils";
 import CryptoJS from "crypto-js";
 
@@ -122,6 +122,7 @@ export async function getSavedIdeas() {
 }
 
 export async function getUserEncryptedDataFromDb(gId) {
+  console.log("Fetching use details from DB");
   try {
     const response = await axios.get(
       `${process.env.REACT_APP_API_BASE_URL}/getUserEncryptedData`,
@@ -285,11 +286,37 @@ export const findCountryAndLanguage = (dataSet, array) => {
   }
 }
 
+// export const fetchUserYoutubeInfo = async () => {
+//   try {
+//     const response = await axios.get(
+//       `${process.env.REACT_APP_API_BASE_URL}/getSavedUserYoutubeInfo`,
+//       {
+//         headers: {
+//           "Content-Type": "application/json",
+//           "x-api-key": process.env.REACT_APP_X_API_KEY,
+//           Authorization: `Bearer ${decryptedFullData.token}`,
+//         },
+//       },
+//     );
+//     localStorage.setItem('userData', JSON.stringify(response.data));
+//     console.log(
+//       "getSavedUserYoutubeInfo:",
+//       response.data,
+//       decryptedFullData.token,
+//     );
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//   }
+// };
+
 // Helper Functions
-const encryptAndStoreData = (data) => {
+export const encryptAndStoreData = (data) => {
+  console.log("Encrypting User Data", data);
   const secretKey = "+)()^77---<@#$>";
   const jsonData = JSON.stringify(data);
   const encryptedGData = CryptoJS.AES.encrypt(jsonData, secretKey).toString();
   localStorage.setItem("encryptedGData", encryptedGData);
+  console.log("Saved User Data to localhost");
   return encryptedGData;
 };

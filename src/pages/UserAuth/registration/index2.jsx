@@ -11,13 +11,16 @@ import {
   useAllUserDeets,
   useUserAccessLevel,
   useUserAuthToken,
+  useUserData,
   useUserLoggedin,
   // useUserLoggedin,
 } from "../../../state/state";
 import { useStateContext } from "../../../contexts/ContextProvider";
 import CryptoJS from "crypto-js";
-import { userFullDataDecrypted } from "../../../data/api/calls";
+import { fetchUserYoutubeInfo, userFullDataDecrypted } from "../../../data/api/calls";
 import countriesWithLanguages from "../../../data/countries";
+import Loader from "../../../components/Loader";
+import { BiLoaderCircle } from "react-icons/bi";
 
 const RegistrationForm = () => {
   const navigate = useNavigate();
@@ -39,6 +42,7 @@ const RegistrationForm = () => {
   const [selectedFormData, setSelectedFormData] = useState(null);
   const accessLevel = useUserAccessLevel((state) => state.accessLevel);
   const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
+  const setUserData = useUserData((state) => state.setUserData);
   const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
   const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
   const [suggestedChannels, setSuggestedChannels] = useState([]);
@@ -49,6 +53,7 @@ const RegistrationForm = () => {
   const [channelUser, setChannelUser] = useState([]);
   const [callForUserChannels, setCallForUserChannels] = useState(false);
   const [clearSelectedChannel, setClearSelectedChannel] = useState(false);
+  const [connectingChannel, setConnectingChannel] = useState(false);
   const userAuthToken = useUserAuthToken((state) => state.userAuthToken);
   const setUserAuthToken = useUserAuthToken((state) => state.setUserAuthToken);
   const allUserDeets = useAllUserDeets((state) => state.allUserDeets);
@@ -61,6 +66,23 @@ const RegistrationForm = () => {
     languageCode: "en",
   };
   const [selectedCountry, setSelectedCountry] = useState(initialCountry);
+
+  const userRecordId = localStorage.getItem("userRecordId");
+  console.log(userRecordId, userRecordId, userRecordId);
+
+  useEffect(()=>{
+    if (!userRecordId || userRecordId.trim() === "" || userRecordId === null) {
+      showToast("error", "Error occurred. Kindly login again", 2000);
+  
+      // Redirect to sign-in after 2 seconds
+      setTimeout(() => {
+        setAccessLevel("");
+        setUserLoggedIn(false);
+        localStorage.clear();
+        navigate("/sign-in");
+      }, 2000);
+    }
+  }, [])
 
   useEffect(() => {
     const fetchChannel = () => {
@@ -131,7 +153,8 @@ const RegistrationForm = () => {
     navigate(path);
   };
 
-  const saveUserToken = async (token) => {
+  const saveUserToken = async (token, updatedFormData) => {
+    
     const updatedGUserData = {
       ...decryptedFullData,
       token,
@@ -142,6 +165,7 @@ const RegistrationForm = () => {
     };
     const encryptedFullData = encryptAndStoreData(updatedGUserData);
     console.log("updatyed encryptedFullData:", updatedGUserData);
+    // await fetchUserYoutubeInfo();  
 
     await axios
       .post(
@@ -159,9 +183,14 @@ const RegistrationForm = () => {
       )
       .then(async (response) => {
         console.log("Token stored successfully", response.data.message);
+        // await fetchUserYoutubeInfo();
+        setConnectingChannel(false)
+        setUserData(updatedFormData);
+        setUserLoggedIn(true);
         navigate("/ideation");
       })
       .catch((error) => {
+        setConnectingChannel(false)
         console.error("Error storing token:", error);
         console.error("-----------------------", error.response.data.message);
         showToast("error", "Error saving token. Try again", 5000);
@@ -176,24 +205,8 @@ const RegistrationForm = () => {
   };
 
   const handleSubmit = async (e) => {
+    setConnectingChannel(true);
     e.preventDefault();
-
-    const userRecordId = localStorage.getItem("userRecordId");
-
-    if (!userRecordId || userRecordId.trim() === "") {
-      showToast("error", "Error occurred. Kindly login again", 5000);
-  
-      // Redirect to sign-in after 2 seconds
-      setTimeout(() => {
-        setAccessLevel("");
-        setUserLoggedIn(false);
-        localStorage.clear();
-        navigate("/sign-in");
-      }, 2000);
-  
-      return; // Stop further execution
-    }
-
     // Extract relevant user data
     const userFirstName = decryptedFullData.firstName;
     const userLastName = decryptedFullData.lastName;
@@ -215,7 +228,7 @@ const RegistrationForm = () => {
       channel_image_link: channel_image_link,
       description: description,
       user_id,
-      userRecordId,
+      userRecordId: localStorage.getItem("userRecordId"),
     };
 
     console.log("updatedFormData", updatedFormData);
@@ -233,18 +246,20 @@ const RegistrationForm = () => {
         },
       );
 
+      console.log(response, response);
       if (response.data.success){
         localStorage.setItem("accessLevel", "L2")
         setAccessLevel("L2")
         console.log("Channel details stored successfully", response.data.token);
         const token = response.data.token;
         setTimeout(() => {
-          saveUserToken(token);
+          saveUserToken(token, updatedFormData);
         }, 2000);
       }
     } catch (error) {
       console.error("-----------------------", error.response.data.message);
       showToast("error", "Error saving channel. Try again", 5000);
+    setConnectingChannel(false);
     }
   };
 
@@ -396,9 +411,7 @@ const RegistrationForm = () => {
               </div>
             </div>
             {isLoading ? (
-              <div className="loading-container">
-                <Spinner />
-              </div>
+              <Loader message={"Searching for your channel"} marginTop={3}/>
             ) : (
               <div className=""></div>
             )}
@@ -462,9 +475,16 @@ const RegistrationForm = () => {
           <button
             type="submit"
             style={{ backgroundColor: "#7352FF" }}
-            className="w-full text-white p-2 rounded"
+            className="w-full text-white p-2 rounded flex items-center cursor-pointer justify-center"
           >
             Connect Channel
+            {
+              connectingChannel && (            <BiLoaderCircle
+                className="animate-spin text-center ml-2"
+                color="white"
+                size={20}
+              />)
+            }
           </button>
         </form>
       </div>

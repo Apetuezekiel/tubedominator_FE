@@ -93,6 +93,7 @@ const SignUpPage = () => {
         );
 
         const data = response.data;
+        console.log("Sign up response", data);
         if (data.success) {
           showToast("success", data.message, 3000);
           setIsLoading(false);
@@ -164,7 +165,7 @@ const SignUpPage = () => {
                       : "border-gray-200"
                   } placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white`}
                   type="text"
-                  placeholder="First Name"
+                  placeholder="Last Name"
                   value={formData.lastName}
                   onChange={(e) =>
                     setFormData({ ...formData, lastName: e.target.value })
