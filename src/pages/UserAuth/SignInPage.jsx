@@ -14,6 +14,7 @@ import {
 
 const SignInPage = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState(false);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -82,14 +83,17 @@ const SignInPage = () => {
           : localStorage.setItem("accessLevel", data.accessLevel);
         localStorage.setItem("userLoggedin", true);
         localStorage.setItem("userRecordId", data.userRecordId);
+        localStorage.setItem("userFirstName", data.firstName);
         setAccessLevel(localStorage.getItem("accessLevel"));
         setUserLoggedIn(true);
         navigate("/ideation");
       } else {
         showToast("error", data.message, 3000);
+        setLoginError(true);
         setIsLoading(false);
       }
     } catch (error) {
+      setLoginError(true);
       console.error("Error Logging User in:", error);
       showToast("error", `Couldn't Log you in`, 3000);
       setIsLoading(false);
@@ -162,6 +166,11 @@ const SignInPage = () => {
                     />
                   )}
                 </button>
+                {loginError && (
+            <div className="text-red-500 text-sm mt-4">
+              Incorrect email or password. Please try again.
+            </div>
+          )}
                 <div className="my-12 border-b text-center">
                   <Link
                     to="/sign-up"

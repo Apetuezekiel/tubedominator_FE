@@ -1239,11 +1239,11 @@ export const menuLinks = [
         link: "optimization",
         icon: <GoRocket />,
       },
-      {
-        name: "Reporting",
-        link: "reporting",
-        icon: <BsGraphUp />,
-      },
+      // {
+      //   name: "Reporting",
+      //   link: "reporting",
+      //   icon: <BsGraphUp />,
+      // },
       {
         name: "Keywords Ranking",
         link: "rankings",

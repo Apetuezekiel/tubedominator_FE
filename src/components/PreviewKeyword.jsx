@@ -34,9 +34,10 @@ import Spinner from "./Spinner";
 import showToast from "../utils/toastUtils";
 import { FaYoutube } from "react-icons/fa";
 import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
+import Loader from "./Loader";
 
 const PreviewKeyword = ({ keywordd, setDisplayPreviewKeyword }) => {
-  showToast("warning", `keyword ${keywordd}`, 2000);
+  // showToast("warning", `keyword ${keywordd}`, 2000);
   const { currentColor } = useStateContext();
   const userData = useUserData((state) => state.userData);
   const setUserData = useUserData((state) => state.setUserData);
@@ -226,14 +227,7 @@ const PreviewKeyword = ({ keywordd, setDisplayPreviewKeyword }) => {
           />
         </div>
         {isSearchLoaded ? (
-          <div className="flex flex-col justify-center items-center w-full mt-20">
-            <BiLoaderCircle
-              className="animate-spin text-center"
-              color="#7352FF"
-              size={30}
-            />
-            <div>Loading up Keyword Insights for you</div>
-          </div>
+          <Loader message={"Loading up Keyword Insights for you"}/>
         ) : (
           <GridComponent
             dataSource={keywordVideosInfo}

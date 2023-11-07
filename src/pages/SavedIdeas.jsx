@@ -134,30 +134,21 @@ const SavedIdeas = () => {
       try {
         const userSavedIdeas = await getSavedIdeas();
         console.log("userSavedIdeas from ideas category view", userSavedIdeas);
-
-        // Create a Set to store unique categories
         const uniqueCategories = new Set();
-
-        // Process the fetched data and add categories to the Set
         userSavedIdeas.forEach((item) => {
           uniqueCategories.add(item.category);
         });
-
-        // Convert the Set back to an array (if needed)
         const uniqueCategoriesArray = Array.from(uniqueCategories);
-
-        // Set the unique categories in the state
         setCategories(uniqueCategoriesArray);
-
-        setFetchedSavedIdeas(true); // Data fetched successfully
+        setFetchedSavedIdeas(false); 
         console.log("categories, categories", categories);
       } catch (error) {
-        setFetchedSavedIdeas(false); // Handle the error
+        setFetchedSavedIdeas(false);
         console.error("Error fetching saved ideas:", error);
       }
     };
 
-    fetchData(); // Call the fetchData function when the component mounts
+    fetchData();
   }, [updatedSavedIdea]);
 
   const handleCategoryChange = (event) => {
@@ -166,15 +157,11 @@ const SavedIdeas = () => {
     setSelectedCategory(selectedValue);
 
     if (selectedValue === "all") {
-      // If "all" is selected, set FilterableSavedIdeasData to the original savedIdeasData
       setFilterableSavedIdeasData(savedIdeasData);
     } else {
-      // Filter the savedIdeasData based on the selectedValue
       const filteredIdeas = savedIdeasData.filter(
         (item) => item.category === selectedValue,
       );
-
-      // Update FilterableSavedIdeasData with the filtered data
       setFilterableSavedIdeasData(filteredIdeas);
     }
   };

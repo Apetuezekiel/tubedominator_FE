@@ -281,14 +281,25 @@ const RegistrationForm = () => {
         .split(",")
         .map((keyword) => keyword.trim());
 
-      return keywordsArray.map((keyword, index) => (
-        <div
-          key={index}
-          className="inline-block bg-gray-200 text-gray-700 rounded-full px-2 py-1 m-1"
-        >
-          {keyword}
+      // return keywordsArray.map((keyword, index) => (
+      //   <div
+      //     key={index}
+      //     className="inline-block bg-gray-200 text-gray-700 rounded-full px-2 py-1 m-1"
+      //   >
+      //     {keyword}
+      //   </div>))
+      return  keywordsArray.map((item, index) => (
+        <div key={index} className="m-2">
+          <div className="flex rounded-full bg-gray-200 p-2">
+            <div className="bg-gray-300 rounded-l-full px-3 py-1 text-xs">
+              {item}
+            </div>
+            <div className="bg-gray-400 rounded-r-full px-3 py-1 ml-2 text-xs">
+              {index+1}
+            </div>
+          </div>
         </div>
-      ));
+      ))
     }
   };
 
@@ -460,8 +471,10 @@ const RegistrationForm = () => {
               className="mt-1 p-2 border rounded w-full"
               placeholder="keywords your channel focuses on"
             />
-            <div className="mt-2">
-              {/* Render the capsules */}
+            {/* <div className="mt-2">
+              {renderCapsules()}
+            </div> */}
+            <div className="flex flex-wrap -mx-2">
               {renderCapsules()}
             </div>
           </div>
