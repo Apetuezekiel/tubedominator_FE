@@ -67,11 +67,11 @@ const SignInPage = () => {
         showToast("success", data.message, 3000);
         setIsLoading(false);
         console.log("Data0", data);
-        const gId = data.user_id.split('_')[1];
+        const gId = data.user_id ? data.user_id.split('_')[1] : null;
         
-        await getUserEncryptedDataFromDb(gId);
+        gId && await getUserEncryptedDataFromDb(gId);
 
-        const channelRegistered = await isChannelRegistered(data.user_id);
+        const channelRegistered = data.user_id ? await isChannelRegistered(data.user_id) : null;
         channelRegistered ? localStorage.setItem("accessLevel", "L2") : localStorage.setItem("accessLevel", data.accessLevel)
         localStorage.setItem("userLoggedin", true);
         setAccessLevel(localStorage.getItem("accessLevel"))
