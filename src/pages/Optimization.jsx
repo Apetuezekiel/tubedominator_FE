@@ -212,7 +212,7 @@ const Ideation = () => {
               <BiEdit />
             </span>
           </span>
-          <Link
+          {/* <Link
             to="/optimization"
             className="flex justify-center items-center cursor-pointer"
           >
@@ -220,7 +220,7 @@ const Ideation = () => {
             <span className="ml-1 text-purple-600">
               <BiTrendingUp />
             </span>
-          </Link>
+          </Link> */}
           <Link
             to={`https://www.youtube.com/watch?v=${props.videoId}`}
             className="flex justify-center items-center cursor-pointer"

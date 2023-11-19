@@ -96,7 +96,7 @@ const IdeasCategoryDelete = ({
     if (responseDelete.data.success) {
       setUpdatedSavedIdea((prevState) => !prevState);
       setDeletingKeywordIdea(false);
-      localStorage.removeItem('savedIdeasData');
+      localStorage.removeItem("savedIdeasData");
       showToast("success", "Idea removed successfully", 2000);
       setShowSavedIdeaCategoryPanel(false);
     } else {
@@ -130,7 +130,7 @@ const IdeasCategoryDelete = ({
 
     console.log(" and response:", response);
     if (response.data.success) {
-      localStorage.removeItem('savedIdeasData');
+      localStorage.removeItem("savedIdeasData");
       setUpdatedSavedIdea((prevState) => !prevState);
       setSavingKeywordIdea(false);
       showToast("success", "Idea saved successfully", 2000);

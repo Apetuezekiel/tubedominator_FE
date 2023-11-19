@@ -21,10 +21,6 @@ import showToast from "../../utils/toastUtils";
 import CryptoJS from "crypto-js";
 import { Link, useNavigate } from "react-router-dom";
 
-const clientId =
-  "372673946018-lu1u3llu6tqi6hmv8m2226ri9qev8bb8.apps.googleusercontent.com";
-const apiKey = "AIzaSyBhnxmlAowrcFI7owW40YrsqI3xPVVk0IU";
-
 const GoogleLoginComp = forwardRef((props, ref) => {
   const internalRef = useRef(null);
 
@@ -181,14 +177,14 @@ const GoogleLoginComp = forwardRef((props, ref) => {
     <div>
       {initialized && (
         <GoogleApiInitializer
-          apiKey={apiKey}
-          clientId={clientId}
+          apiKey={process.env.REACT_APP_GOOGLE_API_KEY}
+          clientId={process.env.REACT_APP_CLIENT_ID}
           initializeOnLoad={true}
         />
       )}
       <button onClick={() => handleLoginClick()}>
         <GoogleLogin
-          clientId={clientId}
+          clientId={process.env.REACT_APP_CLIENT_ID}
           buttonText="Login with Google"
           onSuccess={onLoginSuccess}
           onFailure={onLoginFailure}

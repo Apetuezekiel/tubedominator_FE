@@ -150,9 +150,19 @@ const SignInPage = () => {
                 />
 
                 <button
-                  className="mt-5 tracking-wide font-semibold text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
-                  style={{ backgroundColor: "#7438FF" }}
+                  className={`mt-5 tracking-wide font-semibold text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none ${
+                    (formData.email === "" || formData.password === "") &&
+                    "cursor-not-allowed"
+                  }`}
+                  style={{
+                    backgroundColor: `${
+                      formData.email === "" || formData.password === ""
+                        ? "#E0E0E0"
+                        : "#7438FF"
+                    }`,
+                  }}
                   onClick={handleSubmit}
+                  disabled={formData.email === "" || formData.password === ""}
                 >
                   <span>
                     <MdAccountCircle size={20} color="white" />
@@ -167,10 +177,10 @@ const SignInPage = () => {
                   )}
                 </button>
                 {loginError && (
-            <div className="text-red-500 text-sm mt-4">
-              Incorrect email or password. Please try again.
-            </div>
-          )}
+                  <div className="text-red-500 text-sm mt-4">
+                    Incorrect email or password. Please try again.
+                  </div>
+                )}
                 <div className="my-12 border-b text-center">
                   <Link
                     to="/sign-up"

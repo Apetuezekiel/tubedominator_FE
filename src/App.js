@@ -55,12 +55,8 @@ import ConnectYoutube from "./pages/ConnectYoutube";
 import Testss from "./pages/Testss";
 import axios from "axios";
 import { userFullDataDecrypted } from "./data/api/calls";
-const client_id =
-  "372673946018-lu1u3llu6tqi6hmv8m2226ri9qev8bb8.apps.googleusercontent.com";
-const apiKey = "AIzaSyBhnxmlAowrcFI7owW40YrsqI3xPVVk0IU";
 
 const App = () => {
-  // const { fetchSavedIdeasData } = useSavedIdeasData();
   const decryptedFullData = userFullDataDecrypted();
 
   const {
@@ -97,11 +93,14 @@ const App = () => {
 
         {/* Pages */}
         <Route path="/ideation" element={<ProtectedRoute />}>
-          <Route path="/ideation" element={<Ideation />} />
+          <Route index element={<Ideation />} />
+          <Route path="competition" element={<Competition />} />
+          <Route path="insights" element={<Insights />} />
         </Route>
 
         <Route path="/optimization" element={<ProtectedRoute />}>
-          <Route path="/optimization" element={<Optimization />} />
+          <Route index element={<Optimization />} />
+          <Route path="optimize" element={<Opitimize />} />
         </Route>
 
         <Route path="/reporting" element={<ProtectedRoute />}>
@@ -113,28 +112,16 @@ const App = () => {
         </Route>
 
         <Route path="/keywords" element={<ProtectedRoute />}>
-          <Route path="/keywords" element={<Keywords />} />
+          <Route index element={<Keywords />} />
         </Route>
 
-        <Route path="/rankings" element={<ProtectedRoute />}>
-          <Route path="/rankings" element={<Rankings />} />
-        </Route>
-
+        <Route path="rankings" element={<Rankings />} />
+        
         <Route path="/searchterm" element={<ProtectedRoute />}>
           <Route path="/searchterm" element={<SearchTerm />} />
         </Route>
 
-        <Route path="/competition" element={<ProtectedRoute />}>
-          <Route path="/competition" element={<Competition />} />
-        </Route>
 
-        <Route path="/insights" element={<ProtectedRoute />}>
-          <Route path="/insights" element={<Insights />} />
-        </Route>
-
-        <Route path="/optimize" element={<ProtectedRoute />}>
-          <Route path="/optimize" element={<Opitimize />} />
-        </Route>
 
         {/* <Route path="/channel" element={<ProtectedRoute />}> */}
         <Route path="/channel" element={<RegistrationForm />} />
@@ -157,7 +144,6 @@ const App = () => {
     );
   }
   useEffect(() => {
-    // console.log("R--------------------", process.env.REACT_APP_YOUTUBE_API_KEY);
     const currentThemeColor = localStorage.getItem("colorMode");
     const currentThemeMode = localStorage.getItem("themeMode");
     if (currentThemeColor && currentThemeMode) {
@@ -168,7 +154,6 @@ const App = () => {
 
   useEffect(() => {
     const fetchUserYoutubeInfo = async () => {
-      // const { isLoaded, isSignedIn, user } = useUser();
       try {
         const response = await axios.get(
           `${process.env.REACT_APP_API_BASE_URL}/getSavedUserYoutubeInfo`,
@@ -182,7 +167,6 @@ const App = () => {
         );
 
         setUserData(response.data.data);
-        // setLoadeduserData(true);
         console.log(
           "getSavedUserYoutubeInfo:",
           response.data,
@@ -194,33 +178,24 @@ const App = () => {
     };
 
     console.log("is user logged in from App.js:", userLoggedIn);
+
+    // Only fetch data if the user is logged in
     if (userLoggedIn) {
       fetchUserYoutubeInfo();
     }
   }, [userLoggedIn]);
 
-  // useEffect(() => {
-  //   gapi.load("client:auth2", () => {
-  //     gapi.client.init({
-  //       apiKey,
-  //       client_id,
-  //       scope:
-  //         "https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtube.force-ssl https://www.googleapis.com/auth/youtube https://www.googleapis.com/auth/youtube.upload",
-  //     });
-  //   });
-  // }, []);
-
   useEffect(() => {
     gapi.load("client:auth2", () => {
       gapi.client.init({
-        apiKey,
-        client_id,
+        apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
+        clientId: process.env.REACT_APP_CLIENT_ID,
         scope:
           "https://www.googleapis.com/auth/youtube.readonly " +
           "https://www.googleapis.com/auth/youtube.force-ssl " +
           "https://www.googleapis.com/auth/youtube " +
           "https://www.googleapis.com/auth/youtube.upload " +
-          "https://www.googleapis.com/auth/cse", // Added Custom Search scope
+          "https://www.googleapis.com/auth/cse",
       });
     });
   }, []);
@@ -238,7 +213,7 @@ const App = () => {
       ></ToastContainer>
       <BrowserRouter>
         <div className="flex relative dark:bg-main-dark-bg">
-          <div className="fixed right-4 bottom-4" style={{ zIndex: "1000" }}>
+          {/* <div className="fixed right-4 bottom-4" style={{ zIndex: "1000" }}>
             <TooltipComponent content="Settings" position="Top">
               <button
                 type="button"
@@ -249,7 +224,7 @@ const App = () => {
                 <FiSettings />
               </button>
             </TooltipComponent>
-          </div>
+          </div> */}
           {
             userLoggedIn && (
               <div className="fixed sidebar dark:bg-secondary-dark-bg bg-white ">

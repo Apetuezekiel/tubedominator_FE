@@ -13,7 +13,7 @@ import {
   useUserYoutubeInfo,
 } from "../state/state";
 import Spinner from "./Spinner";
-import { userFullDataDecrypted } from "../data/api/calls";
+import { saveYoutubePost, userFullDataDecrypted } from "../data/api/calls";
 import axios from "axios";
 import { FiCamera, FiLoader } from "react-icons/fi";
 import { BiSearch } from "react-icons/bi";
@@ -154,6 +154,10 @@ function Opitimize({ videoId }) {
     { keyword: "Keyword 3", source: "Source 3", monthlysearch: 800 },
   ];
 
+  // useEffect(() => {
+  // saveYoutubePost(videoId, userYoutubeData[0]?.title, userYoutubeData[0]?.description, userYoutubeData[0]?.tags, userYoutubeData[0]?.thumbnails.url);
+  // }, []);
+  
   let savedSearchTermData;
   useEffect(() => {
     savedSearchTermData = JSON.parse(
@@ -197,6 +201,7 @@ function Opitimize({ videoId }) {
               console.log("setUserYoutubeData", response.data);
               console.log("videoId", videoId);
               setUserYoutubeData(response.data);
+              saveYoutubePost(videoId, response.data[0]?.title, response.data[0]?.description, response.data[0]?.tags, response.data[0]?.thumbnails?.url);
               setIsuserDataLoaded(true);
               console.log(response);
             }
@@ -550,47 +555,6 @@ function Opitimize({ videoId }) {
     // }
   };
 
-  // useEffect(() => {
-  //   let isMounted = true;
-  //   const fetchMyYoutubeVideos = async () => {
-  //     try {
-  //       axios
-  //         .get(`${process.env.REACT_APP_API_BASE_URL}/fetchMyYoutubeVideos`, {
-  //           params: {
-  //             channel_id: decryptedFullData.channelId,
-  //             videoIds: videoId,
-  //           },
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //             "x-api-key": process.env.REACT_APP_X_API_KEY,
-  //             Authorization: `Bearer ${decryptedFullData.token}`,
-  //             gToken: decryptedFullData.gToken,
-  //           },
-  //         })
-  //         .then((response) => {
-  //           if (isMounted) {
-  //             setUserYoutubeData(response.data);
-  //             setIsuserDataLoaded(true);
-  //             console.log(response);
-  //           }
-  //         })
-  //         .catch((error) => {
-  //           console.error("Error fetching data:", error);
-  //         });
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
-
-  //   fetchMyYoutubeVideos();
-  // }, []);
-
-  // urban metro -- Island
-  // board room -- Mainland
-  // Orange -- Mainland
-  // Dj COnsequence club -- Mainland
-  // face scrub, body oil, soap, perfume, Sneakers
-
   const validateAndAddToFixed = (index, condition, errorMessage) => {
     setUnfixed((prevUnfixed) => {
       if (condition) {
@@ -602,7 +566,7 @@ function Opitimize({ videoId }) {
           return [...prevUnfixed, thingsToFix[index]];
         }
       }
-      return prevUnfixed; // Return the unchanged array if no changes were made
+      return prevUnfixed;
     });
 
     setFixed((prevFixed) => {
@@ -615,7 +579,7 @@ function Opitimize({ videoId }) {
         // Remove the item from fixed if it exists
         return prevFixed.filter((item) => item.index !== index);
       }
-      return prevFixed; // Return the unchanged array if no changes were made
+      return prevFixed;
     });
   };
 
@@ -920,25 +884,6 @@ function Opitimize({ videoId }) {
       }, 2000);
     };
 
-    // const makeFavorite = () => {
-    //   isSearchTermFavorite ? toggleSave(props, false) : toggleSave(props, true);
-    // };
-    // showToast('warning', "Format views was rendered")
-    // const bookmarkIcon = isSearchTermFavorite ? (
-    //   <BsFillBookmarkCheckFill color="#7352FF" />
-    // ) : (
-    //   <BsBookmark color="#7352FF" />
-    // );
-
-    // const bookmarkIcon = isSearchTermFavorite ? (
-    //   <BsFillBookmarkCheckFill
-    //     color="#7352FF"
-    //     onClick={() => toggleSave(props, false)}
-    //   />
-    // ) : (
-    //   <BsBookmark color="#7352FF" onClick={() => toggleSave(props, true)} />
-    // );
-
     const bookmarkIcon = props.bookmarked ? (
       <BsFillBookmarkCheckFill
         color="#7352FF"
@@ -950,7 +895,7 @@ function Opitimize({ videoId }) {
 
     return (
       <div className="grid grid-cols-3 items-center">
-        <span className="mr-3">{formatedNumber}</span>
+        <span className="mr-5">{formatedNumber}</span>
         <span className="mr-3 cursor-pointer text-sm flex items-center">
           <span className="mr-2">{bookmarkIcon}</span>
           <span>{processingBookmarked && <Spinner width={3} />}</span>
@@ -1030,8 +975,16 @@ function Opitimize({ videoId }) {
 
   const sourceTemplate = (props) => {
     return (
-      <span>
+      <span className="text-center">
         <FaYoutube color="red" />
+      </span>
+    );
+  };
+
+  const keywordTemplate = (props) => {
+    return (
+      <span className="whitespace-normal">
+        {props.keyword}
       </span>
     );
   };
@@ -1101,12 +1054,18 @@ function Opitimize({ videoId }) {
       <div className="w-1/2 h-full overflow-y-auto p-4">
         <div className="p-4">
           <div className="mb-4">
-            <h4 className="font-semibold">
-              Things to Fix{" "}
-              <span className="ml-3 text-xs px-5 py-1 rounded-full bg-red-600 text-white">
-                {unfixed.length}
-              </span>
-            </h4>
+            {
+              unfixed.length < 1 ? (
+                ""
+              ) : (
+                <h4 className="font-semibold">
+                  Things to Fix{" "}
+                  <span className="ml-3 text-xs px-5 py-1 rounded-full bg-red-600 text-white">
+                    {unfixed.length}
+                  </span>
+                </h4>
+              )
+            }
 
             {unfixed.map((section, index) => (
               <div key={index} className="border rounded shadow mt-5">
@@ -1252,7 +1211,7 @@ function Opitimize({ videoId }) {
                   </button>
                   {isOpen1 && (
                     <div className="p-3 text-sm">
-                      <p>
+                      <div>
                         <GridComponent
                           // id="gridcomp"
                           dataSource={userSearchTerms}
@@ -1269,6 +1228,7 @@ function Opitimize({ videoId }) {
                               field="keyword"
                               headerText="Keywords"
                               width="250"
+                              template={keywordTemplate}
                             />
                             <ColumnDirective
                               field="source"
@@ -1295,7 +1255,7 @@ function Opitimize({ videoId }) {
                             ]}
                           />
                         </GridComponent>
-                      </p>
+                      </div>
                       <div className="text-sm text-gray-500">
                         <div className="text-left flex items-center justify-between focus:outline-none border-b pb-3"></div>
                       </div>
@@ -1321,8 +1281,8 @@ function Opitimize({ videoId }) {
                     <div className="p-3 text-sm">
                       <div>
                         <div className="flex w-full items-end">
-                          <div className="flex flex-col w-4/6">
-                            <span className="mb-2">
+                          <div className="flex flex-col w-3/6">
+                            <span className="mb-2 text-xs">
                               Enter topics closely related to your video.
                             </span>
                             <div
@@ -1344,7 +1304,7 @@ function Opitimize({ videoId }) {
                             </div>
                           </div>
 
-                          <div className="relative ml-4 w-2/6">
+                          <div className="relative ml-4 w-3/6">
                             <select
                               id="countrySelect"
                               className="rounded-full py-2 pl-4 pr-8 border border-gray-300 bg-white text-xs"
@@ -1392,18 +1352,20 @@ function Opitimize({ videoId }) {
                             <ColumnDirective
                               field="keyword"
                               headerText="Keywords"
-                              width="250"
+                              template={keywordTemplate}
+                              // width="250"
                             />
                             <ColumnDirective
                               field="source"
                               headerText="Source"
                               template={sourceTemplate}
-                              width="100"
+                              // width="100"
                             />
                             <ColumnDirective
                               field="monthlysearch"
                               headerText="SV"
                               template={formatViews}
+                              width={200}
                             />
                           </ColumnsDirective>
                           <Inject
@@ -1465,7 +1427,7 @@ function Opitimize({ videoId }) {
       showToast("error", "Template title and content must not be empty", 2000);
       return;
     }
-    showToast("success", `newTemplateData ${newTemplateData.title}`, 2000);
+    // showToast("success", `newTemplateData ${newTemplateData.title}`, 2000);
     console.log("newTemplateData", newTemplateData);
 
     // setIsAddKeyword(false);
@@ -1507,7 +1469,7 @@ function Opitimize({ videoId }) {
     // setUserKeyword(""); // Clear the userKeyword after successful submission
   };
 
-  const updateUserTemplateFunc = async (index) => {
+  const updateUserTemplateFunc = async (index) => { 
     setUpdateUserTemplate(true);
     if (
       userChannelTemplates[index].title === "" ||
@@ -1517,11 +1479,11 @@ function Opitimize({ videoId }) {
       showToast("error", "Template title and content must not be empty", 2000);
       return;
     }
-    showToast(
-      "success",
-      `newTemplateData ${userChannelTemplates[index].title}`,
-      2000,
-    );
+    // showToast(
+    //   "success",
+    //   `newTemplateData ${userChannelTemplates[index].title}`,
+    //   2000,
+    // );
     console.log("userChannelTemplates[index]", userChannelTemplates[index]);
 
     try {
@@ -1570,7 +1532,7 @@ function Opitimize({ videoId }) {
 
     try {
       const deleteUserTemplateResponse = await axios.post(
-        `process.env.REACT_APP_API_BASE_URL}/deleteUserTemplate`,
+        `${process.env.REACT_APP_API_BASE_URL}/deleteUserTemplate`,
         {
           email: decryptedFullData.email,
           template_id: templateId,
@@ -1806,13 +1768,13 @@ function Opitimize({ videoId }) {
             className="mr-3"
           />
           <div className="underline">{userYoutubeData[0]?.title}</div>
-          <span
+          {/* <span
             className="ml-3 text-xs px-5 py-1 rounded-lg text-white"
             style={{ backgroundColor: "#9D88FF" }}
           >
             Draft
-          </span>
-          <span
+          </span> */}
+          <span 
             className="ml-3 text-xs px-5 py-1 rounded-lg text-white cursor-pointer"
             style={{ backgroundColor: "#7438FF" }}
             onClick={() => setRevertToOriginalPost(!revertToOriginalPost)}

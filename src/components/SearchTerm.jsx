@@ -127,6 +127,7 @@ function SearchTerm({ videoId }) {
     const savedSearchTerm = JSON.parse(
       localStorage.getItem(`${videoId}searchTerm`),
     );
+    console.log("savedSearchTerm", savedSearchTerm, savedSearchTermData);
     setSearchQuery(savedSearchTerm);
     setProcessedUserSearchTerms(savedSearchTermData);
     if (!savedSearchTermData) {
@@ -487,7 +488,7 @@ function SearchTerm({ videoId }) {
   };
 
   return (
-    <div className="flex h-screen flex-col px-10 py-5">
+    <div className="flex h-screen flex-col px-10 py-5 w-full">
       {/* <div className="flex pl-5 pb-5 pt-5">
         <div className="w-1/2 items-center flex">
           <img
@@ -565,7 +566,7 @@ function SearchTerm({ videoId }) {
                   <div v className="p-3 text-sm">
                     <div>
                       <div className="flex w-full items-end">
-                        <div className="flex flex-col w-4/6">
+                        <div className="flex flex-col w-3/6">
                           <span className="mb-2">
                             Enter topics closely related to your video.
                           </span>
@@ -585,7 +586,7 @@ function SearchTerm({ videoId }) {
                           </div>
                         </div>
 
-                        <div className="relative ml-4 w-2/6">
+                        <div className="relative ml-20 w-3/6">
                           <select
                             id="countrySelect"
                             className="rounded-full py-2 pl-4 pr-8 border border-gray-300 bg-white text-xs"

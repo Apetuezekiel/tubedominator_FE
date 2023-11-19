@@ -8,34 +8,93 @@ import thumbnail2 from "../../assets/images/thumbnail2.jpg";
 import thumbnail3 from "../../assets/images/thumbnail3.webp";
 import { BsDot } from "react-icons/bs";
 import { MdCancel } from "react-icons/md";
-import { BiArrowBack } from "react-icons/bi";
+import { BiArrowBack, BiLoaderCircle } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import { formatNumberToKMBPlus } from "../../data/helper-funtions/helper";
 import {
+  analyzeVideos,
   findCountryAndLanguage,
+  mergedVideosChannelsData,
   userFullDataDecrypted,
+  analyzeCompetitionInsights,
+  secondsToTime,
+  daysToTime,
 } from "../../data/api/calls";
 import countriesWithLanguages from "../../data/countries";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Loader from "../../components/Loader";
+import { useSerpYoutubeVideosInfo } from "../../state/state";
+import Tags from "../../components/Tags";
+import showToast from "../../utils/toastUtils";
 
 function Competition({ dataSet, setShowInsights, setShowCompetition }) {
   const decryptedFullData = userFullDataDecrypted();
   const [keywordVideosInfo, setKeywordVideosInfo] = useState([]);
-  const [isResultLoaded, setIsResultLoaded] = useState(false);
+  const [competitionInsights, setCompetitionInsights] = useState([]);
+  const [isSerpYoutubeLoaded, setIsSerpYoutubeLoaded] = useState(false);
+  const serpYoutubeVideosInfo = useSerpYoutubeVideosInfo(
+    (state) => state.serpYoutubeVideosInfo,
+  );
+  const setSerpYoutubeVideosInfo = useSerpYoutubeVideosInfo(
+    (state) => state.setSerpYoutubeVideosInfo,
+  );
+
+  const handleDownload = (dataObject) => {
+    // Convert the object to a JSON string
+    const jsonString = JSON.stringify(dataObject, null, 2);
+
+    // Create a Blob with the JSON content
+    const blob = new Blob([jsonString], { type: "application/json" });
+
+    // Create a link element
+    const downloadLink = document.createElement("a");
+
+    // Set the href attribute to a URL created from the Blob
+    downloadLink.href = URL.createObjectURL(blob);
+
+    // Set the download attribute with the desired file name
+    downloadLink.download = "example.json";
+
+    // Append the link to the document body
+    document.body.appendChild(downloadLink);
+
+    // Programmatically click the link to trigger the download
+    downloadLink.click();
+
+    // Remove the link from the DOM
+    document.body.removeChild(downloadLink);
+  };
 
   useEffect(() => {
     let isMounted = true;
-    let ideaKeywordSerpData = JSON.parse(
-      localStorage.getItem(
-        `${decryptedFullData.gid}-${dataSet.index}-keywordVideosInfo`,
-      ),
-    );
-    if (ideaKeywordSerpData !== null || ideaKeywordSerpData !== undefined) {
-      setKeywordVideosInfo(ideaKeywordSerpData);
-      setIsResultLoaded(true);
-      console.log("Loaded from Local storage");
+    if (serpYoutubeVideosInfo.data.analyzed_video_details ?? false) {
+      console.log(
+        "analyzeVideos from local storage",
+        analyzeCompetitionInsights(
+          serpYoutubeVideosInfo.data.analyzed_video_details,
+        ),
+      );
+      setCompetitionInsights(
+        analyzeCompetitionInsights(
+          serpYoutubeVideosInfo.data.analyzed_video_details,
+        ),
+      );
+
+      const mergedData = mergedVideosChannelsData(
+        serpYoutubeVideosInfo.data.data,
+        serpYoutubeVideosInfo.data.analyzed_video_details,
+        serpYoutubeVideosInfo.data.channel_details.detailed_results,
+      );
+      console.log("finalMergedData", mergedData);
+      handleDownload(mergedData);
+      setKeywordVideosInfo(mergedData);
+      setIsSerpYoutubeLoaded(true);
+
+      console.log(
+        "fetchSerpYoutubeVideos from app-wide state",
+        serpYoutubeVideosInfo,
+      );
     } else {
       axios
         .get(`${process.env.REACT_APP_API_BASE_URL}/fetchSerpYoutubeVideos`, {
@@ -49,21 +108,40 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
           },
         })
         .then((response) => {
+          console.log("fetchSerpYoutubeVideos", response);
           if (isMounted) {
-            const keywordVideosInfo = response.data.map((item, index) => ({
-              ...item,
-              index: index + 1,
-            }));
-            setKeywordVideosInfo(keywordVideosInfo);
-            localStorage.setItem(
-              `${decryptedFullData.gid}-${dataSet.index}-keywordVideosInfo`,
-              JSON.stringify(keywordVideosInfo),
+            setSerpYoutubeVideosInfo({
+              keyword: dataSet.keyword,
+              data: response.data,
+            });
+            setCompetitionInsights(
+              analyzeCompetitionInsights(response.data.analyzed_video_details),
             );
-            setIsResultLoaded(true);
+
+            const mergedData = mergedVideosChannelsData(
+              response.data.data,
+              response.data.analyzed_video_details,
+              response.data.channel_details.detailed_results,
+            );
+
+            console.log("finalMergedData", mergedData);
+            setKeywordVideosInfo(mergedData);
+            setIsSerpYoutubeLoaded(true);
+
+            // localStorage.setItem(
+            //   `fetchSerpYoutubeVideos`,
+            //   JSON.stringify(response.data),
+            // );
           }
         })
         .catch((error) => {
           console.error("Error fetching data:", error);
+          showToast(
+            "error",
+            "Couldn't fetch Insights for your keyword at this time. Try again please",
+            2000,
+          );
+          navigate("/ideation");
         });
     }
     return () => {
@@ -76,7 +154,7 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
   let locationData = findCountryAndLanguage(dataSet, countriesWithLanguages);
 
   return (
-    <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl z-50">
+    <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl z-50 absolute top-24 right-0 w-3/4">
       <header>
         <div className="flex items-center justify-between mb-5">
           <span
@@ -106,13 +184,17 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
           </span>
         </div>
         <div className="flex mt-10">
-          <span className="mr-3 pb-3 px-5 cursor-pointer">Insights</span>
           <span
             className="mr-3 pb-3 px-5 cursor-pointer"
             onClick={() => {
               setShowCompetition(false);
               setShowInsights(true);
             }}
+          >
+            Insights
+          </span>
+          <span
+            className="mr-3 pb-3 px-5 cursor-pointer"
             style={{ borderBottom: "#7438FF 2px solid", color: "#7438FF" }}
           >
             Competition
@@ -132,65 +214,89 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
               <span className="font-bold">Competitor's videos</span>
             </header>
             <hr className="mt-5 mb-5" />
-            {isResultLoaded ? (
-              keywordVideosInfo.map((item, index) => {
-                return (
-                  <div key={index}>
-                    <div className="flex items-center">
-                      <span className="mr-10">1</span>
-                      <div className="mt-5 flex items-start">
-                        <img
-                          src={item.thumbnail.static}
-                          alt="Thumnail"
-                          className="rounded-md h-32 mr-3"
-                        />
-                        <div>
-                          <div className="text-lg text-gray-800 capitalize">
-                            {item.title}
-                          </div>
-                          <div className="text-md text-gray-800 flex items-center mt-3">
-                            <img
-                              src={item.channel.thumbnail}
-                              alt=""
-                              className="h-10 w-10 rounded-full mr-3"
-                            />{" "}
-                            ABC News <BsDot size={20} /> 15M Subscribers
-                          </div>
-                          <div className="text-gray-800 flex items-center mt-3 text-xs">
-                            Uploaded {item.published_date} <BsDot size={20} />{" "}
-                            Views:{" "}
-                            {formatNumberToKMBPlus(item.views).replace("+", "")}{" "}
-                            <BsDot size={20} /> Likes:{" "}
-                            {formatNumberToKMBPlus(item.views).replace("+", "")}{" "}
-                            <BsDot size={20} /> Comments: 2.6K
-                          </div>
-                          <div
-                            className="rounded-full flex items-center justify-center py-2 mt-3"
-                            style={{ backgroundColor: "#E8EBED" }}
-                          >
-                            Easy there dog
+            <div>
+              {isSerpYoutubeLoaded ? (
+                keywordVideosInfo.map((item, index) => {
+                  return (
+                    <div key={index}>
+                      <div className="flex items-center">
+                        <span className="mr-10">{index + 1}</span>
+                        <div className="mt-5 flex items-start">
+                          <img
+                            src={item.thumbnail.static}
+                            alt="Thumnail"
+                            className="rounded-md h-28 mr-3"
+                          />
+                          <div>
+                            <div className="text-md text-gray-800 capitalize">
+                              {item.title}
+                            </div>
+                            <div className="text-sm text-gray-800 flex items-center mt-3">
+                              <img
+                                src={item.channel.thumbnail}
+                                alt=""
+                                className="h-10 w-10 rounded-full mr-3"
+                              />{" "}
+                              {item.channel.name} <BsDot size={20} />{" "}
+                              {item?.channel_details?.subscriber_count &&
+                                formatNumberToKMBPlus(
+                                  item?.channel_details?.subscriber_count,
+                                ).replace("+", "")}
+                            </div>
+                            <div className="text-gray-800 flex items-center mt-3 text-xs">
+                              Uploaded {item.published_date} <BsDot size={20} />{" "}
+                              Views:{" "}
+                              {formatNumberToKMBPlus(item.views).replace(
+                                "+",
+                                "",
+                              )}{" "}
+                              <BsDot size={20} /> Likes:{" "}
+                              {item.statistics?.likeCount &&
+                                formatNumberToKMBPlus(
+                                  item.statistics?.likeCount,
+                                ).replace("+", "")}{" "}
+                              <BsDot size={20} /> Comments:{" "}
+                              {item.statistics?.commentCount &&
+                                formatNumberToKMBPlus(
+                                  item.statistics?.commentCount,
+                                ).replace("+", "")}{" "}
+                            </div>
                           </div>
                         </div>
                       </div>
+                      {item.snippet?.tags && (
+                        <Tags items={item.snippet?.tags} />
+                      )}
+                      <hr className="mt-5 mb-5" />
                     </div>
-                    <hr className="mt-5 mb-5" />
-                  </div>
-                );
-              })
-            ) : (
-              <Loader />
-            )}
+                  );
+                })
+              ) : (
+                <Loader />
+              )}
+            </div>
           </div>
           <div className="w-1/4 border-2 p-10 rounded-md mt-5">
             <div className="flex flex-col gap-5 mt-8">
               <div className="text-lg text-gray-800 font-bold">
                 Average Video Length
               </div>
-              <div className="text-3xl text-gray-800">5 min</div>
-              <div className="text-sm text-gray-800 flex items-center mt-3">
-                Shortest: 2 min <BsDot size={20} /> Longest: 14 min
+              <div className="text-3xl text-gray-800">
+                {competitionInsights.averageVideoLength != null
+                  ? secondsToTime(competitionInsights.averageVideoLength)
+                  : "N/A"}
               </div>
-              <div className="text-sm">
+              <div className="text-xs text-gray-800 flex items-center mt-3">
+                Shortest:{" "}
+                {competitionInsights.shortestVideoLength != null
+                  ? secondsToTime(competitionInsights.shortestVideoLength)
+                  : "N/A"}{" "}
+                <BsDot size={20} /> Longest:{" "}
+                {competitionInsights.longestVideoLength != null
+                  ? secondsToTime(competitionInsights.longestVideoLength)
+                  : "N/A"}
+              </div>
+              <div className="text-xs">
                 Based on the median video length of our competitors, we
                 recommend creating a video that is similar in length. This can
                 help ensure that your video is not too long or too short, and
@@ -204,13 +310,24 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
             </div>
             <div className="flex flex-col gap-5 mt-8">
               <div className="text-lg text-gray-800 font-bold">
-                Average Likes & Comments
+                Average Video Age
               </div>
-              <div className="text-3xl text-gray-800 font-bold">67 months</div>
-              <div className="text-sm text-gray-800 flex items-center mt-3">
-                Newest: 4 months <BsDot size={20} /> Oldest: 138 months
+              <div className="text-3xl text-gray-800 font-bold">
+                {competitionInsights.averageVideoAge != null
+                  ? daysToTime(competitionInsights.averageVideoAge)
+                  : "N/A"}
               </div>
-              <div className="text-sm">
+              <div className="text-gray-800 flex items-center mt-3 text-xs">
+                Newest:{" "}
+                {competitionInsights.newestVideoAge != null
+                  ? daysToTime(competitionInsights.newestVideoAge)
+                  : "N/A"}{" "}
+                <BsDot size={20} /> Oldest:{" "}
+                {competitionInsights.oldestVideoAge != null
+                  ? daysToTime(competitionInsights.oldestVideoAge)
+                  : "N/A"}
+              </div>
+              <div className="text-xs">
                 Given videos were uploaded quite some time ago you may have a
                 higher chance of ranking higher in the search results by
                 creating a video on this topic with updated and fresh content.
@@ -219,16 +336,27 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
             </div>
             <div className="flex flex-col gap-5 mt-8">
               <div className="text-lg text-gray-800 font-bold">
-                Average Video Length
+                Average Likes & Comments
               </div>
               <div>
-                <span className="text-3xl text-gray-800 mr-3">17</span>
-                <span className="text-sm">per 1.000 views</span>
+                <span className="text-3xl text-gray-800 mr-3">
+                  {competitionInsights.averageLikesComments != null
+                    ? formatNumberToKMBPlus(Math.ceil(competitionInsights.averageLikesComments))
+                    : "N/A"}
+                </span>
+                <span className="text-xs">per 1.000 views</span>
               </div>
-              <div className="text-md text-gray-800 flex items-center mt-3">
-                Shortest: 2 min <BsDot size={20} /> Longest: 14 min
+              <div className="text-md text-gray-800 flex items-center mt-3 text-xs">
+                Least:{" "}
+                {competitionInsights.leastLikesComments != null
+                  ? formatNumberToKMBPlus(Math.ceil(competitionInsights.leastLikesComments))
+                  : "N/A"}{" "}
+                <BsDot size={20} /> Most:{" "}
+                {competitionInsights.mostLikesComments != null
+                  ? formatNumberToKMBPlus(Math.ceil(competitionInsights.mostLikesComments))
+                  : "N/A"}
               </div>
-              <div className="text-sm">
+              <div className="text-xs">
                 Shares and likes can be an indication of how engaging video
                 content is. In order to rank for that topic, your video content
                 will need to be similarly engaging and provide value to your
@@ -240,11 +368,37 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
               <div className="text-lg text-gray-800 font-bold">
                 Average Subscribers
               </div>
-              <div className="text-3xl text-gray-800 font-bold">5.3M</div>
-              <div className="text-sm text-gray-800 flex items-center mt-3">
-                Smallest: 7.7K <BsDot size={20} /> Biggest: 15M
+              <div className="text-3xl text-gray-800 font-bold">
+                {isSerpYoutubeLoaded ? (
+                  formatNumberToKMBPlus(
+                    serpYoutubeVideosInfo.data.channel_details
+                      .average_subscriber_count,
+                  ).replace("+", "") ?? "No Data"
+                ) : (
+                  <BiLoaderCircle color="#7352FF" className="animate-spin" />
+                )}
               </div>
-              <div className="text-sm">
+              <div className="text-xs text-gray-800 flex items-center mt-3">
+                Smallest:{" "}
+                {isSerpYoutubeLoaded ? (
+                  formatNumberToKMBPlus(
+                    serpYoutubeVideosInfo.data.channel_details
+                      .lowest_subscriber_count,
+                  ).replace("+", "") ?? "No Data"
+                ) : (
+                  <BiLoaderCircle color="#7352FF" className="animate-spin" />
+                )}{" "}
+                <BsDot size={20} /> Biggest:{" "}
+                {isSerpYoutubeLoaded ? (
+                  formatNumberToKMBPlus(
+                    serpYoutubeVideosInfo.data.channel_details
+                      .highest_subscriber_count,
+                  ).replace("+", "") ?? "No Data"
+                ) : (
+                  <BiLoaderCircle color="#7352FF" className="animate-spin" />
+                )}
+              </div>
+              <div className="text-xs">
                 If the average channel size of the top-ranking channels is much
                 larger than yours, you may face challenges to outperform them.
                 However, this doesn't mean it's impossible to rank for the
@@ -258,17 +412,12 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
               <hr />
             </div>
             <div className="flex flex-col gap-5 mt-8">
-              <div className="text-lg text-gray-800 font-bold">
+              <div className="text-xs text-gray-800 font-bold">
                 Popular tags
               </div>
-              <div className="text-sm">
-                <div
-                  className="rounded-full flex items-center justify-center py-2 mt-3"
-                  style={{ backgroundColor: "#E8EBED" }}
-                >
-                  Easy there dog
-                </div>
-              </div>
+              {competitionInsights.topTags && (
+                <Tags items={competitionInsights.topTags} ml={"ml-0"} />
+              )}
             </div>
           </div>
         </div>

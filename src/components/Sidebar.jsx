@@ -93,7 +93,7 @@ const Sidebar = () => {
                   {item.title}
                 </p>
                 {item.links.map((link, index) => (
-                  <div className="nav-link-container" key={index}>
+                  <div className="nav-link-container flex flex-col" key={index}>
                     <NavLink
                       to={`/${link.link}`}
                       key={link.name}

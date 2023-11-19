@@ -87,6 +87,13 @@ export async function getSavedIdeas() {
       },
     );
 
+    // if (response.data.success){
+    //   showToast("success", response.data.message, 2000)
+
+    // } else {
+    //   showToast("error", response.data.message, 2000)
+    // }
+
     const data = response.data.data;
     console.log("response.data.data", response.data.data);
 
@@ -144,7 +151,7 @@ export async function getUserEncryptedDataFromDb(gId) {
     return decryptAndRetrieveData(data);
   } catch (error) {
     console.error("Error fetching data:", error);
-    throw error; // Rethrow the error to handle it in the component if needed
+    throw error;
   }
 }
 
@@ -292,30 +299,6 @@ export const findCountryAndLanguage = (dataSet, array) => {
   }
 };
 
-// export const fetchUserYoutubeInfo = async () => {
-//   try {
-//     const response = await axios.get(
-//       `${process.env.REACT_APP_API_BASE_URL}/getSavedUserYoutubeInfo`,
-//       {
-//         headers: {
-//           "Content-Type": "application/json",
-//           "x-api-key": process.env.REACT_APP_X_API_KEY,
-//           Authorization: `Bearer ${decryptedFullData.token}`,
-//         },
-//       },
-//     );
-//     localStorage.setItem('userData', JSON.stringify(response.data));
-//     console.log(
-//       "getSavedUserYoutubeInfo:",
-//       response.data,
-//       decryptedFullData.token,
-//     );
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error fetching data:", error);
-//   }
-// };
-
 // Helper Functions
 export const encryptAndStoreData = (data) => {
   console.log("Encrypting User Data", data);
@@ -325,4 +308,390 @@ export const encryptAndStoreData = (data) => {
   localStorage.setItem("encryptedGData", encryptedGData);
   console.log("Saved User Data to localhost");
   return encryptedGData;
+};
+
+export const analyzeVideos = (videoData) => {
+  let totalLength = 0;
+  let totalAge = 0;
+  let totalLikesComments = 0;
+  let leastLikesComments = Infinity;
+  let mostLikesComments = 0;
+
+  // Convert date strings to Date objects
+  const today = new Date();
+
+  for (const video of videoData) {
+    // Calculate video length in seconds
+    const videoLength = parseInt(video.statistics.viewCount);
+    const formattedLength = formatVideoLength(videoLength);
+
+    // Calculate video age in days, weeks, and months
+    const publishedAt = new Date(video.snippet.publishedAt);
+
+    // Check if the publishedAt date is valid
+    if (!isNaN(publishedAt)) {
+      const videoAge = calculateVideoAge(publishedAt, today);
+
+      // Calculate average likes & comments per 1,000 views
+      const likesCommentsRatio =
+        ((parseInt(video.statistics.likeCount) +
+          parseInt(video.statistics.commentCount)) /
+          parseInt(video.statistics.viewCount)) *
+        1000;
+
+      // Update total values
+      totalLength += videoLength;
+      totalAge += videoAge.days; // Use only days for simplicity in calculation
+      totalLikesComments += likesCommentsRatio;
+
+      // Update least and most likes & comments
+      leastLikesComments = Math.min(leastLikesComments, likesCommentsRatio);
+      mostLikesComments = Math.max(mostLikesComments, likesCommentsRatio);
+    }
+  }
+
+  // Calculate averages
+  const averageLength = formatVideoLength(totalLength / videoData.length);
+  const averageAge = isNaN(totalAge)
+    ? "undefined days"
+    : formatVideoAge(totalAge / videoData.length);
+  const averageLikesComments = totalLikesComments / videoData.length;
+
+  return {
+    averageVideoLength: averageLength,
+    shortestVideoLength: formatVideoLength(
+      Math.min(
+        ...videoData.map((video) => parseInt(video.statistics.viewCount)),
+      ),
+    ),
+    longestVideoLength: formatVideoLength(
+      Math.max(
+        ...videoData.map((video) => parseInt(video.statistics.viewCount)),
+      ),
+    ),
+    averageVideoAge: averageAge,
+    newestVideoAge: formatVideoAge(
+      Math.min(
+        ...videoData.map((video) => new Date(video.snippet.publishedAt)),
+      ),
+    ),
+    oldestVideoAge: formatVideoAge(
+      Math.max(
+        ...videoData.map((video) => new Date(video.snippet.publishedAt)),
+      ),
+    ),
+    averageLikesComments: averageLikesComments.toFixed(2),
+    leastLikesComments: leastLikesComments.toFixed(2),
+    mostLikesComments: mostLikesComments.toFixed(2),
+  };
+};
+
+// Helper function to format video length
+export const formatVideoLength = (seconds) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = Math.round(seconds % 60);
+
+  const formattedLength = [];
+  if (hours > 0) formattedLength.push(`${hours} hrs`);
+  if (minutes > 0) formattedLength.push(`${minutes} min`);
+  if (remainingSeconds > 0) formattedLength.push(`${remainingSeconds} sec`);
+
+  return formattedLength.join(" ");
+};
+
+// Helper function to calculate video age in days, weeks, and months
+export const calculateVideoAge = (publishedAt, today) => {
+  const millisecondsInDay = 1000 * 60 * 60 * 24;
+  const millisecondsInWeek = millisecondsInDay * 7;
+  const millisecondsInMonth = millisecondsInDay * 30; // Assuming a month has 30 days for simplicity
+
+  const ageInDays = Math.floor((today - publishedAt) / millisecondsInDay);
+  const ageInWeeks = Math.floor(ageInDays / 7);
+  const ageInMonths = Math.floor(ageInDays / 30);
+
+  return { days: ageInDays, weeks: ageInWeeks, months: ageInMonths };
+};
+
+// Helper function to format video age
+export const formatVideoAge = (videoAge) => {
+  if (videoAge.months > 0) return `${videoAge.months} months`;
+  if (videoAge.weeks > 0) return `${videoAge.weeks} weeks`;
+  return `${videoAge.days} days`;
+};
+
+export const mergedVideosChannelsData = (
+  videos,
+  videoDetails,
+  channelDetails,
+) => {
+  // Create a map to store analyzed_video_details objects by video id
+  const analyzedVideoDetailsMap = new Map();
+
+  videoDetails.forEach((video) => {
+    const videoId = video.id;
+    analyzedVideoDetailsMap.set(videoId, video);
+  });
+
+  // Merge objects based on video id
+  const mergedData = videos.map((video) => {
+    const videoId = extractVideoId(video.link);
+    const analyzedDetails = analyzedVideoDetailsMap.get(videoId);
+
+    if (analyzedDetails) {
+      return { ...video, ...analyzedDetails };
+    } else {
+      return video;
+    }
+  });
+
+  // Independent merge with channel_details based on channel ID
+  const finalMergedData = mergedData.map((video) => {
+    const channelId = video.snippet.channelId;
+    const channelDetail = channelDetails.find(
+      (detail) => detail.channel_id === channelId,
+    );
+
+    if (channelDetail) {
+      // // Log relevant information before returning
+      // console.log("channelId:", channelId);
+      // console.log("channelDetail:", channelDetail);
+
+      return { ...video, channel_details: channelDetail };
+    } else {
+      return video;
+    }
+  });
+
+  const keywordVideosInfoWithIndex = finalMergedData.map((item, index) => ({
+    ...item,
+    index: index + 1,
+  }));
+
+  return keywordVideosInfoWithIndex;
+};
+
+// Function to extract video id from YouTube link
+export const extractVideoId = (link) => {
+  const regex = /[?&]v=([^&#]*)/;
+  const match = link.match(regex);
+  return match ? match[1] : null;
+};
+
+export const analyzeCompetitionInsights = (videos) => {
+  // Function to convert duration string to seconds
+  const durationToSeconds = (duration) => {
+    const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+    const hours = parseInt(match[1]) || 0;
+    const minutes = parseInt(match[2]) || 0;
+    const seconds = parseInt(match[3]) || 0;
+    return hours * 3600 + minutes * 60 + seconds;
+  };
+
+  // Calculate average, shortest, and longest video lengths
+  const videoLengths = videos.map((video) =>
+    durationToSeconds(video.contentDetails.duration),
+  );
+  const averageVideoLength = Math.round(
+    videoLengths.reduce((a, b) => a + b, 0) / videos.length,
+  );
+  const shortestVideoLength = Math.min(...videoLengths);
+  const longestVideoLength = Math.max(...videoLengths);
+
+  // Calculate average, newest, and oldest video ages in days
+  const currentDate = new Date("2023-11-14");
+  const videoAges = videos.map((video) => {
+    const publishedDate = new Date(video.snippet.publishedAt);
+    return Math.floor((currentDate - publishedDate) / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
+  });
+  const averageVideoAge = Math.round(
+    videoAges.reduce((a, b) => a + b, 0) / videos.length,
+  );
+  const newestVideoAge = Math.min(...videoAges);
+  const oldestVideoAge = Math.max(...videoAges);
+
+  // Calculate average, least, and most likes and comments
+  const likes = videos.map((video) => parseInt(video.statistics.likeCount));
+  const comments = videos.map((video) =>
+    parseInt(video.statistics.commentCount),
+  );
+  const combinedLikesComments = likes.map(
+    (like, index) => like + comments[index],
+  );
+  const averageLikesComments = Math.round(
+    combinedLikesComments.reduce((a, b) => a + b, 0) / videos.length,
+  );
+  const leastLikesComments = Math.min(...combinedLikesComments);
+  const mostLikesComments = Math.max(...combinedLikesComments);
+  const topTags = analyzePopularTags(videos);
+
+  return {
+    averageVideoLength,
+    shortestVideoLength,
+    longestVideoLength,
+    averageVideoAge,
+    newestVideoAge,
+    oldestVideoAge,
+    averageLikesComments,
+    leastLikesComments,
+    mostLikesComments,
+    topTags,
+  };
+};
+
+const analyzePopularTags = (videos) => {
+  // Create an object to store tag occurrences
+  const tagOccurrences = {};
+
+  // Iterate through each video and count tag occurrences
+  videos.forEach((video) => {
+    const tags = video.snippet.tags || [];
+
+    tags.forEach((tag) => {
+      // Increment tag occurrence count
+      tagOccurrences[tag] = (tagOccurrences[tag] || 0) + 1;
+    });
+  });
+
+  // Convert tag occurrences to an array of objects for sorting
+  const tagArray = Object.keys(tagOccurrences).map((tag) => ({
+    tag,
+    count: tagOccurrences[tag],
+  }));
+
+  // Sort tags by occurrence count in descending order
+  const sortedTags = tagArray.sort((a, b) => b.count - a.count);
+
+  // Get the top 10 tags
+  const topTags = sortedTags.slice(0, 10).map((tagObj) => tagObj.tag);
+
+  return topTags;
+};
+
+export const calculateChancesOfSuccess = (difficulty, ageOfVideos, channel) => {
+  // Validate input values
+  const validLevels = ["Low", "Medium", "High"];
+  if (!validLevels.includes(difficulty) || !validLevels.includes(ageOfVideos)) {
+    return { error: "Invalid input for Difficulty or Competition." };
+  }
+
+  const validChannels = ["Small", "Medium", "Large"];
+  if (!validChannels.includes(channel)) {
+    return { error: "Invalid input for Channel." };
+  }
+
+  // Assign weightage to each metric
+  const weights = {
+    difficulty: 0.4,
+    ageOfVideos: 0.3,
+    channel: 0.3,
+  };
+
+  // Assign scores to each level
+  const scores = {
+    Low: 0.2,
+    Medium: 0.5,
+    High: 0.8,
+    Small: 0.2,
+    Medium: 0.5,
+    Large: 0.8,
+  };
+
+  // Calculate total score
+  const totalScore =
+    scores[difficulty] * weights.difficulty +
+    scores[ageOfVideos] * weights.ageOfVideos +
+    scores[channel] * weights.channel;
+
+  // Assign a level based on the total score
+  let level;
+  if (totalScore >= scores.High) {
+    level = "High";
+  } else if (totalScore >= scores.Medium) {
+    level = "Medium";
+  } else {
+    level = "Low";
+  }
+
+  // Calculate percentage (normalize totalScore to a percentage)
+  const percentage = Math.round((totalScore / scores.High) * 100);
+
+  return {
+      level,
+      percentage: `${percentage}/100`
+    };
+};
+
+export const secondsToTime = (seconds) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+
+  if (hours > 0) {
+      return `${Math.round(hours + minutes / 60)} hrs`;
+  } else {
+      return `${minutes} mins`;
+  }
+};
+
+export const daysToTime = (days) => {
+  if (days >= 365) {
+    const years = Math.round(days / 365);
+    return `${years} ${years === 1 ? 'year' : 'years'}`;
+  } else if (days >= 30) {
+    const months = Math.round(days / 30);
+    return `${months} ${months === 1 ? 'month' : 'months'}`;
+  } else if (days >= 7) {
+    const weeks = Math.round(days / 7);
+    return `${weeks} ${weeks === 1 ? 'week' : 'weeks'}`;
+  } else if (days >= 1) {
+    return `${days} ${days === 1 ? 'day' : 'days'}`;
+  } else if (days === 0) {
+    return "1 day";
+  } else {
+    return "N/A"
+  }
+};
+
+
+export const saveYoutubePost = async (videoId, title, description, tags, thumbnails) => {
+  console.log("data to save",       {
+    video_id: videoId,
+    video_title: title,
+    video_description: description,
+    video_tags: tags,
+    video_thumbnail: thumbnails,
+    email: userFullDataDecrypted()?.email,
+  });
+  try {
+    const response = await axios.post(
+      `${process.env.REACT_APP_API_BASE_URL}/saveYoutubePost`,
+      {
+        video_id: videoId,
+        video_title: title,
+        video_description: description,
+        video_tags: tags,
+        video_thumbnail: thumbnails,
+        email: userFullDataDecrypted()?.email,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+          Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
+        },
+      }
+    );
+
+    console.log("response", response);
+
+    if (response.data.success) {
+      showToast("success", "Youtube Video saved successfully", 2000);
+      localStorage.setItem(`${videoId}-preserved`, "true");
+    } else {
+      showToast("error", "Youtube Video wasn't saved. Try again", 2000);
+    }
+  } catch (error) {
+    console.error("Error saving YouTube Video:", error);
+    showToast("error", "An error occurred saving video. Please try again later.", 2000);
+  }
 };

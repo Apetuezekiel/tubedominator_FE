@@ -288,18 +288,18 @@ const RegistrationForm = () => {
       //   >
       //     {keyword}
       //   </div>))
-      return  keywordsArray.map((item, index) => (
+      return keywordsArray.map((item, index) => (
         <div key={index} className="m-2">
           <div className="flex rounded-full bg-gray-200 p-2">
             <div className="bg-gray-300 rounded-l-full px-3 py-1 text-xs">
               {item}
             </div>
             <div className="bg-gray-400 rounded-r-full px-3 py-1 ml-2 text-xs">
-              {index+1}
+              {index + 1}
             </div>
           </div>
         </div>
-      ))
+      ));
     }
   };
 
@@ -474,9 +474,7 @@ const RegistrationForm = () => {
             {/* <div className="mt-2">
               {renderCapsules()}
             </div> */}
-            <div className="flex flex-wrap -mx-2">
-              {renderCapsules()}
-            </div>
+            <div className="flex flex-wrap -mx-2">{renderCapsules()}</div>
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">

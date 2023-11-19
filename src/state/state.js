@@ -66,6 +66,14 @@ export const useUserAccessLevel = create((set) => ({
   setAccessLevel: (data) => set({ accessLevel: data }),
 }));
 
+export const useSerpYoutubeVideosInfo = create((set) => ({
+  serpYoutubeVideosInfo: {
+    keyword: "",
+    data: {},
+  },
+  setSerpYoutubeVideosInfo: (data) => set({ serpYoutubeVideosInfo: data }),
+}));
+
 export const useSavedIdeasData = create((set) => ({
   savedIdeasData: [],
   setSavedIdeasData: (data) => set({ savedIdeasData: data }),

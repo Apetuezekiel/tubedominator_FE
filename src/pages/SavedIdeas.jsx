@@ -39,6 +39,9 @@ import { BsArrowDownShort, BsArrowUpShort, BsDot } from "react-icons/bs";
 import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
 import IdeasCategoryDelete from "../components/IdeasCategoryDelete";
 import Loader from "../components/Loader";
+import CubeLoader from "../components/CubeLoader";
+import Insights from "./keywords/Insights";
+import Competition from "./keywords/Competition";
 
 const SavedIdeas = () => {
   const decryptAndRetrieveData = (data) => {
@@ -84,6 +87,8 @@ const SavedIdeas = () => {
     useState(false);
   const [ideasDataSet, setIdeasDataSet] = useState(false);
   const [updatedSavedIdea, setUpdatedSavedIdea] = useState(false);
+  const [showInsights, setShowInsights] = useState(false);
+  const [showCompetition, setShowCompetition] = useState(false);
 
   useEffect(() => {
     setFetchedSavedIdeas(true);
@@ -140,7 +145,7 @@ const SavedIdeas = () => {
         });
         const uniqueCategoriesArray = Array.from(uniqueCategories);
         setCategories(uniqueCategoriesArray);
-        setFetchedSavedIdeas(false); 
+        setFetchedSavedIdeas(false);
         console.log("categories, categories", categories);
       } catch (error) {
         setFetchedSavedIdeas(false);
@@ -402,6 +407,26 @@ const SavedIdeas = () => {
     );
   };
 
+  const VideoIconTemplate = (props) => {
+    return (
+      <div
+        className="flex flex-col break-words"
+        onClick={() => {
+          setShowInsights(true);
+          setIdeasDataSet(props);
+        }}
+      >
+        <span className="text-md capitalize">{props.video_ideas}</span>
+        <span
+          className="text-xs text cursor-pointer"
+          style={{ color: "#7352FF" }}
+        >
+          More Insights
+        </span>
+      </div>
+    );
+  };
+
   const TrendsTitleTemplate = (props) => {
     const trendIcon = <FiTrendingUp size={20} />;
     return (
@@ -512,23 +537,23 @@ const SavedIdeas = () => {
           <Header
             title={`All saved ideas (${
               filterableSavedIdeasData && filterableSavedIdeasData.length
+                ? filterableSavedIdeasData.length
+                : 0
             } ideas)`}
             size="text-1xl"
           />
           {fetchedSavedIdeas && (
-            <Loader message={"Loading your Saved Ideas. Hang on"} />
+            <div>
+              <Loader message={"Loading your Saved Ideas. Hang on"} />
+            </div>
           )}
           <br />
           <GridComponent
-            // id="gridcomp"
             dataSource={filterableSavedIdeasData}
             allowExcelExport
             allowPdfExport
             allowPaging
             allowSorting
-            // contextMenuItems={contextMenuItems}
-            // editSettings={editing}
-            // rowSelected={handleRowSelected}
           >
             <ColumnsDirective>
               <ColumnDirective
@@ -544,6 +569,7 @@ const SavedIdeas = () => {
                 headerText="Video ideas"
                 headerTemplate={VideoIconTitleTemplate}
                 tooltip="Hover over for more information"
+                template={VideoIconTemplate}
               />
               <ColumnDirective
                 field="search_volume"
@@ -590,6 +616,20 @@ const SavedIdeas = () => {
               dataSet={ideasDataSet}
               setUpdatedSavedIdea={setUpdatedSavedIdea}
               setShowSavedIdeaCategoryPanel={setShowSavedIdeaCategoryPanel}
+            />
+          )}
+          {showInsights && (
+            <Insights
+              dataSet={ideasDataSet}
+              setShowInsights={setShowInsights}
+              setShowCompetition={setShowCompetition} 
+            />
+          )}
+          {showCompetition && (
+            <Competition
+              dataSet={ideasDataSet}
+              setShowInsights={setShowInsights}
+              setShowCompetition={setShowCompetition}
             />
           )}
         </div>

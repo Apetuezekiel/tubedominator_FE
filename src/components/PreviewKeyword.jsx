@@ -77,7 +77,7 @@ const PreviewKeyword = ({ keywordd, setDisplayPreviewKeyword }) => {
     // Define the API URL you want to fetch data from
     console.log("keyword", keywordd);
     axios
-      .get(`${process.env.REACT_APP_API_BASE_URL}/fetchSerpYoutubeVideos`, {
+      .get(`${process.env.REACT_APP_API_BASE_URL}/fetchSerpYoutubeVideosOnly`, {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
@@ -88,6 +88,7 @@ const PreviewKeyword = ({ keywordd, setDisplayPreviewKeyword }) => {
         },
       })
       .then((response) => {
+        console.log("Response", response);
         if (isMounted) {
           const keywordVideosInfo = response.data.map((item, index) => ({
             ...item,
@@ -227,7 +228,7 @@ const PreviewKeyword = ({ keywordd, setDisplayPreviewKeyword }) => {
           />
         </div>
         {isSearchLoaded ? (
-          <Loader message={"Loading up Keyword Insights for you"}/>
+          <Loader message={"Loading up Keyword Insights for you"} />
         ) : (
           <GridComponent
             dataSource={keywordVideosInfo}

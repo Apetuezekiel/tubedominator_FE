@@ -11,13 +11,13 @@ import engel from "../data/brand_logos/engel_voelkers.svg";
 
 function Home() {
   return (
-    <div className="w-full pageStyling">
+    <div className="m-2 md:m-10 p-2 md:p-10 rounded-3xl">
       <section
         className="hero flex flex-col mt-20"
         style={{ backgroundColor: "#FBFCFE" }}
       >
         <div className="flex" style={{ backgroundColor: "#FBFCFE" }}>
-          <div className="col-1 w-1/2 flex flex-col justify-between bg-black-900">
+          <div className="col-1 w-1/2 flex flex-col justify-between bg-black-900 mr-10">
             <div
               className="px-4 py-2 w-60 rounded-full"
               style={{ backgroundColor: "#F5F2FE", color: "#8754FE" }}
@@ -32,7 +32,7 @@ function Home() {
               easy-to-use software tools, actionable insights, and expert agency
               services to grow their YouTube channel.
             </div>
-            <div className="flex justify-center items-center mt-5">
+            <div className="flex justify-center items-center mt-5 mr-5">
               <button
                 style={{ backgroundColor: "#7438FF" }}
                 className="w-full text-lg text-white py-5 px-5 rounded-full"

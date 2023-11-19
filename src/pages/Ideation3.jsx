@@ -523,13 +523,18 @@ const Ideation = () => {
     return (
       <div
         className="flex flex-col break-words"
-        // onClick={()=>{
-        //   setShowInsights(true);
-        //   setIdeasDataSet(props);
-        //   }}
+        onClick={() => {
+          setShowInsights(true);
+          setIdeasDataSet(props);
+        }}
       >
         <span className="text-md capitalize">{props.keyword}</span>
-        {/* <span className="text-xs text cursor-pointer" style={{color: "#7352FF"}}>More Insights</span> */}
+        <span
+          className="text-xs text cursor-pointer"
+          style={{ color: "#7352FF" }}
+        >
+          More Insights
+        </span>
       </div>
     );
   };
@@ -622,7 +627,7 @@ const Ideation = () => {
   };
 
   const findQuestions = (keywordsArray) => {
-    setKeywordSuggestionRemark("that are Question based");
+    // setKeywordSuggestionRemark("that are Question based");
     const questions = [];
 
     for (const keywordObj of keywordsArray) {
@@ -924,6 +929,7 @@ const Ideation = () => {
           dataSet={ideasDataSet}
           setShowInsights={setShowInsights}
           setShowCompetition={setShowCompetition}
+          showCompetition={showCompetition}
         />
       )}
       {showCompetition && (
