@@ -37,9 +37,6 @@ import { pagesInfo } from "../data/pagesInfo";
 import userAvatar from "../assets/images/man-avatar-profile-picture-vector-illustration_268834-538.avif";
 import Loader from "./Loader";
 
-const clientId =
-  "372673946018-lu1u3llu6tqi6hmv8m2226ri9qev8bb8.apps.googleusercontent.com";
-
 const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
   <TooltipComponent content={title} position="BottomCenter">
     <button
@@ -105,21 +102,6 @@ const Navbar = () => {
     return null;
   };
 
-  // useEffect(() => {
-  //   gapi.load("client:auth2", () => {
-  //     gapi.client.init({
-  //       apiKey,
-  //       client_id,
-  //       scope:
-  //         "https://www.googleapis.com/auth/youtube.readonly " +
-  //         "https://www.googleapis.com/auth/youtube.force-ssl " +
-  //         "https://www.googleapis.com/auth/youtube " +
-  //         "https://www.googleapis.com/auth/youtube.upload " +
-  //         "https://www.googleapis.com/auth/cse", // Added Custom Search scope
-  //     });
-  //   });
-  // }, []);
-
   const userData = useUserData((state) => state.userData);
   const setUserData = useUserData((state) => state.setUserData);
   // const userAuthToken = useUserAuthToken((state) => state.userAuthToken);
@@ -133,6 +115,8 @@ const Navbar = () => {
   const handleActiveMenu = () => setActiveMenu(!activeMenu);
   const [pageTitle, setPageTitle] = useState("");
   const [pageTag, setPageTag] = useState("");
+  const [reloadRequired, setReloadRequired] = useState(false);
+
   const location = useLocation();
 
   // const fetchUserYoutubeInfo = async () => {
@@ -178,6 +162,24 @@ const Navbar = () => {
       setActiveMenu(true);
     }
   }, [screenSize]);
+
+  useEffect(() => {
+    const refreshInterval = 5000; // 2 minutes in milliseconds
+    let timeoutId;
+
+    const checkCondition = () => {
+      if ((userLoggedIn && accessLevel === "L2" && !userData)) {
+        setReloadRequired(true);
+        window.location.reload(true); // force reload from the server
+      } else {
+        setReloadRequired(false);
+      }
+    };
+
+    timeoutId = setTimeout(checkCondition, refreshInterval);
+
+    return () => clearTimeout(timeoutId); // cleanup the timeout on component unmount or condition met
+  }, [userLoggedIn, userData, accessLevel]);
 
   // useEffect(()=>{
 
@@ -250,7 +252,7 @@ const Navbar = () => {
       }`}
     >
       {userLoggedIn && accessLevel === "L2" && !userData ? (
-        <Loader message={"Give us a minute to load up your account data"} />
+        <Loader message={"Hold on tight while your account loads Up. We might reload the page."} />
       ) : userLoggedIn && userData ? (
         <>
           {/* <NavButton
