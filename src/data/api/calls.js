@@ -700,7 +700,7 @@ export const saveYoutubePost = async (
 
     if (response.data.success) {
       showToast("success", "Youtube Video saved successfully", 2000);
-      localStorage.setItem(`${videoId}-preserved`, "true");
+      // localStorage.setItem(`${videoId}-preserved`, "true");
     } else {
       showToast("error", "Youtube Video wasn't saved. Try again", 2000);
     }
@@ -714,12 +714,11 @@ export const saveYoutubePost = async (
   }
 };
 
-export const getYoutubePost = async (videoId) => {
+export const getAllYoutubePosts = async () => {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/getYoutubePosts`, {
+    const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/getAllYoutubePosts`, {
       params: {
         email: userFullDataDecrypted()?.email,
-        video_id: videoId,
       },
       headers: {
         "Content-Type": "application/json",
@@ -731,16 +730,16 @@ export const getYoutubePost = async (videoId) => {
     console.log("response", response);
 
     if (response.data.success) {
-      console.log("gottenYoutubePost", getYoutubePost);
-      return response.data;
+      console.log("gottenYoutubePost", response.data.data);
+      return response.data.data;
     } else {
       showToast("error", "Youtube videos werent retrieved. Try again", 2000);
     }
   } catch (error) {
-    console.error("Error saving YouTube Video:", error);
+    console.error("Error fetching YouTube Video:", error);
     showToast(
       "error",
-      "An error occurred saving video. Please try again later.",
+      "An error occurred fetching video. Please try again later.",
       2000,
     );
   }

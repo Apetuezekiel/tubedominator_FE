@@ -29,7 +29,7 @@ import {
 import { useKeywordStore } from "../state/state";
 import CryptoJS from "crypto-js";
 import Spinner from "../components/Spinner";
-import { getYoutubePost, userFullDataDecrypted } from "../data/api/calls";
+import { getAllYoutubePosts, userFullDataDecrypted } from "../data/api/calls";
 import showToast from "../utils/toastUtils";
 import { BiChevronDown, BiEdit, BiTrendingUp } from "react-icons/bi";
 import { AiOutlineSearch } from "react-icons/ai";
@@ -77,40 +77,130 @@ const Ideation = () => {
     return arr.filter((item) => item !== undefined && item !== null);
   }
 
+  const data = [
+    {
+      categoryId: "27",
+      channelId: "UCIaJua9IU_Db15LKAaq_ZYw",
+      channelTitle: "Zicstack",
+      commentCount: "50",
+      description: "Today Service is tagged \"Holy Ghost Night of\"",
+      favoriteCount: "100000",
+      likeCount: "454230",
+      liveBroadcastContent: "none",
+      madeForKids: true,
+      player: "<iframe width=\"480\" height=\"270\" src=\"//www.youtube.com/embed/tlPt5_0DFsY\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>",
+      playlists: [
+        { id: 1, title: "Playlist 1" },
+        { id: 2, title: "Playlist 2" },
+        { id: 3, title: "Playlist 3" },
+        { id: 4, title: "Playlist 4" },
+        { id: 5, title: "Playlist 5" },
+      ],
+      privacyStatus: "public",
+      publicStatsViewable: true,
+      publishedAt: "2022-02-24T15:25:25Z",
+      thumbnails: { url: 'https://i.ytimg.com/vi/tlPt5_0DFsY/sddefault.jpg', width: 640, height: 480 },
+      title: "Church with the Holy Ghost",
+      topicCategories: ['https://en.wikipedia.org/wiki/Religion'],
+      uploadStatus: "processed",
+      videoId: "tlPt5_0DFsY",
+      viewCount: "900000"
+    },
+    {
+      categoryId: "15",
+      channelId: "UCAnotherChannelID",
+      channelTitle: "AnotherChannelTitle",
+      commentCount: "10",
+      description: "Another video description",
+      favoriteCount: "5",
+      likeCount: "5",
+      liveBroadcastContent: "none",
+      madeForKids: false,
+      player: "<iframe width=\"480\" height=\"270\" src=\"//www.youtube.com/embed/AnotherVideoID\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>",
+      playlists: [
+        { id: 6, title: "Another Playlist 1" },
+        { id: 7, title: "Another Playlist 2" },
+      ],
+      privacyStatus: "private",
+      publicStatsViewable: false,
+      publishedAt: "2022-03-15T12:45:30Z",
+      thumbnails: { url: 'https://i.ytimg.com/vi/AnotherVideoID/sddefault.jpg', width: 720, height: 480 },
+      title: "Another Video Title",
+      topicCategories: ['https://en.wikipedia.org/wiki/Technology'],
+      uploadStatus: "processed",
+      videoId: "tlPt5_0DFsY",
+      viewCount: "5"
+    }
+  ];
+
   useEffect(() => {
     console.log("allUserDeetsallUserDeetsallUserDeets", decryptedFullData);
     let isMounted = true;
 
     const fetchMyYoutubeInfo = async () => {
       try {
-        axios
-          .get(`${process.env.REACT_APP_API_BASE_URL}/fetchMyYoutubeInfo`, {
-            params: {
-              channel_id: decryptedFullData.channelId,
-            },
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": process.env.REACT_APP_X_API_KEY,
-              Authorization: `Bearer ${decryptedFullData.token}`,
-              gToken: decryptedFullData.gToken,
-            },
-          })
-          .then((response) => {
-            if (isMounted) {
-              const gottenYoutubePosts = getYoutubePost(response.data.videoId)
-              console.log("gottenYoutubePosts 222222", gottenYoutubePosts);
-              setUserYoutubeData(response.data);
-              setIsuserDataLoaded(true);
-              console.log("response I am inte", response);
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/fetchMyYoutubeInfo`, {
+          params: {
+            channel_id: decryptedFullData.channelId,
+          },
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
+            Authorization: `Bearer ${decryptedFullData.token}`,
+            gToken: decryptedFullData.gToken,
+          },
+        });
+    
+        console.log("response I am inte", response);
+        if (response.data.success) {
+          const gottenYoutubePosts = await getAllYoutubePosts();
+          const updatedData = response.data.data.map((item1, index1) => {
+            // Initialize item2 here to make it accessible in the entire map function
+            const item2 = gottenYoutubePosts.find(item2 => item1.videoId === item2.video_id);
+          
+            if (item2) {
+              const analyzedVideoPerformance = analyzeVideoPerformance(
+                item2.likeCount,
+                item1.likeCount,
+                item2.commentCount,
+                item1.commentCount,
+                item2.viewCount,
+                item1.viewCount
+              );
+
+              console.log("analyzedVideoPerformanceeeeeeeeee", analyzedVideoPerformance,
+              item2.likeCount,
+              item1.likeCount,
+              item2.commentCount,
+              item1.commentCount,
+              item2.viewCount,
+              item1.viewCount
+            );
+          
+              return {
+                ...item1,
+                optimizationPercentage: analyzedVideoPerformance.optimizationPercentage,
+                optimizationImpact: analyzedVideoPerformance.optimizationImpact,
+              };
             }
-          })
-          .catch((error) => {
-            console.error("Error fetching data:", error);
+          
+            // If a match is not found, return the original item1
+            return item1;
           });
+
+          console.log("updatedData", updatedData);
+          
+          // Assuming setUserYoutubeData is a function to set the updated data
+          setUserYoutubeData(updatedData);
+          setIsuserDataLoaded(true);
+        } else {
+          console.error("Error fetching data:");
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
+    
 
     const fetchMyPlaylists = async () => {
       try {
@@ -172,6 +262,15 @@ const Ideation = () => {
       optimizationImpact,
     };
   };
+
+  function calculatePercentageChange(oldValue, newValue) {
+    if (oldValue === 0) {
+      return newValue !== 0 ? 100 : 0;
+    }
+  
+    const percentageChange = ((newValue - oldValue) / Math.abs(oldValue)) * 100;
+    return parseFloat(percentageChange.toFixed(2));
+  }
   
   const calculateOptimizationPercentage = (likeChangePercentage, commentChangePercentage, viewChangePercentage) => {
     const absoluteLikeChange = Math.abs(likeChangePercentage);
@@ -180,8 +279,24 @@ const Ideation = () => {
   
     const averageChange = (absoluteLikeChange + absoluteCommentChange + absoluteViewChange) / 3;
   
-    return parseFloat(averageChange.toFixed(2));
+    // Cap the value at 100
+    const cappedPercentage = Math.min(averageChange, 100);
+  
+    return parseFloat(cappedPercentage.toFixed(2));
   };
+
+  function calculateOptimizationImpact(likeChangePercentage, commentChangePercentage, viewChangePercentage) {
+    const overallChange = Math.abs(likeChangePercentage) + Math.abs(commentChangePercentage) + Math.abs(viewChangePercentage);
+  
+    if (overallChange < 5) {
+      return "Low";
+    } else if (overallChange < 15) {
+      return "Medium";
+    } else {
+      return "High";
+    }
+  }
+  
   
 
   const ThumbnailTemplate = (props) => {
@@ -224,7 +339,7 @@ const Ideation = () => {
   };
 
   const ThumbnailTitleTemplate = (props) => {
-    console.log("propsppp", props);
+    console.log("propsppp 23323323332", props);
     return (
       <div>
         <div className="flex justify-start items-center">
@@ -288,32 +403,26 @@ const Ideation = () => {
   };
 
   const gridOrderOptimizationLevel = (props) => {
-    return props.viewCount < 1000 ? (
+    const roundedPercentage = Math.round(props.optimizationPercentage);
+    const percentageWidth = `${roundedPercentage}%`;
+  
+    return (
       <div className="h-2 w-full rounded-full flex flex-row items-center justify-between">
         <div className="h-full w-80 bg-gray-300 rounded-full mr-2">
-          <div className="h-full w-10 bg-purple-600 rounded-full"></div>
+          <div
+            className="h-full rounded-full"
+            style={{ width: percentageWidth, background: '#6B46C1' }}
+          ></div>
         </div>
-        <span className="w-20 text-xs text-purple-600">20%</span>
-      </div>
-    ) : props.viewCount < 5000 ? (
-      <div className="h-2 w-full rounded-full flex flex-row items-center justify-between">
-        <div className="h-full w-80 bg-gray-300 rounded-full mr-2">
-          <div className="h-full w-40 bg-purple-600 rounded-full"></div>
-        </div>
-        <span className="w-20 text-xs text-purple-600">50%</span>
-      </div>
-    ) : (
-      <div className="h-2 w-full rounded-full flex flex-row items-center justify-between">
-        <div className="h-full w-80 bg-gray-300 rounded-full mr-2">
-          <div className="h-full w-50 bg-purple-600 rounded-full"></div>
-        </div>
-        <span className="w-20 text-xs text-purple-600">70%</span>
+        <span className="w-20 text-xs text-purple-600">{roundedPercentage}%</span>
       </div>
     );
   };
+  
+  
 
   const gridOrderOptimizationImpact = (props) => {
-    return props.viewCount < 1000 ? (
+    return props.optimizationImpact === 'Low' ? (
       <div className="h-5 w-full rounded-full flex flex-row items-center justify-between">
         <div className="h-full bg-gray-300 w-full rounded-full mr-2">
           <div className="h-full w-10 bg-purple-600 rounded-full">
@@ -321,22 +430,24 @@ const Ideation = () => {
           </div>
         </div>
       </div>
-    ) : props.viewCount < 5000 ? (
+    ) : props.optimizationImpact === 'Medium' ? (
       <div className="h-5 w-full rounded-full flex flex-row items-center justify-between">
         <div className="h-full bg-gray-300 w-full rounded-full mr-2">
           <div className="h-full w-40 bg-purple-600 rounded-full">
-            <span className="w-20 text-xs ml-3 text-white">Med</span>
+            <span className="w-20 text-xs text-white ml-7">Med</span>
+          </div>
+        </div>
+      </div>
+    ) : props.optimizationImpact === 'High' ? (
+      <div className="h-5 w-full rounded-full flex flex-row items-center justify-between">
+        <div className="h-full bg-gray-300 w-full rounded-full mr-2">
+          <div className="h-full w-60 bg-purple-600 rounded-full">
+            <span className="w-20 text-xs ml-3 text-white text-center">High</span>
           </div>
         </div>
       </div>
     ) : (
-      <div className="h-5 w-full rounded-full flex flex-row items-center justify-between">
-        <div className="h-full bg-gray-300 w-full rounded-full mr-2">
-          <div className="h-full w-60 bg-purple-600 rounded-full">
-            <span className="w-20 text-xs ml-3 text-white">High</span>
-          </div>
-        </div>
-      </div>
+      'N/A'
     );
   };
 
@@ -572,17 +683,17 @@ const Ideation = () => {
                   template={gridOrderOptimizationLevel}
                   // width="300"
                 />
-                <ColumnDirective
+                {/* <ColumnDirective
                   field="optimizationImpact"
                   headerText="Optimization impact"
                   template={gridOrderOptimizationImpact}
                   // width="300"
-                />
+                /> */}
                 <ColumnDirective
                   field="viewCount"
                   headerText="View Count"
                   template={viewCountTemplate}
-                  // width="150"
+                  width="150"
                 />
                 <ColumnDirective
                   field="publishedAt"
