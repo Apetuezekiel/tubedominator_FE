@@ -110,26 +110,34 @@ const Ideation = () => {
   const [selectedCountry, setSelectedCountry] = useState(initialCountry);
   // console.log(decryptedFullData);
 
-  let savedData;
-  // !userLoggedIn && setUserLoggedIn(true);
-  // console.log("getUserEncryptedData", getUserEncryptedData());
-
   useEffect(() => {
     // Get saved data from localStorage
-    savedData = JSON.parse(localStorage.getItem("lastVideoIdeas"));
-    setUserLoggedIn(true);
-    console.log("decryptedFullData 2222222", decryptedFullData);
+    const savedDataString = localStorage.getItem("lastVideoIdeas");
 
-    // Compare the length of the API data with the localStorage data
-    if (!savedData) {
-      console.log("got here");
+    // Check if there is any saved data
+    if (!savedDataString) {
+      console.log("No saved data found in localStorage");
+      // Handle the case when there is no saved data
+      return;
+    }
 
-      return null;
-    } else {
-      console.log("now serving from local storage", savedData);
+    try {
+      // Parse the JSON data from localStorage
+      const savedData = JSON.parse(savedDataString);
+      console.log("Decrypted full data", savedData);
+
+      // Set the user as logged in
+      setUserLoggedIn(true);
+
+      // Set the state with the data from localStorage
       setLoadedLocalStorage(true);
       setRelatedKeywordData(savedData.related_keywords);
       setExactKeywordData(savedData.exact_keyword);
+
+      console.log("Now serving from local storage", savedData);
+    } catch (error) {
+      console.error("Error parsing JSON from localStorage", error);
+      // Handle the error, e.g., show an error message or fallback behavior
     }
   }, []);
 
@@ -684,7 +692,7 @@ const Ideation = () => {
     <section>
       <div
         className={`m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl ${
-          showInsights && "hidden"
+          (showInsights || showCompetition) && "hidden"
         }`}
       >
         <div className="flex items-center justify-center h-full mb-5">

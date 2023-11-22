@@ -28,6 +28,7 @@ import {
   BsCurrencyDollar,
   BsShield,
   BsChatLeft,
+  BsYoutube,
 } from "react-icons/bs";
 import {
   BsSearch,
@@ -1248,6 +1249,11 @@ export const menuLinks = [
         name: "Keywords Ranking",
         link: "rankings",
         icon: <BsBarChart />,
+      },
+      {
+        name: "AI Generator",
+        link: "ai-generator",
+        icon: <BsYoutube />,
       },
     ],
   },

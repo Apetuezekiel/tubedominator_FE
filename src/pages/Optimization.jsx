@@ -29,7 +29,7 @@ import {
 import { useKeywordStore } from "../state/state";
 import CryptoJS from "crypto-js";
 import Spinner from "../components/Spinner";
-import { userFullDataDecrypted } from "../data/api/calls";
+import { getYoutubePost, userFullDataDecrypted } from "../data/api/calls";
 import showToast from "../utils/toastUtils";
 import { BiChevronDown, BiEdit, BiTrendingUp } from "react-icons/bi";
 import { AiOutlineSearch } from "react-icons/ai";
@@ -64,7 +64,10 @@ const Ideation = () => {
   const setUserAuthToken = useUserAuthToken((state) => state.setUserAuthToken);
   const decryptedFullData = userFullDataDecrypted();
   const [isUserDataLoaded, setIsuserDataLoaded] = useState(false);
-  const [selectedVideoId, setSelectedVideoId] = useState("");
+  const [selectedVideoId, setSelectedVideoId] = useState(""); 
+  const [selectedVideoLikeCount, setSelectedVideoLikeCount] = useState(""); 
+  const [selectedVideoCommentCount, setSelectedVideoCommentCount] = useState(""); 
+  const [selectedVideoViewCount, setSelectedVideoViewCount] = useState(""); 
   const [userPlaylistData, setUserPlaylistData] = useState([]);
   console.log("decryptedFullData OptimizationPage", decryptedFullData);
   const navigate = useNavigate();
@@ -94,9 +97,11 @@ const Ideation = () => {
           })
           .then((response) => {
             if (isMounted) {
+              const gottenYoutubePosts = getYoutubePost(response.data.videoId)
+              console.log("gottenYoutubePosts 222222", gottenYoutubePosts);
               setUserYoutubeData(response.data);
               setIsuserDataLoaded(true);
-              console.log(response);
+              console.log("response I am inte", response);
             }
           })
           .catch((error) => {
@@ -149,6 +154,36 @@ const Ideation = () => {
     };
   }, []);
 
+  const analyzeVideoPerformance = (oldLikeCount, newLikeCount, oldCommentCount, newCommentCount, oldViewCount, newViewCount) => {
+    // Calculate percentage changes
+    const likeChangePercentage = calculatePercentageChange(oldLikeCount, newLikeCount);
+    const commentChangePercentage = calculatePercentageChange(oldCommentCount, newCommentCount);
+    const viewChangePercentage = calculatePercentageChange(oldViewCount, newViewCount);
+  
+    // Calculate optimizationPercentage
+    const optimizationPercentage = calculateOptimizationPercentage(likeChangePercentage, commentChangePercentage, viewChangePercentage);
+  
+    // Determine optimization impact
+    const optimizationImpact = calculateOptimizationImpact(likeChangePercentage, commentChangePercentage, viewChangePercentage);
+  
+    // Return the results
+    return {
+      optimizationPercentage,
+      optimizationImpact,
+    };
+  };
+  
+  const calculateOptimizationPercentage = (likeChangePercentage, commentChangePercentage, viewChangePercentage) => {
+    const absoluteLikeChange = Math.abs(likeChangePercentage);
+    const absoluteCommentChange = Math.abs(commentChangePercentage);
+    const absoluteViewChange = Math.abs(viewChangePercentage);
+  
+    const averageChange = (absoluteLikeChange + absoluteCommentChange + absoluteViewChange) / 3;
+  
+    return parseFloat(averageChange.toFixed(2));
+  };
+  
+
   const ThumbnailTemplate = (props) => {
     return (
       <div>
@@ -183,6 +218,9 @@ const Ideation = () => {
   const optimizeVideo = (props) => {
     setIsOptimizeVideo(true);
     setSelectedVideoId(props.videoId);
+    setSelectedVideoLikeCount(props.likeCount);
+    setSelectedVideoCommentCount(props.commentCount);
+    setSelectedVideoViewCount(props.viewCount);
   };
 
   const ThumbnailTitleTemplate = (props) => {
@@ -357,7 +395,7 @@ const Ideation = () => {
   return (
     <div>
       {isOptimizeVideo ? (
-        selectedVideoId && <Opitimize videoId={selectedVideoId} />
+        selectedVideoId && <Opitimize videoId={selectedVideoId} likeCount={selectedVideoLikeCount} commentCount={selectedVideoCommentCount} viewCount={selectedVideoViewCount}/>
       ) : (
         <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl overflow-hidden">
           <div className="flex justify-between">

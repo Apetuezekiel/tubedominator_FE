@@ -55,7 +55,8 @@ import countriesWithLanguages from "../data/countries";
 // );
 // import Spinner from "../components/Spinner";
 
-function Opitimize({ videoId }) {
+function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
+  console.log(videoId, likeCount, commentCount, viewCount);
   const initialCountry = {
     countryCode: "GLB",
     languageCode: "en",
@@ -157,7 +158,7 @@ function Opitimize({ videoId }) {
   // useEffect(() => {
   // saveYoutubePost(videoId, userYoutubeData[0]?.title, userYoutubeData[0]?.description, userYoutubeData[0]?.tags, userYoutubeData[0]?.thumbnails.url);
   // }, []);
-  
+
   let savedSearchTermData;
   useEffect(() => {
     savedSearchTermData = JSON.parse(
@@ -201,7 +202,16 @@ function Opitimize({ videoId }) {
               console.log("setUserYoutubeData", response.data);
               console.log("videoId", videoId);
               setUserYoutubeData(response.data);
-              saveYoutubePost(videoId, response.data[0]?.title, response.data[0]?.description, response.data[0]?.tags, response.data[0]?.thumbnails?.url);
+              saveYoutubePost(
+                videoId,
+                response.data[0]?.title,
+                response.data[0]?.description,
+                response.data[0]?.tags,
+                response.data[0]?.thumbnails?.url,
+                likeCount,
+                commentCount,
+                viewCount,
+              );
               setIsuserDataLoaded(true);
               console.log(response);
             }
@@ -982,11 +992,7 @@ function Opitimize({ videoId }) {
   };
 
   const keywordTemplate = (props) => {
-    return (
-      <span className="whitespace-normal">
-        {props.keyword}
-      </span>
-    );
+    return <span className="whitespace-normal">{props.keyword}</span>;
   };
 
   const saveDraftPost = async () => {
@@ -1054,18 +1060,16 @@ function Opitimize({ videoId }) {
       <div className="w-1/2 h-full overflow-y-auto p-4">
         <div className="p-4">
           <div className="mb-4">
-            {
-              unfixed.length < 1 ? (
-                ""
-              ) : (
-                <h4 className="font-semibold">
-                  Things to Fix{" "}
-                  <span className="ml-3 text-xs px-5 py-1 rounded-full bg-red-600 text-white">
-                    {unfixed.length}
-                  </span>
-                </h4>
-              )
-            }
+            {unfixed.length < 1 ? (
+              ""
+            ) : (
+              <h4 className="font-semibold">
+                Things to Fix{" "}
+                <span className="ml-3 text-xs px-5 py-1 rounded-full bg-red-600 text-white">
+                  {unfixed.length}
+                </span>
+              </h4>
+            )}
 
             {unfixed.map((section, index) => (
               <div key={index} className="border rounded shadow mt-5">
@@ -1469,7 +1473,7 @@ function Opitimize({ videoId }) {
     // setUserKeyword(""); // Clear the userKeyword after successful submission
   };
 
-  const updateUserTemplateFunc = async (index) => { 
+  const updateUserTemplateFunc = async (index) => {
     setUpdateUserTemplate(true);
     if (
       userChannelTemplates[index].title === "" ||
@@ -1774,7 +1778,7 @@ function Opitimize({ videoId }) {
           >
             Draft
           </span> */}
-          <span 
+          <span
             className="ml-3 text-xs px-5 py-1 rounded-lg text-white cursor-pointer"
             style={{ backgroundColor: "#7438FF" }}
             onClick={() => setRevertToOriginalPost(!revertToOriginalPost)}

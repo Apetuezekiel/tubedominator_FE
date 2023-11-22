@@ -39,13 +39,12 @@ import {
   keywordDifficulty,
 } from "../../data/insightsData";
 
-
 function Insights({
   dataSet,
   setShowInsights,
   setShowCompetition,
   showCompetition,
-  display
+  display,
 }) {
   console.log("dataSet", dataSet);
   const decryptedFullData = userFullDataDecrypted();
@@ -61,6 +60,32 @@ function Insights({
   );
   // const [youtubeVideosInfo, setYoutubeVideosInfo] = useState(false);
   const [isSerpYoutubeLoaded, setIsSerpYoutubeLoaded] = useState(false);
+
+  if (typeof dataSet.m1 === 'string' && dataSet.m1.includes(":")) {
+    for (let i = 1; i <= 12; i++) {
+      const monthKey = `m${i}`;
+      if (typeof dataSet[monthKey] === 'string' && dataSet[monthKey].includes(":")) {
+        dataSet = {
+          ...dataSet,
+          [monthKey]: dataSet[monthKey].split(':')[2],
+          [`${monthKey}_year`]: dataSet[monthKey].split(':')[1],
+          [`${monthKey}_month`]: dataSet[monthKey].split(':')[0],
+        };
+      }
+    }
+    dataSet = {
+      ...dataSet,
+      keyword: dataSet.video_ideas,
+      volume: dataSet.search_volume,
+      estimated_views: dataSet.potential_views,
+      difficulty: dataSet.keyword_diff,
+    };
+  }
+  
+
+  console.log("new data set", dataSet);
+
+  
 
   let locationData = findCountryAndLanguage(dataSet, countriesWithLanguages);
 
@@ -99,7 +124,9 @@ function Insights({
     "Dec",
   ];
 
-  const updatedFormattedData = formattedData.filter(item => item.month !== undefined && item.month !== null);
+  const updatedFormattedData = formattedData.filter(
+    (item) => item.month !== undefined && item.month !== null,
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -167,15 +194,26 @@ function Insights({
       //   console.log("chancesOfSuccess", chancesOfSuccess);
       //   setIsSerpYoutubeLoaded(true);
       // } else {
-        if (dataSet?.keyword === serpYoutubeVideosInfo?.keyword){
-
-        console.log("Loaded again from Local App wide state", serpYoutubeVideosInfo);
-        const chancesOfSuccess = calculateChancesOfSuccess(dataSet.difficulty, serpYoutubeVideosInfo.data.date_category, serpYoutubeVideosInfo.data.channel_details.subscriber_category)
-        setOverallInsightsMetrics(chancesOfSuccess)
-        console.log("dataSet.difficulty, fetchSerpYoutubeVideosLS.channel_details.subscriber_category, fetchSerpYoutubeVideosLS.date_category", dataSet.difficulty, serpYoutubeVideosInfo.data.channel_details.subscriber_category, serpYoutubeVideosInfo.data.date_category);
+      if (dataSet?.keyword === serpYoutubeVideosInfo?.keyword) {
+        console.log(
+          "Loaded again from Local App wide state",
+          serpYoutubeVideosInfo,
+        );
+        const chancesOfSuccess = calculateChancesOfSuccess(
+          dataSet.difficulty,
+          serpYoutubeVideosInfo.data.date_category,
+          serpYoutubeVideosInfo.data.channel_details.subscriber_category,
+        );
+        setOverallInsightsMetrics(chancesOfSuccess);
+        console.log(
+          "dataSet.difficulty, fetchSerpYoutubeVideosLS.channel_details.subscriber_category, fetchSerpYoutubeVideosLS.date_category",
+          dataSet.difficulty,
+          serpYoutubeVideosInfo.data.channel_details.subscriber_category,
+          serpYoutubeVideosInfo.data.date_category,
+        );
         console.log("chancesOfSuccess", chancesOfSuccess);
         setIsSerpYoutubeLoaded(true);
-        } else {
+      } else {
         try {
           const response = await axios.get(
             `${process.env.REACT_APP_API_BASE_URL}/fetchSerpYoutubeVideos`,
@@ -202,10 +240,14 @@ function Insights({
             );
             setSerpYoutubeVideosInfo({
               keyword: dataSet,
-              data: response.data
+              data: response.data,
             });
-            const chancesOfSuccess = calculateChancesOfSuccess(dataSet.difficulty, response.data.date_category, response.data.channel_details.subscriber_category)
-            setOverallInsightsMetrics(chancesOfSuccess)
+            const chancesOfSuccess = calculateChancesOfSuccess(
+              dataSet.difficulty,
+              response.data.date_category,
+              response.data.channel_details.subscriber_category,
+            );
+            setOverallInsightsMetrics(chancesOfSuccess);
             console.log("chancesOfSuccess", chancesOfSuccess);
             setIsSerpYoutubeLoaded(true);
             // console.log("mergeVideoData(response.data.analyzed_video_details, response.data.data)", mergeVideoData(response.data.analyzed_video_details, response.data.data));
@@ -367,7 +409,10 @@ function Insights({
                         </span>
                         <span
                           className="rounded-full flex items-center justify-center px-5 py-2 w-30"
-                          style={{ backgroundColor: "transparent", color: "transparent" }}
+                          style={{
+                            backgroundColor: "transparent",
+                            color: "transparent",
+                          }}
                         >
                           <span className="mr-1">
                             <AiOutlineArrowDown color="transparent" />
@@ -378,33 +423,33 @@ function Insights({
                     </div>
                   </div>
                   <div className="ml-10 mt-8">
-      <AreaChart
-        width={500}
-        height={200}
-        data={updatedFormattedData}
-        margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey="month"
-          tickFormatter={(month) => monthNames[month - 1]}
-          domain={['dataMin', 'dataMax']}
-        />
-        <YAxis />
-        <Tooltip
-          formatter={(value, name) => [value, `${name}`]}
-          labelFormatter={(label) => monthNames[label - 1]}
-        />
-        <Legend />
-        <Area
-          type="linear"
-          dataKey="searchVolume"
-          fillOpacity={0.6}
-          fill="#7352FF"
-          stroke="#7352FF"
-          activeDot={{ r: 8 }}
-        />
-      </AreaChart>
+                    <AreaChart
+                      width={500}
+                      height={200}
+                      data={updatedFormattedData}
+                      margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis
+                        dataKey="month"
+                        tickFormatter={(month) => monthNames[month - 1]}
+                        domain={["dataMin", "dataMax"]}
+                      />
+                      <YAxis />
+                      <Tooltip
+                        formatter={(value, name) => [value, `${name}`]}
+                        labelFormatter={(label) => monthNames[label - 1]}
+                      />
+                      <Legend />
+                      <Area
+                        type="linear"
+                        dataKey="searchVolume"
+                        fillOpacity={0.6}
+                        fill="#7352FF"
+                        stroke="#7352FF"
+                        activeDot={{ r: 8 }}
+                      />
+                    </AreaChart>
                     {/* <LineChart/> */}
                   </div>
                 </div>
@@ -425,7 +470,7 @@ function Insights({
                       className="rounded-full flex items-center justify-center px-5 py-2 w-30"
                       style={{
                         backgroundColor:
-                        overallInsightMetrics &&
+                          overallInsightMetrics &&
                           (overallInsightMetrics.level === "Low"
                             ? "#D2E7D0"
                             : overallInsightMetrics.level === "Medium"
@@ -438,7 +483,8 @@ function Insights({
                       {overallInsightMetrics && overallInsightMetrics.level}
                     </span>
                     <div className="text-5xl font-bold text-gray-800 mt-5">
-                    {overallInsightMetrics && overallInsightMetrics.percentage}
+                      {overallInsightMetrics &&
+                        overallInsightMetrics.percentage}
                     </div>
                   </div>
                 </div>
@@ -564,9 +610,11 @@ function Insights({
                           isSerpYoutubeLoaded &&
                           (serpYoutubeVideosInfo.data.date_category === "Low"
                             ? "#D2E7D0"
-                            : serpYoutubeVideosInfo.data.date_category === "Medium"
+                            : serpYoutubeVideosInfo.data.date_category ===
+                              "Medium"
                             ? "#FCECBB"
-                            : serpYoutubeVideosInfo.data.date_category === "High"
+                            : serpYoutubeVideosInfo.data.date_category ===
+                              "High"
                             ? "#FDECEC"
                             : "gray"), // fallback to inherit if the category is not Low, Medium, or High
                       }}
@@ -584,7 +632,8 @@ function Insights({
                       {isSerpYoutubeLoaded &&
                         (serpYoutubeVideosInfo.data.date_category === "Low"
                           ? ageOfTopVideos[0].info
-                          : serpYoutubeVideosInfo.data.date_categoryy === "Medium"
+                          : serpYoutubeVideosInfo.data.date_categoryy ===
+                            "Medium"
                           ? ageOfTopVideos[1].info
                           : serpYoutubeVideosInfo.data.date_category === "High"
                           ? ageOfTopVideos[2].info

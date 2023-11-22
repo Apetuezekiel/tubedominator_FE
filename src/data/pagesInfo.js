@@ -54,4 +54,9 @@ export const pagesInfo = [
     page: "Keywords",
     tag: "Search and generate ideas for your next video!",
   },
+  {
+    index: 10,
+    page: "Ai-Generator",
+    tag: "Utilize our AI tool to create youtube posts in seconds",
+  },
 ];

@@ -617,9 +617,9 @@ export const calculateChancesOfSuccess = (difficulty, ageOfVideos, channel) => {
   const percentage = Math.round((totalScore / scores.High) * 100);
 
   return {
-      level,
-      percentage: `${percentage}/100`
-    };
+    level,
+    percentage: `${percentage}/100`,
+  };
 };
 
 export const secondsToTime = (seconds) => {
@@ -627,40 +627,51 @@ export const secondsToTime = (seconds) => {
   const minutes = Math.floor((seconds % 3600) / 60);
 
   if (hours > 0) {
-      return `${Math.round(hours + minutes / 60)} hrs`;
+    return `${Math.round(hours + minutes / 60)} hrs`;
   } else {
-      return `${minutes} mins`;
+    return `${minutes} mins`;
   }
 };
 
 export const daysToTime = (days) => {
   if (days >= 365) {
     const years = Math.round(days / 365);
-    return `${years} ${years === 1 ? 'year' : 'years'}`;
+    return `${years} ${years === 1 ? "year" : "years"}`;
   } else if (days >= 30) {
     const months = Math.round(days / 30);
-    return `${months} ${months === 1 ? 'month' : 'months'}`;
+    return `${months} ${months === 1 ? "month" : "months"}`;
   } else if (days >= 7) {
     const weeks = Math.round(days / 7);
-    return `${weeks} ${weeks === 1 ? 'week' : 'weeks'}`;
+    return `${weeks} ${weeks === 1 ? "week" : "weeks"}`;
   } else if (days >= 1) {
-    return `${days} ${days === 1 ? 'day' : 'days'}`;
+    return `${days} ${days === 1 ? "day" : "days"}`;
   } else if (days === 0) {
     return "1 day";
   } else {
-    return "N/A"
+    return "N/A";
   }
 };
 
-
-export const saveYoutubePost = async (videoId, title, description, tags, thumbnails) => {
-  console.log("data to save",       {
+export const saveYoutubePost = async (
+  videoId,
+  title,
+  description,
+  tags,
+  thumbnails,
+  likeCount,
+  commentCount,
+  viewCount,
+) => {
+  console.log("data to save", {
     video_id: videoId,
     video_title: title,
     video_description: description,
     video_tags: tags,
     video_thumbnail: thumbnails,
     email: userFullDataDecrypted()?.email,
+    likeCount,
+    commentCount,
+    viewCount,
   });
   try {
     const response = await axios.post(
@@ -672,6 +683,9 @@ export const saveYoutubePost = async (videoId, title, description, tags, thumbna
         video_tags: tags,
         video_thumbnail: thumbnails,
         email: userFullDataDecrypted()?.email,
+        likeCount,
+        commentCount,
+        viewCount,
       },
       {
         headers: {
@@ -679,7 +693,7 @@ export const saveYoutubePost = async (videoId, title, description, tags, thumbna
           "x-api-key": process.env.REACT_APP_X_API_KEY,
           Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
         },
-      }
+      },
     );
 
     console.log("response", response);
@@ -692,6 +706,43 @@ export const saveYoutubePost = async (videoId, title, description, tags, thumbna
     }
   } catch (error) {
     console.error("Error saving YouTube Video:", error);
-    showToast("error", "An error occurred saving video. Please try again later.", 2000);
+    showToast(
+      "error",
+      "An error occurred saving video. Please try again later.",
+      2000,
+    );
   }
 };
+
+export const getYoutubePost = async (videoId) => {
+  try {
+    const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/getYoutubePosts`, {
+      params: {
+        email: userFullDataDecrypted()?.email,
+        video_id: videoId,
+      },
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.REACT_APP_X_API_KEY,
+        Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
+      },
+    });
+
+    console.log("response", response);
+
+    if (response.data.success) {
+      console.log("gottenYoutubePost", getYoutubePost);
+      return response.data;
+    } else {
+      showToast("error", "Youtube videos werent retrieved. Try again", 2000);
+    }
+  } catch (error) {
+    console.error("Error saving YouTube Video:", error);
+    showToast(
+      "error",
+      "An error occurred saving video. Please try again later.",
+      2000,
+    );
+  }
+};
+

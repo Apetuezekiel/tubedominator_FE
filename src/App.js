@@ -52,6 +52,7 @@ import Auth from "./components/Auth";
 import Insights from "./pages/keywords/Insights";
 import Competition from "./pages/keywords/Competition";
 import ConnectYoutube from "./pages/ConnectYoutube";
+import AiPostGenerator from "./pages/AiPostGenerator";
 import Testss from "./pages/Testss";
 import axios from "axios";
 import { userFullDataDecrypted } from "./data/api/calls";
@@ -103,6 +104,11 @@ const App = () => {
           <Route path="optimize" element={<Opitimize />} />
         </Route>
 
+        <Route path="/ai-generator" element={<ProtectedRoute />}>
+          <Route index element={<AiPostGenerator />} />
+          <Route path="ai-generator" element={<AiPostGenerator />} />
+        </Route>
+
         <Route path="/reporting" element={<ProtectedRoute />}>
           <Route path="/reporting" element={<Reporting />} />
         </Route>
@@ -116,12 +122,10 @@ const App = () => {
         </Route>
 
         <Route path="rankings" element={<Rankings />} />
-        
+
         <Route path="/searchterm" element={<ProtectedRoute />}>
           <Route path="/searchterm" element={<SearchTerm />} />
         </Route>
-
-
 
         {/* <Route path="/channel" element={<ProtectedRoute />}> */}
         <Route path="/channel" element={<RegistrationForm />} />

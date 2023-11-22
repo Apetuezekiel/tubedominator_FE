@@ -164,11 +164,11 @@ const Navbar = () => {
   }, [screenSize]);
 
   useEffect(() => {
-    const refreshInterval = 5000; // 2 minutes in milliseconds
+    const refreshInterval = 20000; // 2 minutes in milliseconds
     let timeoutId;
 
     const checkCondition = () => {
-      if ((userLoggedIn && accessLevel === "L2" && !userData)) {
+      if (userLoggedIn && accessLevel === "L2" && !userData) {
         setReloadRequired(true);
         window.location.reload(true); // force reload from the server
       } else {
@@ -252,7 +252,11 @@ const Navbar = () => {
       }`}
     >
       {userLoggedIn && accessLevel === "L2" && !userData ? (
-        <Loader message={"Hold on tight while your account loads Up. We might reload the page."} />
+        <Loader
+          message={
+            "Hold on tight while your account loads Up. We might reload the page."
+          }
+        />
       ) : userLoggedIn && userData ? (
         <>
           {/* <NavButton

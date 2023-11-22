@@ -40,6 +40,28 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
     (state) => state.setSerpYoutubeVideosInfo,
   );
 
+  if (typeof dataSet.m1 === 'string' && dataSet.m1.includes(":")) {
+    for (let i = 1; i <= 12; i++) {
+      const monthKey = `m${i}`;
+      if (typeof dataSet[monthKey] === 'string' && dataSet[monthKey].includes(":")) {
+        dataSet = {
+          ...dataSet,
+          [monthKey]: dataSet[monthKey].split(':')[2],
+          [`${monthKey}_year`]: dataSet[monthKey].split(':')[1],
+          [`${monthKey}_month`]: dataSet[monthKey].split(':')[0],
+        };
+      }
+    }
+    dataSet = {
+      ...dataSet,
+      keyword: dataSet.video_ideas,
+      volume: dataSet.search_volume,
+      estimated_views: dataSet.potential_views,
+      difficulty: dataSet.keyword_diff,
+    };
+  }
+  
+
   const handleDownload = (dataObject) => {
     // Convert the object to a JSON string
     const jsonString = JSON.stringify(dataObject, null, 2);
@@ -87,7 +109,7 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
         serpYoutubeVideosInfo.data.channel_details.detailed_results,
       );
       console.log("finalMergedData", mergedData);
-      handleDownload(mergedData);
+      // handleDownload(mergedData);
       setKeywordVideosInfo(mergedData);
       setIsSerpYoutubeLoaded(true);
 
@@ -154,275 +176,283 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
   let locationData = findCountryAndLanguage(dataSet, countriesWithLanguages);
 
   return (
-    <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl z-50 absolute top-24 right-0 w-3/4">
-      <header>
-        <div className="flex items-center justify-between mb-5">
-          <span
-            className="mr-3 flex items-center cursor-pointer"
-            onClick={() => setShowCompetition(false)}
-          >
-            <BiArrowBack color="#7438FF" className="mr-2" /> Back to list
-          </span>
-          <span
-            className="text-3xl font-bold mb-2 cursor-pointer"
-            onClick={() => setShowCompetition(false)}
-          >
-            <MdCancel color="red" />
-          </span>
-        </div>
-        <div className="flex items-center">
-          <span className="mr-3">Your idea:</span>
-          <span className="text-3xl font-bold mb-2 capitalize">
-            {dataSet.keyword}
-          </span>
-        </div>
-        <div className="flex mt-3">
-          <span className="mr-3">Search volume:</span>
-          <span>
-            {formatNumberToKMBPlus(dataSet.volume)} | Language:{" "}
-            {locationData.country} ({locationData.language})
-          </span>
-        </div>
-        <div className="flex mt-10">
-          <span
-            className="mr-3 pb-3 px-5 cursor-pointer"
-            onClick={() => {
-              setShowCompetition(false);
-              setShowInsights(true);
-            }}
-          >
-            Insights
-          </span>
-          <span
-            className="mr-3 pb-3 px-5 cursor-pointer"
-            style={{ borderBottom: "#7438FF 2px solid", color: "#7438FF" }}
-          >
-            Competition
-          </span>
-        </div>
-        <hr />
-      </header>
+    <section className="w-full z-50">
+      <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl z-50">
+        <header>
+          <div className="flex items-center justify-between mb-5">
+            <span
+              className="mr-3 flex items-center cursor-pointer"
+              onClick={() => setShowCompetition(false)}
+            >
+              <BiArrowBack color="#7438FF" className="mr-2" /> Back to list
+            </span>
+            <span
+              className="text-3xl font-bold mb-2 cursor-pointer"
+              onClick={() => setShowCompetition(false)}
+            >
+              <MdCancel color="red" />
+            </span>
+          </div>
+          <div className="flex items-center">
+            <span className="mr-3">Your idea:</span>
+            <span className="text-3xl font-bold mb-2 capitalize">
+              {dataSet.keyword}
+            </span>
+          </div>
+          <div className="flex mt-3">
+            <span className="mr-3">Search volume:</span>
+            <span>
+              {formatNumberToKMBPlus(dataSet.volume)} | Language:{" "}
+              {locationData.country} ({locationData.language})
+            </span>
+          </div>
+          <div className="flex mt-10">
+            <span
+              className="mr-3 pb-3 px-5 cursor-pointer"
+              onClick={() => {
+                setShowCompetition(false);
+                setShowInsights(true);
+              }}
+            >
+              Insights
+            </span>
+            <span
+              className="mr-3 pb-3 px-5 cursor-pointer"
+              style={{ borderBottom: "#7438FF 2px solid", color: "#7438FF" }}
+            >
+              Competition
+            </span>
+          </div>
+          <hr />
+        </header>
 
-      <section className="">
-        <div className="text-xl font-bold flex items-center mt-10">
-          <AiFillYoutube color="red" className="mr-3" /> Top 10 YouTube Videos{" "}
-        </div>
-        <div className="flex w-full gap-10">
-          <div className="w-3/4 border-2 p-10 rounded-md mt-5">
-            <header>
-              <span className="mr-10 font-bold">#</span>
-              <span className="font-bold">Competitor's videos</span>
-            </header>
-            <hr className="mt-5 mb-5" />
-            <div>
-              {isSerpYoutubeLoaded ? (
-                keywordVideosInfo.map((item, index) => {
-                  return (
-                    <div key={index}>
-                      <div className="flex items-center">
-                        <span className="mr-10">{index + 1}</span>
-                        <div className="mt-5 flex items-start">
-                          <img
-                            src={item.thumbnail.static}
-                            alt="Thumnail"
-                            className="rounded-md h-28 mr-3"
-                          />
-                          <div>
-                            <div className="text-md text-gray-800 capitalize">
-                              {item.title}
-                            </div>
-                            <div className="text-sm text-gray-800 flex items-center mt-3">
-                              <img
-                                src={item.channel.thumbnail}
-                                alt=""
-                                className="h-10 w-10 rounded-full mr-3"
-                              />{" "}
-                              {item.channel.name} <BsDot size={20} />{" "}
-                              {item?.channel_details?.subscriber_count &&
-                                formatNumberToKMBPlus(
-                                  item?.channel_details?.subscriber_count,
-                                ).replace("+", "")}
-                            </div>
-                            <div className="text-gray-800 flex items-center mt-3 text-xs">
-                              Uploaded {item.published_date} <BsDot size={20} />{" "}
-                              Views:{" "}
-                              {formatNumberToKMBPlus(item.views).replace(
-                                "+",
-                                "",
-                              )}{" "}
-                              <BsDot size={20} /> Likes:{" "}
-                              {item.statistics?.likeCount &&
-                                formatNumberToKMBPlus(
-                                  item.statistics?.likeCount,
-                                ).replace("+", "")}{" "}
-                              <BsDot size={20} /> Comments:{" "}
-                              {item.statistics?.commentCount &&
-                                formatNumberToKMBPlus(
-                                  item.statistics?.commentCount,
-                                ).replace("+", "")}{" "}
+        <section className="">
+          <div className="text-xl font-bold flex items-center mt-10">
+            <AiFillYoutube color="red" className="mr-3" /> Top 10 YouTube Videos{" "}
+          </div>
+          <div className="flex w-full gap-10">
+            <div className="w-3/4 border-2 p-10 rounded-md mt-5">
+              <header>
+                <span className="mr-10 font-bold">#</span>
+                <span className="font-bold">Competitor's videos</span>
+              </header>
+              <hr className="mt-5 mb-5" />
+              <div>
+                {isSerpYoutubeLoaded ? (
+                  keywordVideosInfo.map((item, index) => {
+                    return (
+                      <div key={index}>
+                        <div className="flex items-center">
+                          <span className="mr-10">{index + 1}</span>
+                          <div className="mt-5 flex items-start">
+                            <img
+                              src={item.thumbnail.static}
+                              alt="Thumnail"
+                              className="rounded-md h-28 mr-3"
+                            />
+                            <div>
+                              <div className="text-md text-gray-800 capitalize">
+                                {item.title}
+                              </div>
+                              <div className="text-sm text-gray-800 flex items-center mt-3">
+                                <img
+                                  src={item.channel.thumbnail}
+                                  alt=""
+                                  className="h-10 w-10 rounded-full mr-3"
+                                />{" "}
+                                {item.channel.name} <BsDot size={20} />{" "}
+                                {item?.channel_details?.subscriber_count &&
+                                  formatNumberToKMBPlus(
+                                    item?.channel_details?.subscriber_count,
+                                  ).replace("+", "")}
+                              </div>
+                              <div className="text-gray-800 flex items-center mt-3 text-xs">
+                                Uploaded {item.published_date}{" "}
+                                <BsDot size={20} /> Views:{" "}
+                                {formatNumberToKMBPlus(item.views).replace(
+                                  "+",
+                                  "",
+                                )}{" "}
+                                <BsDot size={20} /> Likes:{" "}
+                                {item.statistics?.likeCount &&
+                                  formatNumberToKMBPlus(
+                                    item.statistics?.likeCount,
+                                  ).replace("+", "")}{" "}
+                                <BsDot size={20} /> Comments:{" "}
+                                {item.statistics?.commentCount &&
+                                  formatNumberToKMBPlus(
+                                    item.statistics?.commentCount,
+                                  ).replace("+", "")}{" "}
+                              </div>
                             </div>
                           </div>
                         </div>
+                        {item.snippet?.tags && (
+                          <Tags items={item.snippet?.tags} />
+                        )}
+                        <hr className="mt-5 mb-5" />
                       </div>
-                      {item.snippet?.tags && (
-                        <Tags items={item.snippet?.tags} />
-                      )}
-                      <hr className="mt-5 mb-5" />
-                    </div>
-                  );
-                })
-              ) : (
-                <Loader />
-              )}
+                    );
+                  })
+                ) : (
+                  <Loader />
+                )}
+              </div>
             </div>
-          </div>
-          <div className="w-1/4 border-2 p-10 rounded-md mt-5">
-            <div className="flex flex-col gap-5 mt-8">
-              <div className="text-lg text-gray-800 font-bold">
-                Average Video Length
-              </div>
-              <div className="text-3xl text-gray-800">
-                {competitionInsights.averageVideoLength != null
-                  ? secondsToTime(competitionInsights.averageVideoLength)
-                  : "N/A"}
-              </div>
-              <div className="text-xs text-gray-800 flex items-center mt-3">
-                Shortest:{" "}
-                {competitionInsights.shortestVideoLength != null
-                  ? secondsToTime(competitionInsights.shortestVideoLength)
-                  : "N/A"}{" "}
-                <BsDot size={20} /> Longest:{" "}
-                {competitionInsights.longestVideoLength != null
-                  ? secondsToTime(competitionInsights.longestVideoLength)
-                  : "N/A"}
-              </div>
-              <div className="text-xs">
-                Based on the median video length of our competitors, we
-                recommend creating a video that is similar in length. This can
-                help ensure that your video is not too long or too short, and
-                will be more likely to hold your viewers' attention. Typically,
-                videos in our industry are around 5 min long. However, the ideal
-                length of your video may also depend on your specific content
-                and goals. So, we suggest experimenting with different video
-                lengths to find what works best for you.
-              </div>
-              <hr />
-            </div>
-            <div className="flex flex-col gap-5 mt-8">
-              <div className="text-lg text-gray-800 font-bold">
-                Average Video Age
-              </div>
-              <div className="text-3xl text-gray-800 font-bold">
-                {competitionInsights.averageVideoAge != null
-                  ? daysToTime(competitionInsights.averageVideoAge)
-                  : "N/A"}
-              </div>
-              <div className="text-gray-800 flex items-center mt-3 text-xs">
-                Newest:{" "}
-                {competitionInsights.newestVideoAge != null
-                  ? daysToTime(competitionInsights.newestVideoAge)
-                  : "N/A"}{" "}
-                <BsDot size={20} /> Oldest:{" "}
-                {competitionInsights.oldestVideoAge != null
-                  ? daysToTime(competitionInsights.oldestVideoAge)
-                  : "N/A"}
-              </div>
-              <div className="text-xs">
-                Given videos were uploaded quite some time ago you may have a
-                higher chance of ranking higher in the search results by
-                creating a video on this topic with updated and fresh content.
-              </div>
-              <hr />
-            </div>
-            <div className="flex flex-col gap-5 mt-8">
-              <div className="text-lg text-gray-800 font-bold">
-                Average Likes & Comments
-              </div>
-              <div>
-                <span className="text-3xl text-gray-800 mr-3">
-                  {competitionInsights.averageLikesComments != null
-                    ? formatNumberToKMBPlus(Math.ceil(competitionInsights.averageLikesComments))
+            <div className="w-1/4 border-2 p-10 rounded-md mt-5">
+              <div className="flex flex-col gap-5 mt-8">
+                <div className="text-lg text-gray-800 font-bold">
+                  Average Video Length
+                </div>
+                <div className="text-3xl text-gray-800">
+                  {competitionInsights.averageVideoLength != null
+                    ? secondsToTime(competitionInsights.averageVideoLength)
                     : "N/A"}
-                </span>
-                <span className="text-xs">per 1.000 views</span>
+                </div>
+                <div className="text-xs text-gray-800 flex items-center mt-3">
+                  Shortest:{" "}
+                  {competitionInsights.shortestVideoLength != null
+                    ? secondsToTime(competitionInsights.shortestVideoLength)
+                    : "N/A"}{" "}
+                  <BsDot size={20} /> Longest:{" "}
+                  {competitionInsights.longestVideoLength != null
+                    ? secondsToTime(competitionInsights.longestVideoLength)
+                    : "N/A"}
+                </div>
+                <div className="text-xs">
+                  Based on the median video length of our competitors, we
+                  recommend creating a video that is similar in length. This can
+                  help ensure that your video is not too long or too short, and
+                  will be more likely to hold your viewers' attention.
+                  Typically, videos in our industry are around 5 min long.
+                  However, the ideal length of your video may also depend on
+                  your specific content and goals. So, we suggest experimenting
+                  with different video lengths to find what works best for you.
+                </div>
+                <hr />
               </div>
-              <div className="text-md text-gray-800 flex items-center mt-3 text-xs">
-                Least:{" "}
-                {competitionInsights.leastLikesComments != null
-                  ? formatNumberToKMBPlus(Math.ceil(competitionInsights.leastLikesComments))
-                  : "N/A"}{" "}
-                <BsDot size={20} /> Most:{" "}
-                {competitionInsights.mostLikesComments != null
-                  ? formatNumberToKMBPlus(Math.ceil(competitionInsights.mostLikesComments))
-                  : "N/A"}
+              <div className="flex flex-col gap-5 mt-8">
+                <div className="text-lg text-gray-800 font-bold">
+                  Average Video Age
+                </div>
+                <div className="text-3xl text-gray-800 font-bold">
+                  {competitionInsights.averageVideoAge != null
+                    ? daysToTime(competitionInsights.averageVideoAge)
+                    : "N/A"}
+                </div>
+                <div className="text-gray-800 flex items-center mt-3 text-xs">
+                  Newest:{" "}
+                  {competitionInsights.newestVideoAge != null
+                    ? daysToTime(competitionInsights.newestVideoAge)
+                    : "N/A"}{" "}
+                  <BsDot size={20} /> Oldest:{" "}
+                  {competitionInsights.oldestVideoAge != null
+                    ? daysToTime(competitionInsights.oldestVideoAge)
+                    : "N/A"}
+                </div>
+                <div className="text-xs">
+                  Given videos were uploaded quite some time ago you may have a
+                  higher chance of ranking higher in the search results by
+                  creating a video on this topic with updated and fresh content.
+                </div>
+                <hr />
               </div>
-              <div className="text-xs">
-                Shares and likes can be an indication of how engaging video
-                content is. In order to rank for that topic, your video content
-                will need to be similarly engaging and provide value to your
-                viewers.
+              <div className="flex flex-col gap-5 mt-8">
+                <div className="text-lg text-gray-800 font-bold">
+                  Average Likes & Comments
+                </div>
+                <div>
+                  <span className="text-3xl text-gray-800 mr-3">
+                    {competitionInsights.averageLikesComments != null
+                      ? formatNumberToKMBPlus(
+                          Math.ceil(competitionInsights.averageLikesComments),
+                        )
+                      : "N/A"}
+                  </span>
+                  <span className="text-xs">per 1.000 views</span>
+                </div>
+                <div className="text-md text-gray-800 flex items-center mt-3 text-xs">
+                  Least:{" "}
+                  {competitionInsights.leastLikesComments != null
+                    ? formatNumberToKMBPlus(
+                        Math.ceil(competitionInsights.leastLikesComments),
+                      )
+                    : "N/A"}{" "}
+                  <BsDot size={20} /> Most:{" "}
+                  {competitionInsights.mostLikesComments != null
+                    ? formatNumberToKMBPlus(
+                        Math.ceil(competitionInsights.mostLikesComments),
+                      )
+                    : "N/A"}
+                </div>
+                <div className="text-xs">
+                  Shares and likes can be an indication of how engaging video
+                  content is. In order to rank for that topic, your video
+                  content will need to be similarly engaging and provide value
+                  to your viewers.
+                </div>
+                <hr />
               </div>
-              <hr />
-            </div>
-            <div className="flex flex-col gap-5 mt-8">
-              <div className="text-lg text-gray-800 font-bold">
-                Average Subscribers
+              <div className="flex flex-col gap-5 mt-8">
+                <div className="text-lg text-gray-800 font-bold">
+                  Average Subscribers
+                </div>
+                <div className="text-3xl text-gray-800 font-bold">
+                  {isSerpYoutubeLoaded ? (
+                    formatNumberToKMBPlus(
+                      serpYoutubeVideosInfo.data.channel_details
+                        .average_subscriber_count,
+                    ).replace("+", "") ?? "No Data"
+                  ) : (
+                    <BiLoaderCircle color="#7352FF" className="animate-spin" />
+                  )}
+                </div>
+                <div className="text-xs text-gray-800 flex items-center mt-3">
+                  Smallest:{" "}
+                  {isSerpYoutubeLoaded ? (
+                    formatNumberToKMBPlus(
+                      serpYoutubeVideosInfo.data.channel_details
+                        .lowest_subscriber_count,
+                    ).replace("+", "") ?? "No Data"
+                  ) : (
+                    <BiLoaderCircle color="#7352FF" className="animate-spin" />
+                  )}{" "}
+                  <BsDot size={20} /> Biggest:{" "}
+                  {isSerpYoutubeLoaded ? (
+                    formatNumberToKMBPlus(
+                      serpYoutubeVideosInfo.data.channel_details
+                        .highest_subscriber_count,
+                    ).replace("+", "") ?? "No Data"
+                  ) : (
+                    <BiLoaderCircle color="#7352FF" className="animate-spin" />
+                  )}
+                </div>
+                <div className="text-xs">
+                  If the average channel size of the top-ranking channels is
+                  much larger than yours, you may face challenges to outperform
+                  them. However, this doesn't mean it's impossible to rank for
+                  the keyword, as there are other factors that can influence
+                  video performance and visibility, such as video quality and
+                  engagement metrics. So, we recommend focusing on creating
+                  high-quality content and engaging with your audience to
+                  improve your chances of ranking higher in the search results,
+                  even if your channel size is smaller
+                </div>
+                <hr />
               </div>
-              <div className="text-3xl text-gray-800 font-bold">
-                {isSerpYoutubeLoaded ? (
-                  formatNumberToKMBPlus(
-                    serpYoutubeVideosInfo.data.channel_details
-                      .average_subscriber_count,
-                  ).replace("+", "") ?? "No Data"
-                ) : (
-                  <BiLoaderCircle color="#7352FF" className="animate-spin" />
+              <div className="flex flex-col gap-5 mt-8">
+                <div className="text-xs text-gray-800 font-bold">
+                  Popular tags
+                </div>
+                {competitionInsights.topTags && (
+                  <Tags items={competitionInsights.topTags} ml={"ml-0"} />
                 )}
               </div>
-              <div className="text-xs text-gray-800 flex items-center mt-3">
-                Smallest:{" "}
-                {isSerpYoutubeLoaded ? (
-                  formatNumberToKMBPlus(
-                    serpYoutubeVideosInfo.data.channel_details
-                      .lowest_subscriber_count,
-                  ).replace("+", "") ?? "No Data"
-                ) : (
-                  <BiLoaderCircle color="#7352FF" className="animate-spin" />
-                )}{" "}
-                <BsDot size={20} /> Biggest:{" "}
-                {isSerpYoutubeLoaded ? (
-                  formatNumberToKMBPlus(
-                    serpYoutubeVideosInfo.data.channel_details
-                      .highest_subscriber_count,
-                  ).replace("+", "") ?? "No Data"
-                ) : (
-                  <BiLoaderCircle color="#7352FF" className="animate-spin" />
-                )}
-              </div>
-              <div className="text-xs">
-                If the average channel size of the top-ranking channels is much
-                larger than yours, you may face challenges to outperform them.
-                However, this doesn't mean it's impossible to rank for the
-                keyword, as there are other factors that can influence video
-                performance and visibility, such as video quality and engagement
-                metrics. So, we recommend focusing on creating high-quality
-                content and engaging with your audience to improve your chances
-                of ranking higher in the search results, even if your channel
-                size is smaller
-              </div>
-              <hr />
-            </div>
-            <div className="flex flex-col gap-5 mt-8">
-              <div className="text-xs text-gray-800 font-bold">
-                Popular tags
-              </div>
-              {competitionInsights.topTags && (
-                <Tags items={competitionInsights.topTags} ml={"ml-0"} />
-              )}
             </div>
           </div>
-        </div>
-      </section>
-    </div>
+        </section>
+      </div>
+    </section>
   );
 }
 

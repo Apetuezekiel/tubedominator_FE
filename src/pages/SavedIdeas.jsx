@@ -475,7 +475,8 @@ const SavedIdeas = () => {
   };
 
   return (
-    <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
+    <section>
+          <div className={`m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl ${(showInsights || showCompetition) && "hidden"}`}>
       <div className="w-full flex">
         <div className="w-1/2 flex py-2">
           <div className="flex justify-start items-center">
@@ -618,23 +619,24 @@ const SavedIdeas = () => {
               setShowSavedIdeaCategoryPanel={setShowSavedIdeaCategoryPanel}
             />
           )}
-          {showInsights && (
-            <Insights
-              dataSet={ideasDataSet}
-              setShowInsights={setShowInsights}
-              setShowCompetition={setShowCompetition} 
-            />
-          )}
-          {showCompetition && (
-            <Competition
-              dataSet={ideasDataSet}
-              setShowInsights={setShowInsights}
-              setShowCompetition={setShowCompetition}
-            />
-          )}
         </div>
       )}
     </div>
+      {showInsights && (
+        <Insights
+          dataSet={ideasDataSet}
+          setShowInsights={setShowInsights}
+          setShowCompetition={setShowCompetition}
+        />
+      )}
+      {showCompetition && (
+        <Competition
+          dataSet={ideasDataSet}
+          setShowInsights={setShowInsights}
+          setShowCompetition={setShowCompetition}
+        />
+      )}
+    </section>
   );
 };
 export default SavedIdeas;
