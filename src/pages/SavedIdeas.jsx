@@ -476,35 +476,39 @@ const SavedIdeas = () => {
 
   return (
     <section>
-          <div className={`m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl ${(showInsights || showCompetition) && "hidden"}`}>
-      <div className="w-full flex">
-        <div className="w-1/2 flex py-2">
-          <div className="flex justify-start items-center">
-            <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
-              <select
-                className="rounded-full w-full py-2 pl-4 pr-8 border"
-                style={{ border: "1px solid transparent" }}
-                value={selectedCategory && selectedCategory}
-                onChange={handleCategoryChange}
-              >
-                <option value="all">All saved Ideas</option>
-                {categories.map((category, index) => (
-                  <option key={index} value={category} className="text-black">
-                    {category}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {/* <div className="bg-white rounded-tl-full rounded-bl-full border border-gray-300 px-4 py-2 flex items-center">
+      <div
+        className={`m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl ${
+          (showInsights || showCompetition) && "hidden"
+        }`}
+      >
+        <div className="w-full flex">
+          <div className="w-1/2 flex py-2">
+            <div className="flex justify-start items-center">
+              <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
+                <select
+                  className="rounded-full w-full py-2 pl-4 pr-8 border"
+                  style={{ border: "1px solid transparent" }}
+                  value={selectedCategory && selectedCategory}
+                  onChange={handleCategoryChange}
+                >
+                  <option value="all">All saved Ideas</option>
+                  {categories.map((category, index) => (
+                    <option key={index} value={category} className="text-black">
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {/* <div className="bg-white rounded-tl-full rounded-bl-full border border-gray-300 px-4 py-2 flex items-center">
               <span className="mr-2 text-xs">All ideas</span>
             </div>
             <div className="bg-white rounded-tr-full rounded-br-full border border-gray-300 px-4 py-2 flex items-center">
               <span className="mr-2 text-xs">Ideas with script</span>
             </div> */}
+            </div>
           </div>
-        </div>
-        <div className="w-1/2 flex justify-end py-2">
-          {/* <div className="flex items-center w-2/4 border border-gray-300 bg-white rounded-full px-4 py-2">
+          <div className="w-1/2 flex justify-end py-2">
+            {/* <div className="flex items-center w-2/4 border border-gray-300 bg-white rounded-full px-4 py-2">
             <input
               type="text"
               placeholder="Search video idea"
@@ -519,109 +523,109 @@ const SavedIdeas = () => {
               : "bg-purple-500 cursor-pointer"
           }`}/>
           </div> */}
-          <div className="w-full max-w-xs flex items-center p-2 pl-4 pr-4 border border-gray-300 bg-white rounded-full">
-            <input
-              type="text"
-              placeholder="Enter a topic, brand, or product"
-              className="flex-grow bg-transparent outline-none pr-2 text-xs"
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
-            <HiSearch className="text-gray-500 text-xs" />
+            <div className="w-full max-w-xs flex items-center p-2 pl-4 pr-4 border border-gray-300 bg-white rounded-full">
+              <input
+                type="text"
+                placeholder="Enter a topic, brand, or product"
+                className="flex-grow bg-transparent outline-none pr-2 text-xs"
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
+              <HiSearch className="text-gray-500 text-xs" />
+            </div>
           </div>
         </div>
+        {!filterableSavedIdeasData ? (
+          <Loader marginTop={10} />
+        ) : (
+          <div>
+            <Header
+              title={`All saved ideas (${
+                filterableSavedIdeasData && filterableSavedIdeasData.length
+                  ? filterableSavedIdeasData.length
+                  : 0
+              } ideas)`}
+              size="text-1xl"
+            />
+            {fetchedSavedIdeas && (
+              <div>
+                <Loader message={"Loading your Saved Ideas. Hang on"} />
+              </div>
+            )}
+            <br />
+            <GridComponent
+              dataSource={filterableSavedIdeasData}
+              allowExcelExport
+              allowPdfExport
+              allowPaging
+              allowSorting
+            >
+              <ColumnsDirective>
+                <ColumnDirective
+                  field="isFavorite"
+                  headerText=""
+                  width="80"
+                  template={gridOrderStars}
+                  tooltip="Hover over for more information"
+                  headerTemplate={actionTitleTemplate}
+                />
+                <ColumnDirective
+                  field="video_ideas"
+                  headerText="Video ideas"
+                  headerTemplate={VideoIconTitleTemplate}
+                  tooltip="Hover over for more information"
+                  template={VideoIconTemplate}
+                />
+                <ColumnDirective
+                  field="search_volume"
+                  headerText="Search Volume on youtube"
+                  template={searchVolumeFormat}
+                  headerTemplate={VolumeTitleTemplate}
+                  tooltip="Hover over for more information"
+                />
+                <ColumnDirective
+                  field="trend"
+                  headerText="Trends"
+                  headerTemplate={TrendsTitleTemplate}
+                  template={TrendsDataRowTemplate}
+                />
+                <ColumnDirective
+                  field="keyword_diff"
+                  headerText="Keyword Difficulty"
+                  template={keywordDiffTemplate}
+                  tooltip="Hover over for more information"
+                />
+                <ColumnDirective
+                  field="potential_views"
+                  headerText="Potential views on youtube"
+                  headerTemplate={VideoIconTitleTemplate}
+                  template={formatViews}
+                  tooltip="Hover over for more information"
+                />
+              </ColumnsDirective>
+              <Inject
+                services={[
+                  Resize,
+                  Sort,
+                  ContextMenu,
+                  Filter,
+                  Page,
+                  ExcelExport,
+                  Edit,
+                  PdfExport,
+                ]}
+              />
+            </GridComponent>
+            {showSavedIdeaCategoryPanel && (
+              <IdeasCategoryDelete
+                dataSet={ideasDataSet}
+                setUpdatedSavedIdea={setUpdatedSavedIdea}
+                setShowSavedIdeaCategoryPanel={setShowSavedIdeaCategoryPanel}
+              />
+            )}
+          </div>
+        )}
       </div>
-      {!filterableSavedIdeasData ? (
-        <Loader marginTop={10} />
-      ) : (
-        <div>
-          <Header
-            title={`All saved ideas (${
-              filterableSavedIdeasData && filterableSavedIdeasData.length
-                ? filterableSavedIdeasData.length
-                : 0
-            } ideas)`}
-            size="text-1xl"
-          />
-          {fetchedSavedIdeas && (
-            <div>
-              <Loader message={"Loading your Saved Ideas. Hang on"} />
-            </div>
-          )}
-          <br />
-          <GridComponent
-            dataSource={filterableSavedIdeasData}
-            allowExcelExport
-            allowPdfExport
-            allowPaging
-            allowSorting
-          >
-            <ColumnsDirective>
-              <ColumnDirective
-                field="isFavorite"
-                headerText=""
-                width="80"
-                template={gridOrderStars}
-                tooltip="Hover over for more information"
-                headerTemplate={actionTitleTemplate}
-              />
-              <ColumnDirective
-                field="video_ideas"
-                headerText="Video ideas"
-                headerTemplate={VideoIconTitleTemplate}
-                tooltip="Hover over for more information"
-                template={VideoIconTemplate}
-              />
-              <ColumnDirective
-                field="search_volume"
-                headerText="Search Volume on youtube"
-                template={searchVolumeFormat}
-                headerTemplate={VolumeTitleTemplate}
-                tooltip="Hover over for more information"
-              />
-              <ColumnDirective
-                field="trend"
-                headerText="Trends"
-                headerTemplate={TrendsTitleTemplate}
-                template={TrendsDataRowTemplate}
-              />
-              <ColumnDirective
-                field="keyword_diff"
-                headerText="Keyword Difficulty"
-                template={keywordDiffTemplate}
-                tooltip="Hover over for more information"
-              />
-              <ColumnDirective
-                field="potential_views"
-                headerText="Potential views on youtube"
-                headerTemplate={VideoIconTitleTemplate}
-                template={formatViews}
-                tooltip="Hover over for more information"
-              />
-            </ColumnsDirective>
-            <Inject
-              services={[
-                Resize,
-                Sort,
-                ContextMenu,
-                Filter,
-                Page,
-                ExcelExport,
-                Edit,
-                PdfExport,
-              ]}
-            />
-          </GridComponent>
-          {showSavedIdeaCategoryPanel && (
-            <IdeasCategoryDelete
-              dataSet={ideasDataSet}
-              setUpdatedSavedIdea={setUpdatedSavedIdea}
-              setShowSavedIdeaCategoryPanel={setShowSavedIdeaCategoryPanel}
-            />
-          )}
-        </div>
-      )}
-    </div>
       {showInsights && (
         <Insights
           dataSet={ideasDataSet}

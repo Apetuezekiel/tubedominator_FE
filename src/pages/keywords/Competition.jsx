@@ -40,15 +40,18 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
     (state) => state.setSerpYoutubeVideosInfo,
   );
 
-  if (typeof dataSet.m1 === 'string' && dataSet.m1.includes(":")) {
+  if (typeof dataSet.m1 === "string" && dataSet.m1.includes(":")) {
     for (let i = 1; i <= 12; i++) {
       const monthKey = `m${i}`;
-      if (typeof dataSet[monthKey] === 'string' && dataSet[monthKey].includes(":")) {
+      if (
+        typeof dataSet[monthKey] === "string" &&
+        dataSet[monthKey].includes(":")
+      ) {
         dataSet = {
           ...dataSet,
-          [monthKey]: dataSet[monthKey].split(':')[2],
-          [`${monthKey}_year`]: dataSet[monthKey].split(':')[1],
-          [`${monthKey}_month`]: dataSet[monthKey].split(':')[0],
+          [monthKey]: dataSet[monthKey].split(":")[2],
+          [`${monthKey}_year`]: dataSet[monthKey].split(":")[1],
+          [`${monthKey}_month`]: dataSet[monthKey].split(":")[0],
         };
       }
     }
@@ -60,7 +63,6 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
       difficulty: dataSet.keyword_diff,
     };
   }
-  
 
   const handleDownload = (dataObject) => {
     // Convert the object to a JSON string

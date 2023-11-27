@@ -13,7 +13,11 @@ import {
   useUserYoutubeInfo,
 } from "../state/state";
 import Spinner from "./Spinner";
-import { saveYoutubePost, userFullDataDecrypted } from "../data/api/calls";
+import {
+  getYoutubePost,
+  saveYoutubePost,
+  userFullDataDecrypted,
+} from "../data/api/calls";
 import axios from "axios";
 import { FiCamera, FiLoader } from "react-icons/fi";
 import { BiSearch } from "react-icons/bi";
@@ -85,6 +89,7 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
   const setShowSearchTermPanel = useShowSearchTermPanel(
     (state) => state.setShowSearchTermPanel,
   );
+  const [revertToOriginalPost, setRevertToOriginalPost] = useState(false);
   const [formData, setFormData] = useState({
     title:
       userYoutubeData[0]?.title !== undefined
@@ -98,10 +103,11 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
       userYoutubeData[0]?.tags !== undefined
         ? String(userYoutubeData[0].tags)
         : "",
-    thumbnail:
-      userYoutubeData[0]?.thumbnails.url !== undefined
-        ? String(userYoutubeData[0].thumbnails.url)
-        : "",
+    thumbnail: revertToOriginalPost
+      ? String(userYoutubeData[0]?.video_thumbnail)
+      : userYoutubeData[0]?.thumbnails.url !== undefined
+      ? String(userYoutubeData[0].thumbnails.url)
+      : "",
   });
   const [newTemplateData, setNewTemplateData] = useState({
     title: "",
@@ -122,7 +128,6 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [userSearchTerms, setUserSearchTerms] = useState([]);
   const [isSearchTermFavorite, setIsSearchTermFavorite] = useState(false);
-  const [revertToOriginalPost, setRevertToOriginalPost] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
   const [addTemplateBox, setAddTemplateBox] = useState(false);
   const [updatingYtPost, setUpdatingYtPost] = useState(false);
@@ -225,7 +230,7 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
     };
 
     fetchMyYoutubeVideo();
-  }, [revertToOriginalPost]);
+  }, []);
 
   // Loading searchTerms from localstorage
   useEffect(() => {
@@ -1029,6 +1034,12 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
     }
   };
 
+  const revertBackToOriginalPost = async () => {
+    const originalYoutubePost = await getYoutubePost(videoId);
+    console.log("originalYoutubePost", originalYoutubePost);
+    setUserYoutubeData(originalYoutubePost);
+  };
+
   // const handleTagRemove = (tag) => {
   //   const updatedTags = formData.tags
   //     .split(',')
@@ -1765,7 +1776,11 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
             size={20}
           />
           <img
-            src={userYoutubeData[0]?.thumbnails.url}
+            src={
+              revertToOriginalPost
+                ? userYoutubeData[0]?.video_thumbnail
+                : userYoutubeData[0]?.thumbnails.url
+            }
             alt=""
             height="20"
             width="50"
@@ -1781,7 +1796,10 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
           <span
             className="ml-3 text-xs px-5 py-1 rounded-lg text-white cursor-pointer"
             style={{ backgroundColor: "#7438FF" }}
-            onClick={() => setRevertToOriginalPost(!revertToOriginalPost)}
+            onClick={() => {
+              setRevertToOriginalPost(!revertToOriginalPost);
+              revertBackToOriginalPost();
+            }}
           >
             Revert to original
           </span>
@@ -1965,6 +1983,8 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
                   src={
                     selectedFile
                       ? URL.createObjectURL(selectedFile)
+                      : revertToOriginalPost
+                      ? userYoutubeData[0]?.video_thumbnail
                       : userYoutubeData[0]?.thumbnails.url
                   }
                   alt="Video Thumbnail"

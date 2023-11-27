@@ -64,10 +64,11 @@ const Ideation = () => {
   const setUserAuthToken = useUserAuthToken((state) => state.setUserAuthToken);
   const decryptedFullData = userFullDataDecrypted();
   const [isUserDataLoaded, setIsuserDataLoaded] = useState(false);
-  const [selectedVideoId, setSelectedVideoId] = useState(""); 
-  const [selectedVideoLikeCount, setSelectedVideoLikeCount] = useState(""); 
-  const [selectedVideoCommentCount, setSelectedVideoCommentCount] = useState(""); 
-  const [selectedVideoViewCount, setSelectedVideoViewCount] = useState(""); 
+  const [selectedVideoId, setSelectedVideoId] = useState("");
+  const [selectedVideoLikeCount, setSelectedVideoLikeCount] = useState("");
+  const [selectedVideoCommentCount, setSelectedVideoCommentCount] =
+    useState("");
+  const [selectedVideoViewCount, setSelectedVideoViewCount] = useState("");
   const [userPlaylistData, setUserPlaylistData] = useState([]);
   console.log("decryptedFullData OptimizationPage", decryptedFullData);
   const navigate = useNavigate();
@@ -83,12 +84,13 @@ const Ideation = () => {
       channelId: "UCIaJua9IU_Db15LKAaq_ZYw",
       channelTitle: "Zicstack",
       commentCount: "50",
-      description: "Today Service is tagged \"Holy Ghost Night of\"",
+      description: 'Today Service is tagged "Holy Ghost Night of"',
       favoriteCount: "100000",
       likeCount: "454230",
       liveBroadcastContent: "none",
       madeForKids: true,
-      player: "<iframe width=\"480\" height=\"270\" src=\"//www.youtube.com/embed/tlPt5_0DFsY\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>",
+      player:
+        '<iframe width="480" height="270" src="//www.youtube.com/embed/tlPt5_0DFsY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>',
       playlists: [
         { id: 1, title: "Playlist 1" },
         { id: 2, title: "Playlist 2" },
@@ -99,12 +101,16 @@ const Ideation = () => {
       privacyStatus: "public",
       publicStatsViewable: true,
       publishedAt: "2022-02-24T15:25:25Z",
-      thumbnails: { url: 'https://i.ytimg.com/vi/tlPt5_0DFsY/sddefault.jpg', width: 640, height: 480 },
+      thumbnails: {
+        url: "https://i.ytimg.com/vi/tlPt5_0DFsY/sddefault.jpg",
+        width: 640,
+        height: 480,
+      },
       title: "Church with the Holy Ghost",
-      topicCategories: ['https://en.wikipedia.org/wiki/Religion'],
+      topicCategories: ["https://en.wikipedia.org/wiki/Religion"],
       uploadStatus: "processed",
       videoId: "tlPt5_0DFsY",
-      viewCount: "900000"
+      viewCount: "900000",
     },
     {
       categoryId: "15",
@@ -116,7 +122,8 @@ const Ideation = () => {
       likeCount: "5",
       liveBroadcastContent: "none",
       madeForKids: false,
-      player: "<iframe width=\"480\" height=\"270\" src=\"//www.youtube.com/embed/AnotherVideoID\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>",
+      player:
+        '<iframe width="480" height="270" src="//www.youtube.com/embed/AnotherVideoID" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>',
       playlists: [
         { id: 6, title: "Another Playlist 1" },
         { id: 7, title: "Another Playlist 2" },
@@ -124,13 +131,17 @@ const Ideation = () => {
       privacyStatus: "private",
       publicStatsViewable: false,
       publishedAt: "2022-03-15T12:45:30Z",
-      thumbnails: { url: 'https://i.ytimg.com/vi/AnotherVideoID/sddefault.jpg', width: 720, height: 480 },
+      thumbnails: {
+        url: "https://i.ytimg.com/vi/AnotherVideoID/sddefault.jpg",
+        width: 720,
+        height: 480,
+      },
       title: "Another Video Title",
-      topicCategories: ['https://en.wikipedia.org/wiki/Technology'],
+      topicCategories: ["https://en.wikipedia.org/wiki/Technology"],
       uploadStatus: "processed",
       videoId: "tlPt5_0DFsY",
-      viewCount: "5"
-    }
+      viewCount: "5",
+    },
   ];
 
   useEffect(() => {
@@ -139,25 +150,30 @@ const Ideation = () => {
 
     const fetchMyYoutubeInfo = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/fetchMyYoutubeInfo`, {
-          params: {
-            channel_id: decryptedFullData.channelId,
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_BASE_URL}/fetchMyYoutubeInfo`,
+          {
+            params: {
+              channel_id: decryptedFullData.channelId,
+            },
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.REACT_APP_X_API_KEY,
+              Authorization: `Bearer ${decryptedFullData.token}`,
+              gToken: decryptedFullData.gToken,
+            },
           },
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": process.env.REACT_APP_X_API_KEY,
-            Authorization: `Bearer ${decryptedFullData.token}`,
-            gToken: decryptedFullData.gToken,
-          },
-        });
-    
+        );
+
         console.log("response I am inte", response);
         if (response.data.success) {
           const gottenYoutubePosts = await getAllYoutubePosts();
           const updatedData = response.data.data.map((item1, index1) => {
             // Initialize item2 here to make it accessible in the entire map function
-            const item2 = gottenYoutubePosts.find(item2 => item1.videoId === item2.video_id);
-          
+            const item2 = gottenYoutubePosts.find(
+              (item2) => item1.videoId === item2.video_id,
+            );
+
             if (item2) {
               const analyzedVideoPerformance = analyzeVideoPerformance(
                 item2.likeCount,
@@ -165,31 +181,34 @@ const Ideation = () => {
                 item2.commentCount,
                 item1.commentCount,
                 item2.viewCount,
-                item1.viewCount
+                item1.viewCount,
               );
 
-              console.log("analyzedVideoPerformanceeeeeeeeee", analyzedVideoPerformance,
-              item2.likeCount,
-              item1.likeCount,
-              item2.commentCount,
-              item1.commentCount,
-              item2.viewCount,
-              item1.viewCount
-            );
-          
+              console.log(
+                "analyzedVideoPerformanceeeeeeeeee",
+                analyzedVideoPerformance,
+                item2.likeCount,
+                item1.likeCount,
+                item2.commentCount,
+                item1.commentCount,
+                item2.viewCount,
+                item1.viewCount,
+              );
+
               return {
                 ...item1,
-                optimizationPercentage: analyzedVideoPerformance.optimizationPercentage,
+                optimizationPercentage:
+                  analyzedVideoPerformance.optimizationPercentage,
                 optimizationImpact: analyzedVideoPerformance.optimizationImpact,
               };
             }
-          
+
             // If a match is not found, return the original item1
             return item1;
           });
 
           console.log("updatedData", updatedData);
-          
+
           // Assuming setUserYoutubeData is a function to set the updated data
           setUserYoutubeData(updatedData);
           setIsuserDataLoaded(true);
@@ -200,7 +219,6 @@ const Ideation = () => {
         console.error("Error fetching data:", error);
       }
     };
-    
 
     const fetchMyPlaylists = async () => {
       try {
@@ -244,18 +262,42 @@ const Ideation = () => {
     };
   }, []);
 
-  const analyzeVideoPerformance = (oldLikeCount, newLikeCount, oldCommentCount, newCommentCount, oldViewCount, newViewCount) => {
+  const analyzeVideoPerformance = (
+    oldLikeCount,
+    newLikeCount,
+    oldCommentCount,
+    newCommentCount,
+    oldViewCount,
+    newViewCount,
+  ) => {
     // Calculate percentage changes
-    const likeChangePercentage = calculatePercentageChange(oldLikeCount, newLikeCount);
-    const commentChangePercentage = calculatePercentageChange(oldCommentCount, newCommentCount);
-    const viewChangePercentage = calculatePercentageChange(oldViewCount, newViewCount);
-  
+    const likeChangePercentage = calculatePercentageChange(
+      oldLikeCount,
+      newLikeCount,
+    );
+    const commentChangePercentage = calculatePercentageChange(
+      oldCommentCount,
+      newCommentCount,
+    );
+    const viewChangePercentage = calculatePercentageChange(
+      oldViewCount,
+      newViewCount,
+    );
+
     // Calculate optimizationPercentage
-    const optimizationPercentage = calculateOptimizationPercentage(likeChangePercentage, commentChangePercentage, viewChangePercentage);
-  
+    const optimizationPercentage = calculateOptimizationPercentage(
+      likeChangePercentage,
+      commentChangePercentage,
+      viewChangePercentage,
+    );
+
     // Determine optimization impact
-    const optimizationImpact = calculateOptimizationImpact(likeChangePercentage, commentChangePercentage, viewChangePercentage);
-  
+    const optimizationImpact = calculateOptimizationImpact(
+      likeChangePercentage,
+      commentChangePercentage,
+      viewChangePercentage,
+    );
+
     // Return the results
     return {
       optimizationPercentage,
@@ -267,27 +309,39 @@ const Ideation = () => {
     if (oldValue === 0) {
       return newValue !== 0 ? 100 : 0;
     }
-  
+
     const percentageChange = ((newValue - oldValue) / Math.abs(oldValue)) * 100;
     return parseFloat(percentageChange.toFixed(2));
   }
-  
-  const calculateOptimizationPercentage = (likeChangePercentage, commentChangePercentage, viewChangePercentage) => {
+
+  const calculateOptimizationPercentage = (
+    likeChangePercentage,
+    commentChangePercentage,
+    viewChangePercentage,
+  ) => {
     const absoluteLikeChange = Math.abs(likeChangePercentage);
     const absoluteCommentChange = Math.abs(commentChangePercentage);
     const absoluteViewChange = Math.abs(viewChangePercentage);
-  
-    const averageChange = (absoluteLikeChange + absoluteCommentChange + absoluteViewChange) / 3;
-  
+
+    const averageChange =
+      (absoluteLikeChange + absoluteCommentChange + absoluteViewChange) / 3;
+
     // Cap the value at 100
     const cappedPercentage = Math.min(averageChange, 100);
-  
+
     return parseFloat(cappedPercentage.toFixed(2));
   };
 
-  function calculateOptimizationImpact(likeChangePercentage, commentChangePercentage, viewChangePercentage) {
-    const overallChange = Math.abs(likeChangePercentage) + Math.abs(commentChangePercentage) + Math.abs(viewChangePercentage);
-  
+  function calculateOptimizationImpact(
+    likeChangePercentage,
+    commentChangePercentage,
+    viewChangePercentage,
+  ) {
+    const overallChange =
+      Math.abs(likeChangePercentage) +
+      Math.abs(commentChangePercentage) +
+      Math.abs(viewChangePercentage);
+
     if (overallChange < 5) {
       return "Low";
     } else if (overallChange < 15) {
@@ -296,8 +350,6 @@ const Ideation = () => {
       return "High";
     }
   }
-  
-  
 
   const ThumbnailTemplate = (props) => {
     return (
@@ -405,24 +457,24 @@ const Ideation = () => {
   const gridOrderOptimizationLevel = (props) => {
     const roundedPercentage = Math.round(props.optimizationPercentage);
     const percentageWidth = `${roundedPercentage}%`;
-  
+
     return (
       <div className="h-2 w-full rounded-full flex flex-row items-center justify-between">
         <div className="h-full w-80 bg-gray-300 rounded-full mr-2">
           <div
             className="h-full rounded-full"
-            style={{ width: percentageWidth, background: '#6B46C1' }}
+            style={{ width: percentageWidth, background: "#6B46C1" }}
           ></div>
         </div>
-        <span className="w-20 text-xs text-purple-600">{roundedPercentage}%</span>
+        <span className="w-20 text-xs text-purple-600">
+          {roundedPercentage}%
+        </span>
       </div>
     );
   };
-  
-  
 
   const gridOrderOptimizationImpact = (props) => {
-    return props.optimizationImpact === 'Low' ? (
+    return props.optimizationImpact === "Low" ? (
       <div className="h-5 w-full rounded-full flex flex-row items-center justify-between">
         <div className="h-full bg-gray-300 w-full rounded-full mr-2">
           <div className="h-full w-10 bg-purple-600 rounded-full">
@@ -430,7 +482,7 @@ const Ideation = () => {
           </div>
         </div>
       </div>
-    ) : props.optimizationImpact === 'Medium' ? (
+    ) : props.optimizationImpact === "Medium" ? (
       <div className="h-5 w-full rounded-full flex flex-row items-center justify-between">
         <div className="h-full bg-gray-300 w-full rounded-full mr-2">
           <div className="h-full w-40 bg-purple-600 rounded-full">
@@ -438,16 +490,18 @@ const Ideation = () => {
           </div>
         </div>
       </div>
-    ) : props.optimizationImpact === 'High' ? (
+    ) : props.optimizationImpact === "High" ? (
       <div className="h-5 w-full rounded-full flex flex-row items-center justify-between">
         <div className="h-full bg-gray-300 w-full rounded-full mr-2">
           <div className="h-full w-60 bg-purple-600 rounded-full">
-            <span className="w-20 text-xs ml-3 text-white text-center">High</span>
+            <span className="w-20 text-xs ml-3 text-white text-center">
+              High
+            </span>
           </div>
         </div>
       </div>
     ) : (
-      'N/A'
+      "N/A"
     );
   };
 
@@ -506,13 +560,20 @@ const Ideation = () => {
   return (
     <div>
       {isOptimizeVideo ? (
-        selectedVideoId && <Opitimize videoId={selectedVideoId} likeCount={selectedVideoLikeCount} commentCount={selectedVideoCommentCount} viewCount={selectedVideoViewCount}/>
+        selectedVideoId && (
+          <Opitimize
+            videoId={selectedVideoId}
+            likeCount={selectedVideoLikeCount}
+            commentCount={selectedVideoCommentCount}
+            viewCount={selectedVideoViewCount}
+          />
+        )
       ) : (
         <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl overflow-hidden">
           <div className="flex justify-between">
             <div className="w-3/4 flex py-2">
               <div className="flex justify-start items-center">
-                <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
+                {/* <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
                   <select
                     id="mySelect"
                     // value={this.state.selectedOption}
@@ -530,7 +591,7 @@ const Ideation = () => {
                       Unlisted Videos
                     </option>
                   </select>
-                </div>
+                </div> */}
                 <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
                   <select
                     id="mySelect"
@@ -621,11 +682,14 @@ const Ideation = () => {
                     className="text-xs outline-none"
                   >
                     <option value=""> Time (All)</option>
+                    <option className="text-xs" value="Last Week">
+                      Last Week
+                    </option>
                     <option className="text-xs" value="Last Month">
                       Last Month
                     </option>
                     <option className="text-xs" value="Last Week">
-                      Last Week
+                      Last Year
                     </option>
                   </select>
                 </div>

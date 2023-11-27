@@ -98,10 +98,25 @@ const Keyword2 = () => {
   const [isShowPreviewKw, setIsShowPreviewKw] = useState(false);
   let unconventionalKeyword = "";
   const [unconventionalKeywordd, setUnconventionalKeywordd] = useState("Holy");
+  const [rankedResults, setRankedResults] = useState([]);
   // const [displayPreviewKeyword, setDisplayPreviewKeyword] = useState(false);
 
   function removeUndefinedOrNull(arr) {
     return arr.filter((item) => item !== undefined && item !== null);
+  }
+
+  function splitObjectsBySearchVolume(arrayOfObjects) {
+    const sortedArray = arrayOfObjects.sort((a, b) => b.search_volume - a.search_volume);
+  
+    const top3 = sortedArray.slice(0, 3);
+    const top10 = sortedArray.slice(0, 10);
+    const top20 = sortedArray.slice(0, 20);
+  
+    return {
+      top3,
+      top10,
+      top20
+    };
   }
 
   useEffect(() => {
@@ -124,7 +139,7 @@ const Keyword2 = () => {
         );
 
         const data = response.data;
-        console.log("data", response);
+        console.log("data", data.data);
 
         console.log("response", response.data.success === "trueNut");
         if (response.data.success === "trueNut") {
@@ -613,23 +628,22 @@ const Keyword2 = () => {
           </div>
         </div>
         <div className="flex justify-between items-center w-full mt-10">
-          <div className="h-30 flex flex-col justify-start items-center rankingStatBoxes border-1 w-1/3 py-20 px-5 mr-8 border-gray-300 rounded">
+          {/* <div className="h-30 flex flex-col justify-start items-center rankingStatBoxes border-1 w-1/3 py-20 px-5 mr-8 border-gray-300 rounded">
             <div>Average Position</div>
             <div className="text-gray-500 text-xs">{dateRange}</div>
             <div>n/a</div>
             <div className="w-full bg-gray-300 h-5 mt-3">
-              {/* <input
+              <input
               type="range"
               min="0"
               max="100"
               step="1"
               className="w-full bg-gray-300"
-            /> */}
+            />
             </div>
-          </div>
-          <div className="h-30 flex flex-col justify-start items-center rankingStatBoxes border-1 w-1/3 py-8 mr-8 border-gray-300 rounded">
+          </div> */}
+          {/* <div className="h-64 flex flex-col justify-start items-center rankingStatBoxes border-1 w-full  py-8 mr-8 border-gray-300 rounded">
             <div>Keyword Distribution</div>
-            <div className="text-gray-500 text-xs">{dateRange}</div>
             <div className="flex items-center mt-5">
               <div className="mr-10">
                 <img src={donought} alt="" />
@@ -654,7 +668,7 @@ const Keyword2 = () => {
               </div>
               <div className="text-xs">
                 <div className="flex items-center mb-3">
-                  <span className="mr-2">0</span>
+                  <span className="mr-2">{userChannelKeywords && splitObjectsBySearchVolume(userChannelKeywords).top3.length}</span>
                   <AiOutlineArrowRight />
                   <span className="ml-1">0</span>
                 </div>
@@ -675,23 +689,7 @@ const Keyword2 = () => {
                 </div>
               </div>
             </div>
-          </div>
-          <div className="h-30 flex flex-col justify-start items-center rankingStatBoxes border-1 w-1/3 py-20 px-5 border-gray-300 rounded">
-            <div>Keyword Rank Up/Down</div>
-            <div className="text-gray-500 text-xs">{dateRange}</div>
-            <div className="flex items-center">
-              <span className="flex items-center mr-5 text-lg">
-                0 <AiOutlineArrowUp className="ml-1" color="green" />
-              </span>
-              <span className="flex items-center mr-5 text-lg">
-                0 <AiOutlineArrowDown className="ml-1" color="red" />
-              </span>
-              <span className="flex items-center text-lg">
-                0 <AiOutlineArrowRight className="ml-1" color="gray" />
-              </span>
-            </div>
-            <div className="w-full bg-gray-500 h-5 mt-3"></div>
-          </div>
+          </div> */}
         </div>
         <div className="w-full flex mb-5">
           <div className="w-1/2 py-2">
@@ -706,7 +704,7 @@ const Keyword2 = () => {
                 )}
               </span>
             </div>
-            <span className="text-xs">From 18 Aug - 25 Aug 2023</span>
+            {/* <span className="text-xs">From 18 Aug - 25 Aug 2023</span> */}
           </div>
           <div className="w-1/2 flex justify-end py-2"></div>
         </div>

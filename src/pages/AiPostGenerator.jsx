@@ -175,37 +175,107 @@ function AiPostGenerator({ display }) {
           {loadedYoutubePost ? (
             <div>
               <section className="flex gap-5">
-                <div className="section1 m-2 mt-14 p-2 px-5 py-10 border-2 bg-white rounded-3xl shadow-lg w-3/5">
-                  <header className="flex justify-between w-full">
-                    <span className="font-semibold">Title</span>
-                    <span className="relative">
-                      <IoCopy
-                        className="ml-2 text-gray-500 cursor-pointer"
-                        onClick={() =>
-                          handleCopyToClipboard(
-                            generatedYoutubePost.title,
-                            "title",
-                          )
-                        }
-                        data-tip="Copy to Clipboard"
-                      />
-                      <Tooltip place="bottom" type="dark" effect="solid" />
+                <div className="w-3/5">
+                  <div className="m-2 mt-14 px-5 py-10 border-2 bg-white rounded-3xl shadow-lg w-full">
+                    <header className="flex justify-between w-full">
+                      <span className="font-semibold">Title</span>
+                      <span className="relative">
+                        <IoCopy
+                          className="ml-2 text-gray-500 cursor-pointer"
+                          onClick={() =>
+                            handleCopyToClipboard(
+                              generatedYoutubePost.title,
+                              "title",
+                            )
+                          }
+                          data-tip="Copy to Clipboard"
+                        />
+                        <Tooltip place="bottom" type="dark" effect="solid" />
 
-                      {copiedStates.title && (
-                        <div
-                          className="absolute right-0 text-white px-2 py-1 rounded mt-2"
-                          style={{ backgroundColor: "#7438FF" }}
-                        >
-                          Copied!
+                        {copiedStates.title && (
+                          <div
+                            className="absolute right-0 text-white px-2 py-1 rounded mt-2"
+                            style={{ backgroundColor: "#7438FF" }}
+                          >
+                            Copied!
+                          </div>
+                        )}
+                      </span>
+                    </header>
+                    <div className="mt-3 text-sm   text-gray-500 font-medium">
+                      {generatedYoutubePost.title}
+                    </div>
+                  </div>
+                  <div className="section1 m-2 mt-5 px-5 py-10 border-2 bg-white rounded-3xl shadow-lg w-full">
+                    <header className="flex justify-between w-full">
+                      <span className="font-semibold">Description</span>
+                      <span className="relative">
+                        <IoCopy
+                          className="ml-2 text-gray-500 cursor-pointer"
+                          onClick={() =>
+                            handleCopyToClipboard(
+                              generatedYoutubePost.script,
+                              "description",
+                            )
+                          }
+                          data-tip="Copy to Clipboard"
+                        />
+                        <Tooltip place="bottom" type="dark" effect="solid" />
+
+                        {copiedStates.description && (
+                          <div
+                            className="absolute right-0 text-white px-2 py-1 rounded mt-2"
+                            style={{ backgroundColor: "#7438FF" }}
+                          >
+                            Copied!
+                          </div>
+                        )}
+                      </span>
+                    </header>
+                    <div className="mt-5 text-xs text-gray-700 ">
+                      {generatedYoutubePost.description}
+                    </div>
+                  </div>
+                  <div className="section1 m-2 mt-5 px-5 py-10 border-2 bg-white rounded-3xl shadow-lg w-full">
+                    <header className="flex justify-between w-full">
+                      <span className="font-semibold">Tags</span>
+                      <span className="relative">
+                        <IoCopy
+                          className="ml-2 text-gray-500 cursor-pointer"
+                          onClick={() =>
+                            handleCopyToClipboard(
+                              generatedYoutubePost.tags,
+                              "tags",
+                            )
+                          }
+                          data-tip="Copy to Clipboard"
+                        />
+                        <Tooltip place="bottom" type="dark" effect="solid" />
+
+                        {copiedStates.tags && (
+                          <div
+                            className="absolute right-0 text-white px-2 py-1 rounded mt-2"
+                            style={{ backgroundColor: "#7438FF" }}
+                          >
+                            Copied!
+                          </div>
+                        )}
+                      </span>
+                    </header>
+                    <div className={`flex flex-wrap mt-5`}>
+                      {generatedYoutubePost.tags.map((item, index) => (
+                        <div key={index} className="m-2">
+                          <div className="flex rounded-full bg-gray-200 p-2">
+                            <div className="bg-gray-300 rounded-full px-3 py-1 text-xs text-gray-700">
+                              {item}
+                            </div>
+                          </div>
                         </div>
-                      )}
-                    </span>
-                  </header>
-                  <div className="mt-3 text-xs px-5 text-gray-500 font-medium">
-                    {generatedYoutubePost.title}
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <div className="section1 m-2 mt-14 p-2 px-5 py-10 border-2 bg-white rounded-3xl shadow-lg w-2/5">
+                <div className="section2 m-2 mt-14 p-2 px-5 py-10 border-2 bg-white rounded-3xl shadow-lg w-2/5">
                   <header className="flex justify-between w-full">
                     <span className="font-semibold">Video Script</span>
                     <span className="relative">
@@ -237,79 +307,8 @@ function AiPostGenerator({ display }) {
                 </div>
               </section>
 
-              <section className="flex gap-5">
-                <div className="section1 m-2 mt-7 p-2 px-5 py-10 border-2 bg-white rounded-3xl shadow-lg w-3/5">
-                  <header className="flex justify-between w-full">
-                    <span className="font-semibold">Description</span>
-                    <span className="relative">
-                      <IoCopy
-                        className="ml-2 text-gray-500 cursor-pointer"
-                        onClick={() =>
-                          handleCopyToClipboard(
-                            generatedYoutubePost.script,
-                            "description",
-                          )
-                        }
-                        data-tip="Copy to Clipboard"
-                      />
-                      <Tooltip place="bottom" type="dark" effect="solid" />
-
-                      {copiedStates.description && (
-                        <div
-                          className="absolute right-0 text-white px-2 py-1 rounded mt-2"
-                          style={{ backgroundColor: "#7438FF" }}
-                        >
-                          Copied!
-                        </div>
-                      )}
-                    </span>
-                  </header>
-                  <div className="mt-10 text-xs px-5 text-gray-700 ">
-                    {generatedYoutubePost.description}
-                  </div>
-                </div>
-                <div className="section1 m-2 mt-7 p-2 px-5 py-10 border-2 bg-white rounded-3xl shadow-lg w-2/5">
-                  <header className="flex justify-between w-full">
-                    <span className="font-semibold">Tags</span>
-                    <span className="relative">
-                      <IoCopy
-                        className="ml-2 text-gray-500 cursor-pointer"
-                        onClick={() =>
-                          handleCopyToClipboard(
-                            generatedYoutubePost.tags,
-                            "tags",
-                          )
-                        }
-                        data-tip="Copy to Clipboard"
-                      />
-                      <Tooltip place="bottom" type="dark" effect="solid" />
-
-                      {copiedStates.tags && (
-                        <div
-                          className="absolute right-0 text-white px-2 py-1 rounded mt-2"
-                          style={{ backgroundColor: "#7438FF" }}
-                        >
-                          Copied!
-                        </div>
-                      )}
-                    </span>
-                  </header>
-                  <div className={`flex flex-wrap mt-10`}>
-                    {generatedYoutubePost.tags.map((item, index) => (
-                      <div key={index} className="m-2">
-                        <div className="flex rounded-full bg-gray-200 p-2">
-                          <div className="bg-gray-300 rounded-full px-3 py-1 text-xs text-gray-700">
-                            {item}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </section>
-
-              <section className="flex gap-5">
-                <div className="section1 m-2 mt-7 p-2 px-5 py-10 border-2 bg-white rounded-3xl shadow-lg w-3/5">
+              <section className="flex gap-2">
+                <div className="section1 m-2 mt-5 p-2 px-5 py-10 border-2 bg-white rounded-3xl shadow-lg w-3/5">
                   <header className="flex justify-between w-full">
                     <span className="font-semibold">Hashtags</span>
                     <span className="relative">
@@ -347,7 +346,7 @@ function AiPostGenerator({ display }) {
                     ))}
                   </div>
                 </div>
-                <div className="section1 m-2 mt-7 p-2 px-5 py-10 border-2 bg-white rounded-3xl shadow-lg w-2/5">
+                <div className="section1 m-2 mt-5 p-2 px-5 py-10 border-2 bg-white rounded-3xl shadow-lg w-2/5">
                   <header className="flex justify-between w-full">
                     <span className="font-semibold">Keywords</span>
                     <span className="relative">

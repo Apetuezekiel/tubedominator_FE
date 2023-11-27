@@ -74,50 +74,74 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
 
   const addSavedIdea = async () => {
     setSavingKeywordIdea(true);
-  
+
     const requestBody = {
-      video_ideas: dataSet.keyword || '',
-      search_volume: dataSet.monthlysearch || '',
-      keyword_diff: dataSet.difficulty || '',
-      potential_views: dataSet.estimated_views || '',
-      trend: dataSet.trend || '',
-      email: decryptedFullData.email || '',
-      category: selectedCategory || '',
-      cpc: dataSet.cpc || '',
-      cmp: dataSet.cmp || '',
-      languageCode: dataSet.languageCode || '',
-      countryCode: dataSet.countryCode || '',
-      m1: `${dataSet.m1_month || ''}:${dataSet.m1_year || ''}:${dataSet.m1 || ''}`,
-      m2: `${dataSet.m2_month || ''}:${dataSet.m2_year || ''}:${dataSet.m2 || ''}`,
-      m3: `${dataSet.m3_month || ''}:${dataSet.m3_year || ''}:${dataSet.m3 || ''}`,
-      m4: `${dataSet.m4_month || ''}:${dataSet.m4_year || ''}:${dataSet.m4 || ''}`,
-      m5: `${dataSet.m5_month || ''}:${dataSet.m5_year || ''}:${dataSet.m5 || ''}`,
-      m6: `${dataSet.m6_month || ''}:${dataSet.m6_year || ''}:${dataSet.m6 || ''}`,
-      m7: `${dataSet.m7_month || ''}:${dataSet.m7_year || ''}:${dataSet.m7 || ''}`,
-      m8: `${dataSet.m8_month || ''}:${dataSet.m8_year || ''}:${dataSet.m8 || ''}`,
-      m9: `${dataSet.m9_month || ''}:${dataSet.m9_year || ''}:${dataSet.m9 || ''}`,
-      m10: `${dataSet.m10_month || ''}:${dataSet.m10_year || ''}:${dataSet.m10 || ''}`,
-      m11: `${dataSet.m11_month || ''}:${dataSet.m11_year || ''}:${dataSet.m11 || ''}`,
-      m12: `${dataSet.m12_month || ''}:${dataSet.m12_year || ''}:${dataSet.m12 || ''}`,
+      video_ideas: dataSet.keyword || "",
+      search_volume: dataSet.monthlysearch || "",
+      keyword_diff: dataSet.difficulty || "",
+      potential_views: dataSet.estimated_views || "",
+      trend: dataSet.trend || "",
+      email: decryptedFullData.email || "",
+      category: selectedCategory || "",
+      cpc: dataSet.cpc || "",
+      cmp: dataSet.cmp || "",
+      languageCode: dataSet.languageCode || "",
+      countryCode: dataSet.countryCode || "",
+      m1: `${dataSet.m1_month || ""}:${dataSet.m1_year || ""}:${
+        dataSet.m1 || ""
+      }`,
+      m2: `${dataSet.m2_month || ""}:${dataSet.m2_year || ""}:${
+        dataSet.m2 || ""
+      }`,
+      m3: `${dataSet.m3_month || ""}:${dataSet.m3_year || ""}:${
+        dataSet.m3 || ""
+      }`,
+      m4: `${dataSet.m4_month || ""}:${dataSet.m4_year || ""}:${
+        dataSet.m4 || ""
+      }`,
+      m5: `${dataSet.m5_month || ""}:${dataSet.m5_year || ""}:${
+        dataSet.m5 || ""
+      }`,
+      m6: `${dataSet.m6_month || ""}:${dataSet.m6_year || ""}:${
+        dataSet.m6 || ""
+      }`,
+      m7: `${dataSet.m7_month || ""}:${dataSet.m7_year || ""}:${
+        dataSet.m7 || ""
+      }`,
+      m8: `${dataSet.m8_month || ""}:${dataSet.m8_year || ""}:${
+        dataSet.m8 || ""
+      }`,
+      m9: `${dataSet.m9_month || ""}:${dataSet.m9_year || ""}:${
+        dataSet.m9 || ""
+      }`,
+      m10: `${dataSet.m10_month || ""}:${dataSet.m10_year || ""}:${
+        dataSet.m10 || ""
+      }`,
+      m11: `${dataSet.m11_month || ""}:${dataSet.m11_year || ""}:${
+        dataSet.m11 || ""
+      }`,
+      m12: `${dataSet.m12_month || ""}:${dataSet.m12_year || ""}:${
+        dataSet.m12 || ""
+      }`,
     };
 
     console.log("requestBody", requestBody);
-  
+
     const headers = {
       "Content-Type": "application/json",
       "x-api-key": process.env.REACT_APP_X_API_KEY,
       Authorization: `Bearer ${decryptedFullData.token}`,
     };
-  
+
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}/addToSavedIdeas`,
         requestBody,
-        { headers }
+        { headers },
       );
-  
+
       console.log(" and response:", response);
-  
+
       if (response.data.success) {
         setSavingKeywordIdea(false);
         showToast("success", "Idea saved successfully", 2000);
@@ -230,13 +254,13 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
                 disabled={fetchedSavedIdeas === false}
               >
                 Done
-              {savingKeywordIdea && (
-                <BiLoaderCircle
-                  className="animate-spin ml-2"
-                  color="white"
-                  size={20}
-                />
-              )}
+                {savingKeywordIdea && (
+                  <BiLoaderCircle
+                    className="animate-spin ml-2"
+                    color="white"
+                    size={20}
+                  />
+                )}
               </button>
             </div>
           </div>

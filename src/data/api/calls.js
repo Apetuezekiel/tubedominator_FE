@@ -714,23 +714,64 @@ export const saveYoutubePost = async (
   }
 };
 
-export const getAllYoutubePosts = async () => {
+export const getYoutubePost = async (videoId) => {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/getAllYoutubePosts`, {
-      params: {
-        email: userFullDataDecrypted()?.email,
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_BASE_URL}/getYoutubePosts`,
+      {
+        params: {
+          email: userFullDataDecrypted()?.email,
+          video_id: videoId,
+        },
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+          Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
+        },
       },
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.REACT_APP_X_API_KEY,
-        Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
-      },
-    });
+    );
 
     console.log("response", response);
 
     if (response.data.success) {
       console.log("gottenYoutubePost", response.data.data);
+      return response.data.data;
+    } else {
+      showToast(
+        "error",
+        "Original Youtube post werent retrieved. Try again",
+        2000,
+      );
+    }
+  } catch (error) {
+    console.error("Error fetching Original YouTube post:", error);
+    showToast(
+      "error",
+      "An error occurred fetching video. Please try again later.",
+      2000,
+    );
+  }
+};
+
+export const getAllYoutubePosts = async () => {
+  try {
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_BASE_URL}/getAllYoutubePosts`,
+      {
+        params: {
+          email: userFullDataDecrypted()?.email,
+        },
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+          Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
+        },
+      },
+    );
+
+    console.log("response", response);
+
+    if (response.data.success) {
       return response.data.data;
     } else {
       showToast("error", "Youtube videos werent retrieved. Try again", 2000);
@@ -744,4 +785,3 @@ export const getAllYoutubePosts = async () => {
     );
   }
 };
-

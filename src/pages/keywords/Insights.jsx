@@ -61,15 +61,18 @@ function Insights({
   // const [youtubeVideosInfo, setYoutubeVideosInfo] = useState(false);
   const [isSerpYoutubeLoaded, setIsSerpYoutubeLoaded] = useState(false);
 
-  if (typeof dataSet.m1 === 'string' && dataSet.m1.includes(":")) {
+  if (typeof dataSet.m1 === "string" && dataSet.m1.includes(":")) {
     for (let i = 1; i <= 12; i++) {
       const monthKey = `m${i}`;
-      if (typeof dataSet[monthKey] === 'string' && dataSet[monthKey].includes(":")) {
+      if (
+        typeof dataSet[monthKey] === "string" &&
+        dataSet[monthKey].includes(":")
+      ) {
         dataSet = {
           ...dataSet,
-          [monthKey]: dataSet[monthKey].split(':')[2],
-          [`${monthKey}_year`]: dataSet[monthKey].split(':')[1],
-          [`${monthKey}_month`]: dataSet[monthKey].split(':')[0],
+          [monthKey]: dataSet[monthKey].split(":")[2],
+          [`${monthKey}_year`]: dataSet[monthKey].split(":")[1],
+          [`${monthKey}_month`]: dataSet[monthKey].split(":")[0],
         };
       }
     }
@@ -81,11 +84,8 @@ function Insights({
       difficulty: dataSet.keyword_diff,
     };
   }
-  
 
   console.log("new data set", dataSet);
-
-  
 
   let locationData = findCountryAndLanguage(dataSet, countriesWithLanguages);
 
