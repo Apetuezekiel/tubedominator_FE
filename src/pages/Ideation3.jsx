@@ -15,7 +15,12 @@ import {
   Edit,
   Inject,
 } from "@syncfusion/ej2-react-grids";
-import { HiOutlineChevronDown, HiSearch } from "react-icons/hi";
+import {
+  HiOutlineChevronDown,
+  HiOutlineTrendingDown,
+  HiOutlineTrendingUp,
+  HiSearch,
+} from "react-icons/hi";
 import { Header } from "../components";
 import { HiOutlineRefresh } from "react-icons/hi";
 import IdeasCategoryView from "../components/IdeasCategoryView";
@@ -152,15 +157,15 @@ const Ideation = () => {
   }, []);
 
   useEffect(() => {
-      const userLevel = localStorage.getItem("accessLevel");
-      if (userLevel === "L1") {
-        alert(
-          "Connect your Youtube Account now to enjoy the cool features of Tubedominator",
-        );
-      }
-    }, []);
+    const userLevel = localStorage.getItem("accessLevel");
+    if (userLevel === "L1") {
+      alert(
+        "Connect your Youtube Account now to enjoy the cool features of Tubedominator",
+      );
+    }
+  }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     const handleGetIdeas = async () => {
       if (!searchQuery.trim()) {
         return;
@@ -211,8 +216,8 @@ const Ideation = () => {
       }
     };
 
-    if (searchQueryComplete){
-      handleGetIdeas()
+    if (searchQueryComplete) {
+      handleGetIdeas();
     }
   }, [searchQueryComplete]);
 
@@ -456,7 +461,7 @@ const Ideation = () => {
     };
 
     const starIcon = savingKeywordIdea ? (
-      <BiLoaderCircle color="#7352FF" size={20} />
+      <BiLoaderCircle color="#7352FF" size={15} />
     ) : isFavorite ? (
       <AiFillStar className="cursor-pointer" color="#7352FF" />
     ) : (
@@ -515,7 +520,7 @@ const Ideation = () => {
         return (
           <span className="flex items-center justify-center">
             <span className="mr-1">
-              <BsArrowUpShort color="green" size={20} />
+              <HiOutlineTrendingUp color="green" size={15} />
             </span>{" "}
             {trend}% {/* Up arrow */}
           </span>
@@ -524,7 +529,7 @@ const Ideation = () => {
         return (
           <span className="flex items-center justify-center">
             <span className="mr-1">
-              <BsArrowDownShort color="red" size={20} />
+              <HiOutlineTrendingDown color="red" size={15} />
             </span>{" "}
             {trend}% {/* Down arrow */}
           </span>
@@ -533,7 +538,7 @@ const Ideation = () => {
         return (
           <span className="flex items-center justify-center">
             <span className="mr-1">
-              <BsDot size={20} />
+              <BsDot size={15} />
             </span>{" "}
             {props.trend}% {/* Circle or Zero */}
           </span>
@@ -850,7 +855,9 @@ const Ideation = () => {
 
           <button
             className={`text-white rounded-md px-4 py-2 ml-4 flex items-center text-xs getIdeasBtn`}
-            onClick={()=>{setShowSearchPanel(true)}}
+            onClick={() => {
+              setShowSearchPanel(true);
+            }}
             // disabled={isSearchEmpty}
             style={{
               background:
@@ -860,7 +867,13 @@ const Ideation = () => {
             <BsLightningChargeFill className="mr-2" color="white" />
             Get Ideas
           </button>
-          {showSearchPanel && <GenerateIdeasPanel onSearchChange={handleSearchChange} setShowSearchPanel={setShowSearchPanel} setSearchQueryComplete={setSearchQueryComplete}/>}
+          {showSearchPanel && (
+            <GenerateIdeasPanel
+              onSearchChange={handleSearchChange}
+              setShowSearchPanel={setShowSearchPanel}
+              setSearchQueryComplete={setSearchQueryComplete}
+            />
+          )}
         </div>
         {isLoading ? (
           <Loader message={"Gathering Insights for your Keyword."} />

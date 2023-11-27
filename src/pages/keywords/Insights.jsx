@@ -38,6 +38,7 @@ import {
   competitorChannelSize,
   keywordDifficulty,
 } from "../../data/insightsData";
+import { FiEye } from "react-icons/fi";
 
 function Insights({
   dataSet,
@@ -309,7 +310,7 @@ function Insights({
 
   return (
     <section className={`w-full z-50 ${display}`}>
-      <div className="m-2 md:m-10 mt-10 p-2 md:p-10 bg-white rounded-3xl">
+      <div className="m-2 md:m-10 mt-10 p-2 md:p-10 rounded-3xl">
         {isSerpYoutubeLoaded ? (
           <div>
             <header>
@@ -318,40 +319,54 @@ function Insights({
                   className="mr-3 flex items-center cursor-pointer"
                   onClick={() => setShowInsights(false)}
                 >
-                  <BiArrowBack color="#7438FF" className="mr-2" /> Back to list
+                  <BiArrowBack color="#7472C2" className="mr-2" /> Back to list
                 </span>
-                <span
+                {/* <span
                   className="text-3xl font-bold mb-2 cursor-pointer"
                   onClick={() => setShowInsights(false)}
                 >
                   <MdCancel color="red" />
-                </span>
+                </span> */}
               </div>
-              <div className="flex items-center">
-                <span className="mr-3">Your idea:</span>
-                <span className="text-3xl font-bold mb-2 capitalize">
-                  {dataSet.keyword}
-                </span>
+              <div
+                className="rounded-md px-5 py-5"
+                style={{ backgroundColor: "#DBDBF6" }}
+              >
+                <div className="">
+                  <div className="mr-3">Your idea:</div>
+                  <div className="text-2xl font-semibold mb-2 capitalize">
+                    {dataSet.keyword}
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <span className="mr-3 font-thin">Search volume:</span>
+                  <span className="font-bold">
+                    {formatNumberToKMBPlus(dataSet.volume)}
+                  </span>
+                  <div className="mt-3 font-thin">
+                    Language:{" "}
+                    <span className="font-bold">
+                      {locationData.country} ({locationData.language})
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="flex mt-3">
-                <span className="mr-3">Search volume:</span>
-                <span>
-                  {formatNumberToKMBPlus(dataSet.volume)} | Language:{" "}
-                  {locationData.country} ({locationData.language})
-                </span>
-              </div>
-              <div className="flex mt-10">
+              <div
+                className="flex mt-10 rounded-md w-1/6"
+                style={{ border: "solid 1px #9999FF" }}
+              >
                 <span
-                  className="mr-3 pb-3 px-5 cursor-pointer"
+                  className="mr-3 pb-3 px-7 cursor-pointer rounded-md m-auto pt-2"
                   style={{
-                    borderBottom: "#7438FF 2px solid",
-                    color: "#7438FF",
+                    border: "#9999FF 1px solid",
+                    color: "white",
+                    backgroundColor: "#9999FF",
                   }}
                 >
                   Insights
                 </span>
                 <span
-                  className="mr-3 pb-3 px-5 cursor-pointer"
+                  className="mr-3 pb-3 pr-5 cursor-pointer pt-2 rounded-md m-auto"
                   onClick={() => {
                     setShowInsights(false);
                     setShowCompetition(true);
@@ -359,300 +374,302 @@ function Insights({
                 >
                   Competition
                 </span>
+                <span>
+                  <hr color="#9999FF" />
+                </span>
               </div>
-              <hr />
             </header>
 
-            <section className="section1 m-2 mt-14 p-2 px-5 py-10 border-2 bg-white rounded-3xl flex shadow-lg">
-              <div className="w-3/12 border-r-2">
-                <div className="flex items-center">
-                  <span className="mr-2 text-sm font-medium">
-                    Potential Views on YouTube
-                  </span>
-                  <AiOutlineInfoCircle color="gray" size={15} />
-                </div>
-                <div className="mt-20">
-                  <div className="text-5xl font-semibold">
-                    {formatNumberToKMBPlus(dataSet.estimated_views)}
+            <section className="section1 flex gap-5 items-center m-2 mt-14 p-2 px-5 py-5 bg-white rounded-md">
+              <div
+                className="w-3/12 h-48 flex-col items-center justify-center rounded-md"
+                style={{ backgroundColor: "#FDF2E5" }}
+              >
+                <div className="flex items-center flex-col justify-center">
+                  <div className="flex items-center text-sm font-medium m-auto mt-10 mb-5">
+                    <span>Potential Views on YouTube</span>
+                    <span>
+                      <AiOutlineInfoCircle
+                        color="gray"
+                        className="ml-3"
+                        size={15}
+                      />
+                    </span>
                   </div>
-                  <div className="text-sm">per month</div>
+                  <div className="m-auto mb-5">
+                    <FiEye size={15} color="#E87A00" />
+                  </div>
+                  <div className="text-center m-auto">
+                    <div className="text-3xl font-semibold">
+                      {formatNumberToKMBPlus(dataSet.estimated_views)}
+                    </div>
+                    <div className="text-sm">per month</div>
+                  </div>
                 </div>
-                {/* <div style={{ color: "#7438FF" }} className="mt-20 text-xs">
-              How do we calculate this number?
-            </div> */}
               </div>
 
-              <div className="w-7/12 px-8">
-                <div className="flex items-center">
+              <div
+                className="w-3/12 h-48 px-8 rounded-md"
+                style={{ backgroundColor: "#E1E1FF" }}
+              >
+                <div className="flex items-center mb-5 mt-3">
                   <span className="mr-2 text-sm font-medium">
-                    Search Trend on
-                  </span>
-                  <span className="mr-2">
-                    <AiFillYoutube color="red" size={20} />
+                    Search Trend on Youtube
                   </span>
                   <AiOutlineInfoCircle color="gray" size={15} />
                 </div>
                 <div className="flex">
                   <div>
-                    <div className="mt-8">
-                      <div className="mb-3 text-sm">Search Volume Avg</div>
+                    <div className="mb-3 text-xs">Search Volume Avg</div>
+                    <div className="flex items-center">
                       <span className="text-3xl font-semibold mr-3">
                         {formatNumberToKMBPlus(dataSet.estimated_views)}
                       </span>
-                      <span className="text-sm">per month</span>
+                      <span className="text-xs">per month</span>
                     </div>
-                    <div className="mt-8">
-                      <div className="mb-3 text-sm">Last Month</div>
+                    <div className="mt-4 flex items-center">
                       <div className="flex items-center">
                         <span className="text-3xl font-semibold mr-3">
                           {formatNumberToKMBPlus(dataSet.m1)}
                         </span>
-                        <span
-                          className="rounded-full flex items-center justify-center px-5 py-2 w-30"
-                          style={{
-                            backgroundColor: "transparent",
-                            color: "transparent",
-                          }}
-                        >
-                          <span className="mr-1">
-                            <AiOutlineArrowDown color="transparent" />
-                          </span>{" "}
-                          -28%
-                        </span>
+                      </div>
+                      <div className="text-xs">Last Month</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="w-4/12 h-48 ml-10">
+                <AreaChart
+                  width={500}
+                  height={200}
+                  data={updatedFormattedData}
+                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="month"
+                    tickFormatter={(month) => monthNames[month - 1]}
+                    domain={["dataMin", "dataMax"]}
+                  />
+                  <YAxis />
+                  <Tooltip
+                    formatter={(value, name) => [value, `${name}`]}
+                    labelFormatter={(label) => monthNames[label - 1]}
+                  />
+                  <Legend />
+                  <Area
+                    type="linear"
+                    dataKey="searchVolume"
+                    fillOpacity={0.6}
+                    fill="#7352FF"
+                    stroke="#7352FF"
+                    activeDot={{ r: 8 }}
+                  />
+                </AreaChart>
+                {/* <LineChart/> */}
+              </div>
+            </section>
+
+            <section className="section1 bg-white m-2 mt-14 p-2 px-5 py-5 rounded-md">
+              <div className="flex gap-5">
+                <div
+                  className="w-3/12 min-h-64 rounded-md px-5 py-5"
+                  style={{ backgroundColor: "#F1F1FA" }}
+                >
+                  <div className="flex items-center mt-3 justify-center">
+                    <span className="mr-2 text-sm font-medium">
+                      Chances of Success For Idea
+                    </span>
+                    <AiOutlineInfoCircle color="gray" size={15} />
+                  </div>
+                  <div className="mt- w-full h-fit flex justify-center items-center">
+                    <div className="mt-10">
+                      <span
+                        className="rounded-full flex items-center justify-center px-5 py-2 w-30"
+                        style={{
+                          backgroundColor:
+                            overallInsightMetrics &&
+                            (overallInsightMetrics.level === "Low"
+                              ? "#D2E7D0"
+                              : overallInsightMetrics.level === "Medium"
+                              ? "#FCECBB"
+                              : overallInsightMetrics.level === "High"
+                              ? "#FDECEC"
+                              : "gray"), // fallback to inherit if the category is not Small, Medium, or Large
+                        }}
+                      >
+                        {overallInsightMetrics && overallInsightMetrics.level}
+                      </span>
+                      <div className="text-5xl font-bold text-gray-800 mt-5">
+                        {overallInsightMetrics &&
+                          overallInsightMetrics.percentage}
                       </div>
                     </div>
                   </div>
-                  <div className="ml-10 mt-8">
-                    <AreaChart
-                      width={500}
-                      height={200}
-                      data={updatedFormattedData}
-                      margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis
-                        dataKey="month"
-                        tickFormatter={(month) => monthNames[month - 1]}
-                        domain={["dataMin", "dataMax"]}
-                      />
-                      <YAxis />
-                      <Tooltip
-                        formatter={(value, name) => [value, `${name}`]}
-                        labelFormatter={(label) => monthNames[label - 1]}
-                      />
-                      <Legend />
-                      <Area
-                        type="linear"
-                        dataKey="searchVolume"
-                        fillOpacity={0.6}
-                        fill="#7352FF"
-                        stroke="#7352FF"
-                        activeDot={{ r: 8 }}
-                      />
-                    </AreaChart>
-                    {/* <LineChart/> */}
-                  </div>
                 </div>
-              </div>
-            </section>
 
-            <section className="section1 m-2 mt-14 p-2 px-5 py-10 border-2 bg-white rounded-3xl flex shadow-lg">
-              <div className="border-r-2 w-3/12">
-                <div className="flex items-center">
-                  <span className="mr-2 text-sm font-medium">
-                    Chances of Success For Idea
-                  </span>
-                  <AiOutlineInfoCircle color="gray" size={15} />
-                </div>
-                <div className="mt-8 w-full h-fit flex justify-center items-center">
-                  <div className="mt-10">
-                    <span
-                      className="rounded-full flex items-center justify-center px-5 py-2 w-30"
-                      style={{
-                        backgroundColor:
-                          overallInsightMetrics &&
-                          (overallInsightMetrics.level === "Low"
-                            ? "#D2E7D0"
-                            : overallInsightMetrics.level === "Medium"
-                            ? "#FCECBB"
-                            : overallInsightMetrics.level === "High"
-                            ? "#FDECEC"
-                            : "gray"), // fallback to inherit if the category is not Small, Medium, or Large
-                      }}
-                    >
-                      {overallInsightMetrics && overallInsightMetrics.level}
+                <div
+                  className="flex items-start flex-col w-3/12 min-h-64 rounded-md px-5 py-5"
+                  style={{ backgroundColor: "#F1F1FA" }}
+                >
+                  <div className="flex items-center mt-5 mb-5">
+                    <span className="mr-2 text-xs text-gray-500 font-semibold">
+                      Keyword Difficulty
                     </span>
-                    <div className="text-5xl font-bold text-gray-800 mt-5">
-                      {overallInsightMetrics &&
-                        overallInsightMetrics.percentage}
-                    </div>
+                    <AiOutlineInfoCircle size={10} className="text-gray-500" />
+                  </div>
+                  <span
+                    className="rounded-full flex items-center justify-center px-5 py-2 w-30 text-xs"
+                    style={{ backgroundColor: difficultyColor }}
+                  >
+                    {dataSet.difficulty}
+                  </span>
+                  <div className="text-xs mt-5 text-gray-500 whitespace-normal">
+                    {dataSet.difficulty === "Low"
+                      ? keywordDifficulty[0].info
+                      : dataSet.difficulty === "Medium"
+                      ? keywordDifficulty[1].info
+                      : dataSet.difficulty === "High"
+                      ? keywordDifficulty[2].info
+                      : ""}
                   </div>
                 </div>
-              </div>
 
-              <div className="w-9/12 px-8">
-                <div className="flex items-center">
-                  <span className="mr-2 text-sm font-medium">
-                    Calculated based on your top 10 competitors' characteristics
-                    for this video idea:
-                  </span>
-                </div>
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="flex items-start flex-col mt-5">
-                    <div className="flex items-center mt-5 mb-5">
-                      <span className="mr-2 text-xs text-gray-500 font-semibold">
-                        Keyword Difficulty
-                      </span>
-                      <AiOutlineInfoCircle
-                        size={10}
-                        className="text-gray-500"
-                      />
-                    </div>
-                    <span
-                      className="rounded-full flex items-center justify-center px-5 py-2 w-30 text-xs"
-                      style={{ backgroundColor: difficultyColor }}
-                    >
-                      {dataSet.difficulty}
+                <div
+                  className="flex items-start flex-col w-3/12 min-h-64 rounded-md px-5 py-5"
+                  style={{ backgroundColor: "#F1F1FA" }}
+                >
+                  <div className="flex items-center mt-5 mb-5">
+                    <span className="mr-2 text-xs text-gray-500 font-semibold">
+                      Competitor's Channel Size
                     </span>
-                    <div className="text-xs mt-5 text-gray-500 whitespace-normal">
-                      {dataSet.difficulty === "Low"
-                        ? keywordDifficulty[0].info
-                        : dataSet.difficulty === "Medium"
-                        ? keywordDifficulty[1].info
-                        : dataSet.difficulty === "High"
-                        ? keywordDifficulty[2].info
-                        : ""}
-                    </div>
+                    <AiOutlineInfoCircle size={10} className="text-gray-500" />
                   </div>
-                  <div className="flex items-start flex-col mt-5">
-                    <div className="flex items-center mt-5 mb-5">
-                      <span className="mr-2 text-xs text-gray-500 font-semibold">
-                        Competitor's Channel Size
-                      </span>
-                      <AiOutlineInfoCircle
-                        size={10}
-                        className="text-gray-500"
-                      />
-                    </div>
-                    <span
-                      className="rounded-full flex items-center justify-center px-5 py-2 w-30 text-xs"
-                      style={{
-                        backgroundColor:
-                          isSerpYoutubeLoaded &&
-                          (serpYoutubeVideosInfo.data.channel_details
-                            .subscriber_category === "Small"
-                            ? "#D2E7D0"
-                            : serpYoutubeVideosInfo.data.channel_details
-                                .subscriber_category === "Medium"
-                            ? "#FCECBB"
-                            : serpYoutubeVideosInfo.data.channel_details
-                                .subscriber_category === "Large"
-                            ? "#FDECEC"
-                            : "gray"), // fallback to inherit if the category is not Small, Medium, or Large
-                      }}
-                    >
-                      {isSerpYoutubeLoaded ? (
-                        serpYoutubeVideosInfo.data.channel_details
-                          .subscriber_category ?? "No Data"
-                      ) : (
-                        <BiLoaderCircle
-                          color="#7352FF"
-                          className="animate-spin"
-                        />
-                      )}
-                    </span>
-                    <div className="text-xs mt-5 text-gray-500 whitespace-normal">
-                      {isSerpYoutubeLoaded &&
+                  <span
+                    className="rounded-full flex items-center justify-center px-5 py-2 w-30 text-xs"
+                    style={{
+                      backgroundColor:
+                        isSerpYoutubeLoaded &&
                         (serpYoutubeVideosInfo.data.channel_details
                           .subscriber_category === "Small"
-                          ? competitorChannelSize[0].info.replace(
-                              "medianInfo",
-                              formatNumber(
-                                serpYoutubeVideosInfo.data.channel_details
-                                  .median_subscriber_count,
-                              ),
-                            )
+                          ? "#D2E7D0"
                           : serpYoutubeVideosInfo.data.channel_details
                               .subscriber_category === "Medium"
-                          ? competitorChannelSize[1].info.replace(
-                              "medianInfo",
-                              formatNumber(
-                                serpYoutubeVideosInfo.data.channel_details
-                                  .median_subscriber_count,
-                              ),
-                            )
+                          ? "#FCECBB"
                           : serpYoutubeVideosInfo.data.channel_details
                               .subscriber_category === "Large"
-                          ? competitorChannelSize[2].info.replace(
-                              "medianInfo",
-                              formatNumber(
-                                serpYoutubeVideosInfo.data.channel_details
-                                  .median_subscriber_count,
-                              ),
-                            )
-                          : "")}
-                    </div>
-                  </div>
-                  <div className="flex items-start flex-col mt-5">
-                    <div className="flex items-center mt-5 mb-5">
-                      <span className="mr-2 text-xs text-gray-500 font-semibold">
-                        Age of Top Videos
-                      </span>
-                      <AiOutlineInfoCircle
-                        size={10}
-                        className="text-gray-500"
+                          ? "#FDECEC"
+                          : "gray"), // fallback to inherit if the category is not Small, Medium, or Large
+                    }}
+                  >
+                    {isSerpYoutubeLoaded ? (
+                      serpYoutubeVideosInfo.data.channel_details
+                        .subscriber_category ?? "No Data"
+                    ) : (
+                      <BiLoaderCircle
+                        color="#7352FF"
+                        className="animate-spin"
                       />
-                    </div>
-                    <span
-                      className="rounded-full flex items-center justify-center px-5 py-2 w-30 text-xs"
-                      style={{
-                        backgroundColor:
-                          isSerpYoutubeLoaded &&
-                          (serpYoutubeVideosInfo.data.date_category === "Low"
-                            ? "#D2E7D0"
-                            : serpYoutubeVideosInfo.data.date_category ===
-                              "Medium"
-                            ? "#FCECBB"
-                            : serpYoutubeVideosInfo.data.date_category ===
-                              "High"
-                            ? "#FDECEC"
-                            : "gray"), // fallback to inherit if the category is not Low, Medium, or High
-                      }}
-                    >
-                      {isSerpYoutubeLoaded ? (
-                        serpYoutubeVideosInfo.data.date_category ?? "No Data"
-                      ) : (
-                        <BiLoaderCircle
-                          color="#7352FF"
-                          className="animate-spin"
-                        />
-                      )}
+                    )}
+                  </span>
+                  <div className="text-xs mt-5 text-gray-500 whitespace-normal">
+                    {isSerpYoutubeLoaded &&
+                      (serpYoutubeVideosInfo.data.channel_details
+                        .subscriber_category === "Small"
+                        ? competitorChannelSize[0].info.replace(
+                            "medianInfo",
+                            formatNumber(
+                              serpYoutubeVideosInfo.data.channel_details
+                                .median_subscriber_count,
+                            ),
+                          )
+                        : serpYoutubeVideosInfo.data.channel_details
+                            .subscriber_category === "Medium"
+                        ? competitorChannelSize[1].info.replace(
+                            "medianInfo",
+                            formatNumber(
+                              serpYoutubeVideosInfo.data.channel_details
+                                .median_subscriber_count,
+                            ),
+                          )
+                        : serpYoutubeVideosInfo.data.channel_details
+                            .subscriber_category === "Large"
+                        ? competitorChannelSize[2].info.replace(
+                            "medianInfo",
+                            formatNumber(
+                              serpYoutubeVideosInfo.data.channel_details
+                                .median_subscriber_count,
+                            ),
+                          )
+                        : "")}
+                  </div>
+                </div>
+
+                <div
+                  className="flex items-start flex-col w-3/12 min-h-64 rounded-md px-5 py-5"
+                  style={{ backgroundColor: "#F1F1FA" }}
+                >
+                  <div className="flex items-center mt-5 mb-5">
+                    <span className="mr-2 text-xs text-gray-500 font-semibold">
+                      Age of Top Videos
                     </span>
-                    <div className="text-xs mt-5 text-gray-500 whitespace-normal">
-                      {isSerpYoutubeLoaded &&
+                    <AiOutlineInfoCircle size={10} className="text-gray-500" />
+                  </div>
+                  <span
+                    className="rounded-full flex items-center justify-center px-5 py-2 w-30 text-xs"
+                    style={{
+                      backgroundColor:
+                        isSerpYoutubeLoaded &&
                         (serpYoutubeVideosInfo.data.date_category === "Low"
-                          ? ageOfTopVideos[0].info
-                          : serpYoutubeVideosInfo.data.date_categoryy ===
+                          ? "#D2E7D0"
+                          : serpYoutubeVideosInfo.data.date_category ===
                             "Medium"
-                          ? ageOfTopVideos[1].info
+                          ? "#FCECBB"
                           : serpYoutubeVideosInfo.data.date_category === "High"
-                          ? ageOfTopVideos[2].info
-                          : "")}
-                    </div>
+                          ? "#FDECEC"
+                          : "gray"), // fallback to inherit if the category is not Low, Medium, or High
+                    }}
+                  >
+                    {isSerpYoutubeLoaded ? (
+                      serpYoutubeVideosInfo.data.date_category ?? "No Data"
+                    ) : (
+                      <BiLoaderCircle
+                        color="#7352FF"
+                        className="animate-spin"
+                      />
+                    )}
+                  </span>
+                  <div className="text-xs mt-5 text-gray-500 whitespace-normal">
+                    {isSerpYoutubeLoaded &&
+                      (serpYoutubeVideosInfo.data.date_category === "Low"
+                        ? ageOfTopVideos[0].info
+                        : serpYoutubeVideosInfo.data.date_categoryy === "Medium"
+                        ? ageOfTopVideos[1].info
+                        : serpYoutubeVideosInfo.data.date_category === "High"
+                        ? ageOfTopVideos[2].info
+                        : "")}
                   </div>
                 </div>
               </div>
+
+              <div className="flex items-center justify-end mt-5">
+                <span className="mr-2 text-xs font-medium">
+                  Calculated based on your top 10 competitors' characteristics
+                  for this video idea
+                </span>
+              </div>
             </section>
 
-            <section className="section1 m-2 mt-14 p-2 px-5 py-10 border-2 bg-white rounded-3xl flex shadow-lg">
-              <div className="w-3/6 border-r-2">
+            <section className="section1 m-2 mt-14 p-2 px-5 py-5 bg-white rounded-md flex">
+              <div className="w-3/6 rounded-md p-5" style={{ backgroundColor: "#F1F1FA" }}>
                 <div className="flex items-center mb-2">
                   <span className="text-xl mr-2 font-bold">
                     Video on Google
                   </span>
-                  <AiOutlineInfoCircle size={20} />
+                  <AiOutlineInfoCircle size={15} />
                 </div>
-                <div>Top videos ranking on Google for this idea</div>
+                <div className="text-xs">Top videos ranking on Google for this idea</div>
                 <div className="mt-8">
                   {isSerpGoogleLoaded === "data" ? (
                     keywordVideosInfo.map((item, index) => {
@@ -680,13 +697,15 @@ function Insights({
                       );
                     })
                   ) : isSerpGoogleLoaded === "nodata" ? (
-                    <div className="flex items-center justify-center mt-20">
+                    <div className="flex flex-col items-center justify-center mt-5 w-full h-48 bg-black rounded-md">
+                      <div className="p-3 mb-5 rounded-md" style={{backgroundColor: "#1C1C2F"}}>
                       <img
                         src={tubeDominatorLogo}
                         alt="Tubedominator logo"
                         className="h-7"
                       />
-                      <div className="text-xs whitespace-normal ml-5">
+                      </div>
+                      <div className="text-xs whitespace-normal ml-5 text-white">
                         Google doesn't have video snippets for this keyword
                       </div>
                     </div>
@@ -763,15 +782,17 @@ function Insights({
           </div> */}
                 <div className="flex flex-wrap -mx-2">
                   {savedIdeasData.related_keywords.map((item, index) => (
-                    <div key={index} className="m-2">
-                      <div className="flex rounded-full bg-gray-200 p-2">
-                        <div className="bg-gray-300 rounded-l-full px-3 py-1 text-xs">
+                    <div key={index} className="m-2 flex">
+                      <div className="rounded-tl-md rounded-bl-md bg-gray-200 p-2" style={{backgroundColor: "#EAEAF5"}}>
+                        <div className="px-3 py-1 text-xs">
                           {item.string}
                         </div>
-                        <div className="bg-gray-400 rounded-r-full px-3 py-1 ml-2 text-xs">
+                      </div>
+                        <div className="bg-gray-400 rounded-tl-md rounded-bl-md p-3 pt-3 py-1 text-xs transform translate-x-[-5px]" style={{backgroundColor: "#E0E0F6"}}>
                           {formatNumberToKMBPlus(item.volume)}
                         </div>
-                      </div>
+                        <div className="bg-gray-400 rounded-md px-2 py-1 text-xs transform translate-x-[-10px]" style={{backgroundColor: "#D7D7F7"}}>
+                        </div>
                     </div>
                   ))}
                 </div>

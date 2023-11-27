@@ -5,14 +5,18 @@ import countriesWithLanguages from "../data/countries";
 import { BsLightningChargeFill } from "react-icons/bs";
 import { FaLongArrowAltRight } from "react-icons/fa";
 
-const GenerateIdeasPanel = ({ onSearchChange, setShowSearchPanel, setSearchQueryComplete }) => {
+const GenerateIdeasPanel = ({
+  onSearchChange,
+  setShowSearchPanel,
+  setSearchQueryComplete,
+}) => {
   const initialCountry = {
     countryCode: "GLB",
     languageCode: "en",
   };
   const [selectedCountry, setSelectedCountry] = useState(initialCountry);
   const [searchQuery, setSearchQuery] = useState("");
-//   const [searchQueryComplete, setSearchQueryComplete] = useState("");
+  //   const [searchQueryComplete, setSearchQueryComplete] = useState("");
 
   const handleCountryChange = (event) => {
     const selectedValue = event.target.value;
@@ -51,7 +55,9 @@ const GenerateIdeasPanel = ({ onSearchChange, setShowSearchPanel, setSearchQuery
               alignItems: "center",
               justifyContent: "center",
             }}
-            onClick={()=>{setShowSearchPanel(false)}}
+            onClick={() => {
+              setShowSearchPanel(false);
+            }}
           >
             X
           </span>
@@ -102,21 +108,21 @@ const GenerateIdeasPanel = ({ onSearchChange, setShowSearchPanel, setSearchQuery
         </div>
 
         <button
-            className={`text-white rounded-full px-7 py-2 mt-5 flex items-center text-xs getIdeasBtn text-center`}
-            onClick={()=>{
-                setSearchQueryComplete(true)
-                setShowSearchPanel(false)
-            }}
-            disabled={isSearchEmpty}
-            style={{
-                background: isSearchEmpty
-                  ? "rgba(169, 169, 169, 0.5)" // Grayed out background
-                  : "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%)",
-              }}
-          >
-            GENERATE
-            <FaLongArrowAltRight className="ml-2" color="white" />
-          </button>
+          className={`text-white rounded-full px-7 py-2 mt-5 flex items-center text-xs getIdeasBtn text-center`}
+          onClick={() => {
+            setSearchQueryComplete(true);
+            setShowSearchPanel(false);
+          }}
+          disabled={isSearchEmpty}
+          style={{
+            background: isSearchEmpty
+              ? "rgba(169, 169, 169, 0.5)" // Grayed out background
+              : "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%)",
+          }}
+        >
+          GENERATE
+          <FaLongArrowAltRight className="ml-2" color="white" />
+        </button>
       </div>
     </div>
   );

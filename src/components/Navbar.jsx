@@ -247,7 +247,7 @@ const Navbar = () => {
   return (
     <div
       // style={{backgroundColor: 'black'}}
-      className={`w-8/9 flex justify-between py-2 mt-5 md:ml-6 md:mr-6 relative ${
+      className={`w-full flex justify-between py-2 mt-5 md:ml-6 md:mr-6 relative ${
         userLoggedIn ? "" : "shadow-xl"
       }`}
     >
@@ -273,8 +273,9 @@ const Navbar = () => {
           <div className="flex">
             <TooltipComponent content="Profile" position="BottomCenter">
               <div
-                className="flex items-center gap-2 cursor-pointer p-1 hover:bg-light-gray rounded-lg"
+                className="flex items-center gap-2 cursor-pointer hover:bg-light-gray rounded-full px-2 py-2 mr-10"
                 onClick={() => handleClick("userProfile")}
+                style={{ backgroundColor: "#EAEAFF" }}
               >
                 <img
                   className="rounded-full w-10 h-10"
@@ -282,7 +283,7 @@ const Navbar = () => {
                   alt="user-profile"
                 />
                 <p>
-                  <span className="text-gray-400 text-14">Hi,</span>{" "}
+                  {/* <span className="text-gray-400 text-14">Hi,</span>{" "} */}
                   <span className="text-gray-400 font-bold ml-1 text-14">
                     {userData.firstName}
                   </span>
