@@ -106,16 +106,18 @@ const Keyword2 = () => {
   }
 
   function splitObjectsBySearchVolume(arrayOfObjects) {
-    const sortedArray = arrayOfObjects.sort((a, b) => b.search_volume - a.search_volume);
-  
+    const sortedArray = arrayOfObjects.sort(
+      (a, b) => b.search_volume - a.search_volume,
+    );
+
     const top3 = sortedArray.slice(0, 3);
     const top10 = sortedArray.slice(0, 10);
     const top20 = sortedArray.slice(0, 20);
-  
+
     return {
       top3,
       top10,
-      top20
+      top20,
     };
   }
 

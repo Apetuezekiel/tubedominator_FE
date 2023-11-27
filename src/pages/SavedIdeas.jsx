@@ -17,7 +17,11 @@ import {
   Edit,
   Inject,
 } from "@syncfusion/ej2-react-grids";
-import { HiOutlineRefresh } from "react-icons/hi";
+import {
+  HiOutlineRefresh,
+  HiOutlineTrendingDown,
+  HiOutlineTrendingUp,
+} from "react-icons/hi";
 import Spinner from "../components/Spinner";
 
 import { HiOutlineChevronDown, HiSearch } from "react-icons/hi";
@@ -29,7 +33,7 @@ import {
   useKeywordStore,
   useSavedIdeasData,
 } from "../state/state";
-import { FaYoutube, FaGoogle, FaPlus, FaVideo } from "react-icons/fa";
+import { FaYoutube, FaGoogle, FaPlus, FaVideo, FaHeart } from "react-icons/fa";
 import CryptoJS from "crypto-js";
 import showToast from "../utils/toastUtils";
 import { getSavedIdeas, userFullDataDecrypted } from "../data/api/calls";
@@ -326,9 +330,9 @@ const SavedIdeas = () => {
     };
 
     const starIcon = isFavorite ? (
-      <AiFillStar color="#7352FF" size={20} />
+      <AiFillStar color="#7352FF" size={15} />
     ) : (
-      <BiLoaderCircle className="animate-spin" color="#7352FF" size={20} />
+      <BiLoaderCircle className="animate-spin" color="#7352FF" size={15} />
     );
 
     return (
@@ -339,7 +343,7 @@ const SavedIdeas = () => {
         }}
         className="cursor-pointer"
       >
-        {<AiFillStar color="#7352FF" size={20} />}
+        {<FaHeart color="#7352FF" size={15} />}
       </div>
     );
   };
@@ -362,7 +366,7 @@ const SavedIdeas = () => {
       <div className="flex items-center justify-center">
         <div>
           {processingDeleteSavedIdea && (
-            <BiLoaderCircle color="red" size={20} className="animate-spin" />
+            <BiLoaderCircle color="red" size={15} className="animate-spin" />
           )}
         </div>
       </div>
@@ -428,7 +432,7 @@ const SavedIdeas = () => {
   };
 
   const TrendsTitleTemplate = (props) => {
-    const trendIcon = <FiTrendingUp size={20} />;
+    const trendIcon = <FiTrendingUp size={15} />;
     return (
       <div className="flex items-center justify-center">
         {props.headerText}
@@ -445,7 +449,7 @@ const SavedIdeas = () => {
         return (
           <span className="flex items-center justify-center">
             <span className="mr-1">
-              <BsArrowUpShort color="green" size={20} />
+              <HiOutlineTrendingUp color="green" size={15} />
             </span>{" "}
             {trend}% {/* Up arrow */}
           </span>
@@ -454,7 +458,7 @@ const SavedIdeas = () => {
         return (
           <span className="flex items-center justify-center">
             <span className="mr-1">
-              <BsArrowDownShort color="red" size={20} />
+              <HiOutlineTrendingDown color="red" size={15} />
             </span>{" "}
             {trend}% {/* Down arrow */}
           </span>
@@ -463,7 +467,7 @@ const SavedIdeas = () => {
         return (
           <span className="flex items-center justify-center">
             <span className="mr-1">
-              <BsDot size={20} />
+              <BsDot size={15} />
             </span>{" "}
             {props.trend}% {/* Circle or Zero */}
           </span>

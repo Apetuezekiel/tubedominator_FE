@@ -9,7 +9,7 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 import { GoogleLogin } from "react-google-login";
 
-import avatar from "../assets/images/TubeDominator 1000x1000.png";
+import avatar from "../assets/images/TDLogo.png";
 import { UserProfile } from ".";
 import PreviewKeyword from "./PreviewKeyword";
 // import PreviewKeyword from
@@ -170,7 +170,7 @@ const Navbar = () => {
     const checkCondition = () => {
       if (userLoggedIn && accessLevel === "L2" && !userData) {
         setReloadRequired(true);
-        window.location.reload(true); // force reload from the server
+        // window.location.reload(true); // force reload from the server
       } else {
         setReloadRequired(false);
       }

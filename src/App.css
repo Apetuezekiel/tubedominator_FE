@@ -269,3 +269,10 @@
   cursor: pointer;
 } */
 
+
+/* FOLLOWING FIGMA */
+
+.getIdeasBtn:hover {
+  background: linear-gradient(270deg, #9999FF 99.97%, #4B49AC 0.05%);
+  cursor: pointer; /* Add this line to change the cursor on hover */
+}

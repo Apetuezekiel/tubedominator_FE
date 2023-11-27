@@ -44,12 +44,19 @@ import showToast from "../utils/toastUtils";
 import CryptoJS from "crypto-js";
 import { getSavedIdeas, userFullDataDecrypted } from "../data/api/calls";
 import countriesWithLanguages from "../data/countries";
-import { FiTrendingUp } from "react-icons/fi";
-import { BsArrowDownShort, BsArrowUpShort, BsDot } from "react-icons/bs";
+import { FiEye, FiSearch, FiTrendingUp } from "react-icons/fi";
+import {
+  BsArrowDownShort,
+  BsArrowUpShort,
+  BsDot,
+  BsLightningChargeFill,
+} from "react-icons/bs";
 import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
 import Insights from "./keywords/Insights";
 import Competition from "./keywords/Competition";
 import Loader from "../components/Loader";
+import { RiKey2Fill } from "react-icons/ri";
+import GenerateIdeasPanel from "../components/GenerateIdeasPanel";
 
 const Ideation = () => {
   const apiUrl = process.env.REACT_APP_API_BASE_URL;
@@ -102,12 +109,15 @@ const Ideation = () => {
   const decryptedFullData = userFullDataDecrypted();
   const [keywordSuggestionRemark, setKeywordSuggestionRemark] = useState("");
   const [showCompetition, setShowCompetition] = useState(false);
+  const [showSearchPanel, setShowSearchPanel] = useState(false);
+  const [searchQueryComplete, setSearchQueryComplete] = useState("");
 
   const initialCountry = {
     countryCode: "GLB",
     languageCode: "en",
   };
   const [selectedCountry, setSelectedCountry] = useState(initialCountry);
+  const [selectedOption, setSelectedOption] = useState("all");
   // console.log(decryptedFullData);
 
   useEffect(() => {
@@ -142,13 +152,69 @@ const Ideation = () => {
   }, []);
 
   useEffect(() => {
-    const userLevel = localStorage.getItem("accessLevel");
-    if (userLevel === "L1") {
-      alert(
-        "Connect your Youtube Account now to enjoy the cool features of Tubedominator",
-      );
+      const userLevel = localStorage.getItem("accessLevel");
+      if (userLevel === "L1") {
+        alert(
+          "Connect your Youtube Account now to enjoy the cool features of Tubedominator",
+        );
+      }
+    }, []);
+
+    useEffect(() => {
+    const handleGetIdeas = async () => {
+      if (!searchQuery.trim()) {
+        return;
+      }
+
+      const postData = {
+        keyword: searchQuery,
+        countryCode: selectedCountry.countryCode,
+        languageCode: selectedCountry.languageCode,
+      };
+
+      console.log("postData", postData);
+
+      try {
+        setIsLoading(true);
+        console.log("handleGetIdeas", decryptedFullData.token);
+
+        const response = await axios.post(
+          `${process.env.REACT_APP_API_BASE_URL}/fetchKeywordStat`,
+          postData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.REACT_APP_X_API_KEY,
+              Authorization: `Bearer ${decryptedFullData.token}`,
+            },
+          },
+        );
+
+        const data = response.data;
+        console.log("response.data", response.data);
+        console.log("response", response);
+        setIsLoading(false);
+
+        // Update state with the API response
+        setExactKeywordData(data.response.exact_keyword);
+        setRelatedKeywordData(data.response.related_keywords);
+        localStorage.setItem("lastVideoIdeas", JSON.stringify(data.response));
+        setLoadedLocalStorage(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        showToast(
+          "error",
+          `Couldn't fetch results for your search "${searchQuery}"`,
+          5000,
+        );
+        setIsLoading(false);
+      }
+    };
+
+    if (searchQueryComplete){
+      handleGetIdeas()
     }
-  }, []);
+  }, [searchQueryComplete]);
 
   // useEffect(() => {
   //   console.log("userAuthToken 1 decryptedFullData", decryptedFullData);
@@ -478,16 +544,16 @@ const Ideation = () => {
     return <div>{renderTrend()}</div>;
   };
 
-  const youtubeGooglePlusIcons = [FaYoutube, FaGoogle, FaPlus];
+  const youtubeGooglePlusIcons = [FiSearch];
   const videoIcon = [FaYoutube];
 
-  function IconsWithTitle({ title, icons }) {
+  function IconsWithTitle({ title, icons, color }) {
     return (
       <div className="flex items-center">
         {title}
         {icons.map((Icon, index) => (
           <span key={index} style={{ marginLeft: "5px", display: "flex" }}>
-            <Icon />
+            <Icon color={`${color && color}`} />
           </span>
         ))}
       </div>
@@ -500,13 +566,14 @@ const Ideation = () => {
         <IconsWithTitle
           title={props.headerText}
           icons={youtubeGooglePlusIcons}
+          color={"#9967FF"}
         />
       </div>
     );
   };
 
   const TrendsTitleTemplate = (props) => {
-    const trendIcon = <FiTrendingUp size={20} />;
+    const trendIcon = <FiTrendingUp size={15} color="green" />;
     return (
       <div className="flex items-center justify-center">
         {props.headerText}
@@ -515,10 +582,34 @@ const Ideation = () => {
     );
   };
 
+  const keywordDiffTitleTemplate = (props) => {
+    const diffIcon = <RiKey2Fill size={15} color="grey" />;
+    return (
+      <div className="flex items-center justify-center">
+        {props.headerText}
+        <div className="ml-2">{diffIcon}</div>
+      </div>
+    );
+  };
+
+  const PotentialViewsTitleTemplate = (props) => {
+    const icon = <FiEye size={15} color="#E87A00" />;
+    return (
+      <div className="flex items-center justify-center">
+        {props.headerText}
+        <div className="ml-2">{icon}</div>
+      </div>
+    );
+  };
+
   const VideoIconTitleTemplate = (props) => {
     return (
       <div className="tooltip-container flex items-center justify-center break-words">
-        <IconsWithTitle title={props.headerText} icons={videoIcon} />
+        <IconsWithTitle
+          title={props.headerText}
+          icons={videoIcon}
+          color={"red"}
+        />
         <div className="tooltip-text text-black">
           Information about potential views
         </div>
@@ -555,8 +646,8 @@ const Ideation = () => {
     }
   };
 
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
+  const handleSearchChange = (value) => {
+    setSearchQuery(value);
   };
 
   const handleGetIdeas = async () => {
@@ -653,6 +744,20 @@ const Ideation = () => {
     setRelatedKeywordData(questions);
   };
 
+  const handleSelectChange = (event) => {
+    const value = event.target.value;
+    setSelectedOption(value);
+
+    // Perform actions based on the selected option
+    if (value === "all") {
+      serveAllVideoIdeas();
+    } else if (value === "questions") {
+      findQuestions(relatedKeywordData);
+    } else if (value === "keywords") {
+      filterBySearchQuery(relatedKeywordData, searchQuery);
+    }
+  };
+
   // const findQuestions = (keywordsArray) => {
   //   setKeywordSuggestionRemark('that are Question based');
   //   const questions = [];
@@ -691,12 +796,18 @@ const Ideation = () => {
   return (
     <section>
       <div
-        className={`m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl ${
+        className={`m-2 md:m-10 mt-24 p-2 md:p-10 rounded-3xl ${
           (showInsights || showCompetition) && "hidden"
         }`}
       >
-        <div className="flex items-center justify-center h-full mb-5">
-          <div className="flex items-center flex-col ">
+        <div className="flex items-center justify-between h-full mb-5 relative">
+          <div className="">
+            <div className="pageTitle text-3xl font-semibold">Ideation</div>
+            <div className="tag text-md mt-2 text-xs font-thin">
+              Search and generate ideas for your next video!
+            </div>
+          </div>
+          {/* <div className="flex items-center flex-col ">
             <div className="w-full max-w-xs flex items-center p-2 pl-4 pr-4 border border-gray-300 bg-white rounded-full">
               <input
                 type="text"
@@ -707,7 +818,7 @@ const Ideation = () => {
               />
               <BiSearch className="text-gray-500 text-xs" />
             </div>
-          </div>
+          </div> */}
 
           {/* <div className="relative ml-4">
           <select className="rounded-full py-2 pl-4 pr-8 border border-gray-300 bg-white text-xs">
@@ -718,7 +829,7 @@ const Ideation = () => {
           </select>
         </div> */}
 
-          <div className="relative ml-4">
+          {/* <div className="relative ml-4">
             <select
               id="countrySelect"
               className="rounded-full py-2 pl-4 pr-8 border border-gray-300 bg-white text-xs"
@@ -735,19 +846,21 @@ const Ideation = () => {
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
 
           <button
-            className={`text-white rounded-full px-4 py-2 ml-4 text-xs ${
-              isSearchEmpty
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-purple-500 cursor-pointer"
-            }`}
-            onClick={handleGetIdeas}
-            disabled={isSearchEmpty}
+            className={`text-white rounded-md px-4 py-2 ml-4 flex items-center text-xs getIdeasBtn`}
+            onClick={()=>{setShowSearchPanel(true)}}
+            // disabled={isSearchEmpty}
+            style={{
+              background:
+                "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%)",
+            }}
           >
-            GET IDEAS
+            <BsLightningChargeFill className="mr-2" color="white" />
+            Get Ideas
           </button>
+          {showSearchPanel && <GenerateIdeasPanel onSearchChange={handleSearchChange} setShowSearchPanel={setShowSearchPanel} setSearchQueryComplete={setSearchQueryComplete}/>}
         </div>
         {isLoading ? (
           <Loader message={"Gathering Insights for your Keyword."} />
@@ -755,174 +868,197 @@ const Ideation = () => {
           <div className=""></div>
         )}
         <div>
-          <div className="flex justify-start items-center">
-            <Header title="Keyword you provided" size="text-1xl" />
-            <span className="mt-5 ml-4 text-xs">
-              {loadedLocalStorage && "(Results loaded from your last query)"}
-            </span>
+          <div className="bg-white px-5 pb-5 rounded-md">
+            <div className="flex justify-start items-center">
+              <Header title="Keyword you provided" size="text-1xl" />
+              <span className="mt-5 ml-4 text-xs">
+                {loadedLocalStorage && "(Results loaded from your last query)"}
+              </span>
+            </div>
+            <GridComponent
+              // id="gridcomp"
+              dataSource={exactKeywordData}
+              allowExcelExport
+              allowPdfExport
+              allowPaging
+              allowSorting
+              // contextMenuItems={contextMenuItems}
+              // editSettings={editing}
+              // rowSelected={handleRowSelected}
+            >
+              <ColumnsDirective>
+                <ColumnDirective
+                  field="isFavorite"
+                  headerText=""
+                  width="80"
+                  template={gridOrderStars}
+                />
+                <ColumnDirective
+                  field="keyword"
+                  headerText="Video ideas"
+                  headerTemplate={VideoIconTitleTemplate}
+                  template={VideoIconTemplate}
+                />
+                <ColumnDirective
+                  field="monthlysearch"
+                  headerText="Search Volume on youtube"
+                  headerTemplate={VolumeTitleTemplate}
+                  template={searchVolumeDataRowTemplate}
+                />
+                <ColumnDirective
+                  field="trend"
+                  headerText="Trends"
+                  headerTemplate={TrendsTitleTemplate}
+                  template={TrendsDataRowTemplate}
+                />
+                <ColumnDirective
+                  field="difficulty"
+                  headerText="Keyword Difficulty"
+                  headerTemplate={keywordDiffTitleTemplate}
+                  template={keywordDiffTemplate}
+                />
+                <ColumnDirective
+                  field="estimated_views"
+                  headerText="Potential views on youtube"
+                  headerTemplate={PotentialViewsTitleTemplate}
+                  template={formatViews}
+                />
+              </ColumnsDirective>
+              <Inject
+                services={[
+                  Resize,
+                  Sort,
+                  ContextMenu,
+                  Filter,
+                  Page,
+                  ExcelExport,
+                  Edit,
+                  PdfExport,
+                ]}
+              />
+            </GridComponent>
           </div>
-          <GridComponent
-            // id="gridcomp"
-            dataSource={exactKeywordData}
-            allowExcelExport
-            allowPdfExport
-            allowPaging
-            allowSorting
-            // contextMenuItems={contextMenuItems}
-            // editSettings={editing}
-            // rowSelected={handleRowSelected}
-          >
-            <ColumnsDirective>
-              <ColumnDirective
-                field="isFavorite"
-                headerText=""
-                width="80"
-                template={gridOrderStars}
-              />
-              <ColumnDirective
-                field="keyword"
-                headerText="Video ideas"
-                headerTemplate={VideoIconTitleTemplate}
-                template={VideoIconTemplate}
-              />
-              <ColumnDirective
-                field="monthlysearch"
-                headerText="Search Volume on youtube"
-                headerTemplate={VolumeTitleTemplate}
-                template={searchVolumeDataRowTemplate}
-              />
-              <ColumnDirective
-                field="trend"
-                headerText="Trends"
-                headerTemplate={TrendsTitleTemplate}
-                template={TrendsDataRowTemplate}
-              />
-              <ColumnDirective
-                field="difficulty"
-                headerText="Keyword Difficulty"
-                template={keywordDiffTemplate}
-              />
-              <ColumnDirective
-                field="estimated_views"
-                headerText="Potential views on youtube"
-                headerTemplate={VideoIconTitleTemplate}
-                template={formatViews}
-              />
-            </ColumnsDirective>
-            <Inject
-              services={[
-                Resize,
-                Sort,
-                ContextMenu,
-                Filter,
-                Page,
-                ExcelExport,
-                Edit,
-                PdfExport,
-              ]}
-            />
-          </GridComponent>
+          <br />
+          <br />
+          <div className="bg-white px-5 py-5 rounded-md">
+            <div className="flex justify-between items-center">
+              <div>
+                <Header
+                  title="Keyword Suggestions"
+                  size="text-1xl"
+                  className="mt-4"
+                />
+                <div className="mt-[-3]">
+                  <span className="text-xs">{`${relatedKeywordData.length} video ideas found ${keywordSuggestionRemark}`}</span>
+                </div>
+              </div>
+              <div className="flex">
+                <div className="flex py-2">
+                  <div className="flex justify-start items-center">
+                    <span className="text-xs">Filter:</span>
 
-          <Header
-            title="Keyword Suggestions"
-            size="text-1xl"
-            className="mt-4"
-          />
-          <div className="w-full flex">
-            <div className="w-1/2 flex py-2">
-              <div className="flex justify-start items-center">
-                <div
-                  className="bg-white rounded-tl-full rounded-bl-full border border-gray-300 px-4 py-2 flex items-center w-24"
-                  onClick={serveAllVideoIdeas}
-                  style={{ cursor: "pointer" }}
-                >
-                  <span className="mr-2 text-xs">All</span>
-                </div>
-                <div
-                  className="bg-white border border-gray-300 px-4 py-2 flex items-center"
-                  onClick={() => findQuestions(relatedKeywordData)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <span className="mr-2 text-xs">Questions Only</span>
-                </div>
-                <div
-                  className="bg-white rounded-tr-full rounded-br-full border border-gray-300 px-4 py-2 flex items-center"
-                  onClick={() =>
-                    filterBySearchQuery(relatedKeywordData, searchQuery)
-                  }
-                  style={{ cursor: "pointer" }}
-                >
-                  <span className="mr-2 text-xs">Keywords Only</span>
-                </div>
-                <div>
-                  <span className="ml-4 text-xs">{`${relatedKeywordData.length} video ideas found ${keywordSuggestionRemark}`}</span>
+                    <div className="relative ml-4">
+                      <select
+                        className="rounded-sm py-2 pl-4 pr-8 border border-gray-300 bg-white text-xs"
+                        value={selectedOption}
+                        onChange={handleSelectChange}
+                      >
+                        <option value="all">All</option>
+                        <option value="questions">Questions Only</option>
+                        <option value="keywords">Keywords Only</option>
+                      </select>
+                    </div>
+                    {/* <div
+                      className="bg-white rounded-tl-full rounded-bl-full border border-gray-300 px-4 py-2 flex items-center w-24"
+                      onClick={serveAllVideoIdeas}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <span className="mr-2 text-xs">All</span>
+                    </div>
+                    <div
+                      className="bg-white border border-gray-300 px-4 py-2 flex items-center"
+                      onClick={() => findQuestions(relatedKeywordData)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <span className="mr-2 text-xs">Questions Only</span>
+                    </div>
+                    <div
+                      className="bg-white rounded-tr-full rounded-br-full border border-gray-300 px-4 py-2 flex items-center"
+                      onClick={() =>
+                        filterBySearchQuery(relatedKeywordData, searchQuery)
+                      }
+                      style={{ cursor: "pointer" }}
+                    >
+                      <span className="mr-2 text-xs">Keywords Only</span>
+                    </div> */}
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="w-1/2 flex justify-end py-2"></div>
+            <GridComponent
+              // id="gridcomp"
+              dataSource={relatedKeywordData}
+              allowExcelExport
+              allowPdfExport
+              allowPaging
+              allowSorting
+              selectionSettings={{ type: "Multiple" }}
+              // contextMenuItems={contextMenuItems}
+              // editSettings={editing}
+              // rowSelected={handleRowSelected}
+            >
+              <ColumnsDirective>
+                <ColumnDirective
+                  field="isFavorite"
+                  headerText=""
+                  width="80"
+                  template={gridOrderStars}
+                />
+                <ColumnDirective
+                  field="keyword"
+                  headerText="Video ideas"
+                  headerTemplate={VideoIconTitleTemplate}
+                  template={VideoIconTemplate}
+                />
+                <ColumnDirective
+                  field="monthlysearch"
+                  headerText="Search Volume on youtube"
+                  headerTemplate={VolumeTitleTemplate}
+                  template={searchVolumeDataRowTemplate}
+                />
+                <ColumnDirective
+                  field="trend"
+                  headerText="Trends"
+                  headerTemplate={TrendsTitleTemplate}
+                  template={TrendsDataRowTemplate}
+                />
+                <ColumnDirective
+                  field="difficulty"
+                  headerText="Keyword Difficulty"
+                  headerTemplate={keywordDiffTitleTemplate}
+                  template={keywordDiffTemplate}
+                />
+                <ColumnDirective
+                  field="estimated_views"
+                  headerText="Potential views on youtube"
+                  headerTemplate={PotentialViewsTitleTemplate}
+                  template={formatViews}
+                />
+              </ColumnsDirective>
+              <Inject
+                services={[
+                  Resize,
+                  Sort,
+                  ContextMenu,
+                  Filter,
+                  Page,
+                  ExcelExport,
+                  Edit,
+                  PdfExport,
+                ]}
+              />
+            </GridComponent>
           </div>
-          <GridComponent
-            // id="gridcomp"
-            dataSource={relatedKeywordData}
-            allowExcelExport
-            allowPdfExport
-            allowPaging
-            allowSorting
-            selectionSettings={{ type: "Multiple" }}
-            // contextMenuItems={contextMenuItems}
-            // editSettings={editing}
-            // rowSelected={handleRowSelected}
-          >
-            <ColumnsDirective>
-              <ColumnDirective
-                field="isFavorite"
-                headerText=""
-                width="80"
-                template={gridOrderStars}
-              />
-              <ColumnDirective
-                field="keyword"
-                headerText="Video ideas"
-                headerTemplate={VideoIconTitleTemplate}
-                template={VideoIconTemplate}
-              />
-              <ColumnDirective
-                field="monthlysearch"
-                headerText="Search Volume on youtube"
-                headerTemplate={VolumeTitleTemplate}
-                template={searchVolumeDataRowTemplate}
-              />
-              <ColumnDirective
-                field="trend"
-                headerText="Trends"
-                headerTemplate={TrendsTitleTemplate}
-                template={TrendsDataRowTemplate}
-              />
-              <ColumnDirective
-                field="difficulty"
-                headerText="Keyword Difficulty"
-                template={keywordDiffTemplate}
-              />
-              <ColumnDirective
-                field="estimated_views"
-                headerText="Potential views on youtube"
-                headerTemplate={VideoIconTitleTemplate}
-                template={formatViews}
-              />
-            </ColumnsDirective>
-            <Inject
-              services={[
-                Resize,
-                Sort,
-                ContextMenu,
-                Filter,
-                Page,
-                ExcelExport,
-                Edit,
-                PdfExport,
-              ]}
-            />
-          </GridComponent>
           {showSavedIdeaCategoryPanel && (
             <IdeasCategoryView
               dataSet={ideasDataSet}

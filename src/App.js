@@ -44,6 +44,7 @@ import IdeasCategoryView from "./components/IdeasCategoryView";
 import Register from "./pages/UserAuth/registration/Register";
 import SignUpPage2 from "./pages/UserAuth/registration/SignUpPage";
 import PreviewKeyword from "./components/PreviewKeyword";
+import Sidebar2 from "./components/Sidebar2";
 
 import { useStateContext } from "./contexts/ContextProvider";
 import Home from "./pages/Home";
@@ -56,6 +57,7 @@ import AiPostGenerator from "./pages/AiPostGenerator";
 import Testss from "./pages/Testss";
 import axios from "axios";
 import { userFullDataDecrypted } from "./data/api/calls";
+import GenerateIdeasPanel from "./components/GenerateIdeasPanel";
 
 const App = () => {
   const decryptedFullData = userFullDataDecrypted();
@@ -129,6 +131,8 @@ const App = () => {
 
         {/* <Route path="/channel" element={<ProtectedRoute />}> */}
         <Route path="/channel" element={<RegistrationForm />} />
+        <Route path="/sidebar" element={<Sidebar2 />} />
+        <Route path="/generate" element={<GenerateIdeasPanel />} />
         {/* </Route> */}
 
         {/* Navigation */}
@@ -212,11 +216,11 @@ const App = () => {
         // hideProgressBar={false}
         // newestOnTop={false}
         closeOnClick
-        pauseOnFocusLoss
-        pauseOnHover
+        // pauseOnFocusLoss
+        // pauseOnHover
       ></ToastContainer>
       <BrowserRouter>
-        <div className="flex relative dark:bg-main-dark-bg">
+        <div className="flex relative">
           {/* <div className="fixed right-4 bottom-4" style={{ zIndex: "1000" }}>
             <TooltipComponent content="Settings" position="Top">
               <button
@@ -231,7 +235,7 @@ const App = () => {
           </div> */}
           {
             userLoggedIn && (
-              <div className="fixed sidebar dark:bg-secondary-dark-bg bg-white ">
+              <div className="fixed sidebar mt-36">
                 <Sidebar />
               </div>
             )
@@ -244,9 +248,10 @@ const App = () => {
           <div
             className={
               userLoggedIn
-                ? "dark:bg-main-dark-bg  bg-main-bg min-h-screen md:ml-72 w-full  "
+                ? "dark:bg-main-dark-bg bg-main-bg min-h-screen md:ml-72 w-full"
                 : "bg-main-bg dark:bg-main-dark-bg w-full min-h-screen flex-2 "
             }
+            style={{ backgroundColor: `${userLoggedIn && "#F1F1FA"}` }}
           >
             <div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full">
               <Navbar />

@@ -6,7 +6,7 @@ import { SiShopware } from "react-icons/si";
 import { MdOutlineCancel } from "react-icons/md";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 import { FaYoutube, FaGoogle, FaPlus } from "react-icons/fa";
-import tubedominatorLogo from "../assets/images/TubeDominator 1000x1000.png";
+import tubedominatorLogo from "../assets/images/TDLogo.png";
 import GoogleLoginComp from "../pages/UserAuth/GoogleLogin";
 
 import { menuLinks } from "../data/dummy";
@@ -43,17 +43,13 @@ const Sidebar = () => {
       {activeMenu && (
         <>
           <div className="flex justify-between items-center">
-            <Link
+            {/* <Link
               to="/"
               onClick={handleCloseSideBar}
               className="items-center gap-3 ml-3 mt-4 flex text-xl font-extrabold tracking-tight dark:text-white text-slate-900"
             >
-              <img
-                className="mainLogo"
-                src={tubedominatorLogo}
-                alt="Tubics Logo"
-              />
-            </Link>
+              <img className="" src={tubedominatorLogo} alt="Tubics Logo" />
+            </Link> */}
             <TooltipComponent content="Menu" position="BottomCenter">
               <button
                 type="button"
@@ -93,7 +89,10 @@ const Sidebar = () => {
                   {item.title}
                 </p>
                 {item.links.map((link, index) => (
-                  <div className="nav-link-container flex flex-col" key={index}>
+                  <div
+                    className="flex flex-col w-20 justify-center m-auto"
+                    key={index}
+                  >
                     <NavLink
                       to={`/${link.link}`}
                       key={link.name}
@@ -108,7 +107,7 @@ const Sidebar = () => {
                       }
                     >
                       <div>{link.icon}</div>
-                      <div className="capitalize pr-4">{link.name}</div>
+                      {/* <div className="capitalize pr-4">{link.name}</div> */}
                     </NavLink>
                     {isDisabled && ( // Show a message on hover if accessLevel is not 'L2'
                       <div className="tooltip bg-white">
