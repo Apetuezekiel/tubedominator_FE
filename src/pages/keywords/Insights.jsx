@@ -352,11 +352,11 @@ function Insights({
                 </div>
               </div>
               <div
-                className="flex mt-10 rounded-md w-1/6"
+                className="flex mt-10 rounded-md w-fit"
                 style={{ border: "solid 1px #9999FF" }}
               >
                 <span
-                  className="mr-3 pb-3 px-7 cursor-pointer rounded-md m-auto pt-2"
+                  className="mr-3 pb-3 px-7 cursor-pointer rounded-md pt-2"
                   style={{
                     border: "#9999FF 1px solid",
                     color: "white",
@@ -366,7 +366,7 @@ function Insights({
                   Insights
                 </span>
                 <span
-                  className="mr-3 pb-3 pr-5 cursor-pointer pt-2 rounded-md m-auto"
+                  className="mr-3 pb-3 pr-5 cursor-pointer pt-2 rounded-md"
                   onClick={() => {
                     setShowInsights(false);
                     setShowCompetition(true);

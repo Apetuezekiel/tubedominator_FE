@@ -27,6 +27,7 @@ import Loader from "../../components/Loader";
 import { useSerpYoutubeVideosInfo } from "../../state/state";
 import Tags from "../../components/Tags";
 import showToast from "../../utils/toastUtils";
+import youtubeHeading from "../../assets/images/youtubeHeading.png";
 
 function Competition({ dataSet, setShowInsights, setShowCompetition }) {
   const decryptedFullData = userFullDataDecrypted();
@@ -179,38 +180,51 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
 
   return (
     <section className="w-full z-50">
-      <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl z-50">
+      <div className="m-2 md:m-10 mt-24 p-2 md:p-10 z-50">
         <header>
           <div className="flex items-center justify-between mb-5">
             <span
               className="mr-3 flex items-center cursor-pointer"
               onClick={() => setShowCompetition(false)}
             >
-              <BiArrowBack color="#7438FF" className="mr-2" /> Back to list
+              <BiArrowBack color="#7472C2" className="mr-2" /> Back to list
             </span>
+            {/* <span
+                  className="text-3xl font-bold mb-2 cursor-pointer"
+                  onClick={() => setShowInsights(false)}
+                >
+                  <MdCancel color="red" />
+                </span> */}
+          </div>
+          <div
+            className="rounded-md px-5 py-5"
+            style={{ backgroundColor: "#DBDBF6" }}
+          >
+            <div className="">
+              <div className="mr-3">Your idea:</div>
+              <div className="text-2xl font-semibold mb-2 capitalize">
+                {dataSet.keyword}
+              </div>
+            </div>
+            <div className="mt-3">
+              <span className="mr-3 font-thin">Search volume:</span>
+              <span className="font-bold">
+                {formatNumberToKMBPlus(dataSet.volume)}
+              </span>
+              <div className="mt-3 font-thin">
+                Language:{" "}
+                <span className="font-bold">
+                  {locationData.country} ({locationData.language})
+                </span>
+              </div>
+            </div>
+          </div>
+          <div
+            className="flex mt-10 rounded-md w-fit"
+            style={{ border: "solid 1px #9999FF" }}
+          >
             <span
-              className="text-3xl font-bold mb-2 cursor-pointer"
-              onClick={() => setShowCompetition(false)}
-            >
-              <MdCancel color="red" />
-            </span>
-          </div>
-          <div className="flex items-center">
-            <span className="mr-3">Your idea:</span>
-            <span className="text-3xl font-bold mb-2 capitalize">
-              {dataSet.keyword}
-            </span>
-          </div>
-          <div className="flex mt-3">
-            <span className="mr-3">Search volume:</span>
-            <span>
-              {formatNumberToKMBPlus(dataSet.volume)} | Language:{" "}
-              {locationData.country} ({locationData.language})
-            </span>
-          </div>
-          <div className="flex mt-10">
-            <span
-              className="mr-3 pb-3 px-5 cursor-pointer"
+              className="mr-3 mt-3 px-5 cursor-pointer"
               onClick={() => {
                 setShowCompetition(false);
                 setShowInsights(true);
@@ -219,89 +233,256 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
               Insights
             </span>
             <span
-              className="mr-3 pb-3 px-5 cursor-pointer"
-              style={{ borderBottom: "#7438FF 2px solid", color: "#7438FF" }}
+              className="px-7 pb-3 pr-5 cursor-pointer pt-2 rounded-sm"
+              style={{
+                border: "#9999FF 1px solid",
+                color: "white",
+                backgroundColor: "#9999FF",
+              }}
             >
               Competition
             </span>
+            <span>
+              <hr color="#9999FF" />
+            </span>
           </div>
-          <hr />
         </header>
 
         <section className="">
           <div className="text-xl font-bold flex items-center mt-10">
-            <AiFillYoutube color="red" className="mr-3" /> Top 10 YouTube Videos{" "}
+            <img src={youtubeHeading} alt="" className="h-5" />
           </div>
-          <div className="flex w-full gap-10">
-            <div className="w-3/4 border-2 p-10 rounded-md mt-5">
-              <header>
-                <span className="mr-10 font-bold">#</span>
-                <span className="font-bold">Competitor's videos</span>
-              </header>
-              <hr className="mt-5 mb-5" />
-              <div>
+
+          <div className="flex items-center gap-5 mt-10">
+            <div
+              className="w-1/4 bg-white rounded-md p-3"
+              style={{ border: "1px solid #DBDBF6" }}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-800 font-bold">
+                  Average Video Length
+                </span>
+                <span>
+                  <AiOutlineInfoCircle color="gray" size={15} />
+                </span>
+              </div>
+              <div className="text-lg font-bold pt-3 text-gray-800">
+                {competitionInsights.averageVideoLength != null
+                  ? secondsToTime(competitionInsights.averageVideoLength)
+                  : "N/A"}
+              </div>
+              <div className="text-xs text-gray-800 flex items-center mt-3">
+                Shortest:{" "}
+                {competitionInsights.shortestVideoLength != null
+                  ? secondsToTime(competitionInsights.shortestVideoLength)
+                  : "N/A"}{" "}
+              </div>
+              <div className="text-xs text-gray-800 flex items-center mt-1">
+                Longest:{" "}
+                {competitionInsights.longestVideoLength != null
+                  ? secondsToTime(competitionInsights.longestVideoLength)
+                  : "N/A"}
+              </div>
+            </div>
+            <div
+              className="w-1/4 bg-white rounded-md p-3"
+              style={{ border: "1px solid #DBDBF6" }}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-800 font-bold">
+                  Average Video Age
+                </span>
+                <span>
+                  <AiOutlineInfoCircle color="gray" size={15} />
+                </span>
+              </div>
+              <div className="text-lg font-bold pt-3 text-gray-800">
+                {competitionInsights.averageVideoAge != null
+                  ? daysToTime(competitionInsights.averageVideoAge)
+                  : "N/A"}
+              </div>
+              <div className="text-xs text-gray-800 flex items-center mt-3">
+                Newest:{" "}
+                {competitionInsights.newestVideoAge != null
+                  ? daysToTime(competitionInsights.newestVideoAge)
+                  : "N/A"}{" "}
+              </div>
+              <div className="text-xs text-gray-800 flex items-center mt-1">
+                Oldest:{" "}
+                {competitionInsights.oldestVideoAge != null
+                  ? daysToTime(competitionInsights.oldestVideoAge)
+                  : "N/A"}
+              </div>
+            </div>
+            <div
+              className="w-1/4 bg-white rounded-md p-3"
+              style={{ border: "1px solid #DBDBF6" }}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-800 font-bold">
+                  Average Likes & Comments
+                </span>
+                <span>
+                  <AiOutlineInfoCircle color="gray" size={15} />
+                </span>
+              </div>
+              <div className="text-lg font-bold pt-3 text-gray-800">
+                {competitionInsights.averageLikesComments != null
+                  ? formatNumberToKMBPlus(
+                      Math.ceil(competitionInsights.averageLikesComments),
+                    )
+                  : "N/A"}
+              </div>
+              <div className="text-xs text-gray-800 flex items-center mt-3">
+                Least:{" "}
+                {competitionInsights.leastLikesComments != null
+                  ? formatNumberToKMBPlus(
+                      Math.ceil(competitionInsights.leastLikesComments),
+                    )
+                  : "N/A"}{" "}
+              </div>
+              <div className="text-xs text-gray-800 flex items-center mt-1">
+                Most:{" "}
+                {competitionInsights.mostLikesComments != null
+                  ? formatNumberToKMBPlus(
+                      Math.ceil(competitionInsights.mostLikesComments),
+                    )
+                  : "N/A"}
+              </div>
+            </div>
+            <div
+              className="w-1/4 bg-white rounded-md p-3"
+              style={{ border: "1px solid #DBDBF6" }}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-800 font-bold">
+                  Average Subscribers
+                </span>
+                <span>
+                  <AiOutlineInfoCircle color="gray" size={15} />
+                </span>
+              </div>
+              <div className="text-lg font-bold pt-3 text-gray-800">
                 {isSerpYoutubeLoaded ? (
-                  keywordVideosInfo.map((item, index) => {
-                    return (
-                      <div key={index}>
-                        <div className="flex items-center">
-                          <span className="mr-10">{index + 1}</span>
-                          <div className="mt-5 flex items-start">
-                            <img
-                              src={item.thumbnail.static}
-                              alt="Thumnail"
-                              className="rounded-md h-28 mr-3"
-                            />
-                            <div>
-                              <div className="text-md text-gray-800 capitalize">
-                                {item.title}
-                              </div>
-                              <div className="text-sm text-gray-800 flex items-center mt-3">
-                                <img
-                                  src={item.channel.thumbnail}
-                                  alt=""
-                                  className="h-10 w-10 rounded-full mr-3"
-                                />{" "}
-                                {item.channel.name} <BsDot size={20} />{" "}
-                                {item?.channel_details?.subscriber_count &&
-                                  formatNumberToKMBPlus(
-                                    item?.channel_details?.subscriber_count,
-                                  ).replace("+", "")}
-                              </div>
-                              <div className="text-gray-800 flex items-center mt-3 text-xs">
-                                Uploaded {item.published_date}{" "}
-                                <BsDot size={20} /> Views:{" "}
-                                {formatNumberToKMBPlus(item.views).replace(
-                                  "+",
-                                  "",
-                                )}{" "}
-                                <BsDot size={20} /> Likes:{" "}
-                                {item.statistics?.likeCount &&
-                                  formatNumberToKMBPlus(
-                                    item.statistics?.likeCount,
-                                  ).replace("+", "")}{" "}
-                                <BsDot size={20} /> Comments:{" "}
-                                {item.statistics?.commentCount &&
-                                  formatNumberToKMBPlus(
-                                    item.statistics?.commentCount,
-                                  ).replace("+", "")}{" "}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        {item.snippet?.tags && (
-                          <Tags items={item.snippet?.tags} />
-                        )}
-                        <hr className="mt-5 mb-5" />
-                      </div>
-                    );
-                  })
+                  formatNumberToKMBPlus(
+                    serpYoutubeVideosInfo.data.channel_details
+                      .average_subscriber_count,
+                  ).replace("+", "") ?? "No Data"
                 ) : (
-                  <Loader />
+                  <BiLoaderCircle color="#7352FF" className="animate-spin" />
+                )}
+              </div>
+              <div className="text-xs text-gray-800 flex items-center mt-3">
+                Smallest:{" "}
+                {isSerpYoutubeLoaded ? (
+                  formatNumberToKMBPlus(
+                    serpYoutubeVideosInfo.data.channel_details
+                      .lowest_subscriber_count,
+                  ).replace("+", "") ?? "No Data"
+                ) : (
+                  <BiLoaderCircle color="#7352FF" className="animate-spin" />
+                )}{" "}
+              </div>
+              <div className="text-xs text-gray-800 flex items-center mt-1">
+                Biggest:{" "}
+                {isSerpYoutubeLoaded ? (
+                  formatNumberToKMBPlus(
+                    serpYoutubeVideosInfo.data.channel_details
+                      .highest_subscriber_count,
+                  ).replace("+", "") ?? "No Data"
+                ) : (
+                  <BiLoaderCircle color="#7352FF" className="animate-spin" />
                 )}
               </div>
             </div>
-            <div className="w-1/4 border-2 p-10 rounded-md mt-5">
+          </div>
+
+          <div className="flex w-full">
+            <div className="mt-5 w-full">
+              <header className="border-2 rounded-md p-3 mb-5 w-full">
+                <span className="mr-10 font-bold">#</span>
+                <span className="font-bold">Competitor's videos</span>
+              </header>
+              <div className="w-full">
+                {isSerpYoutubeLoaded ? (
+                  keywordVideosInfo.map((item, index) => (
+                    <div key={index} className="bg-white rounded-md p-5 mb-5">
+                      <div className="flex items-center">
+                        <span className="mr-10">{index + 1}</span>
+                        <div className="mt-5 flex items-start">
+                          <img
+                            src={item.thumbnail.static}
+                            alt="Thumbnail"
+                            className="rounded-md h-28 mr-3"
+                          />
+                          <div>
+                            <div className="text-md text-gray-800 capitalize">
+                              {item.title}
+                            </div>
+                            <div className="text-sm text-gray-800 flex items-center mt-3">
+                              <img
+                                src={item.channel.thumbnail}
+                                alt=""
+                                className="h-10 w-10 rounded-full mr-3"
+                              />{" "}
+                              {item.channel.name} |{" "}
+                              {item?.channel_details?.subscriber_count &&
+                                formatNumberToKMBPlus(
+                                  item?.channel_details?.subscriber_count,
+                                ).replace("+", "")}
+                            </div>
+                            <div className="text-gray-800 flex items-center mt-3 text-xs">
+                              Uploaded:{" "}
+                              <span className="font-bold">
+                                {item.published_date}{" "}
+                              </span>{" "}
+                              | Views:{" "}
+                              <span className="font-bold">
+                                {formatNumberToKMBPlus(item.views).replace(
+                                  "+",
+                                  "",
+                                )}
+                              </span>{" "}
+                              | Likes:{" "}
+                              <span className="font-bold">
+                                {item.statistics?.likeCount &&
+                                  formatNumberToKMBPlus(
+                                    item.statistics?.likeCount,
+                                  ).replace("+", "")}
+                              </span>{" "}
+                              | Comments:{" "}
+                              <span className="font-bold">
+                                {item.statistics?.commentCount &&
+                                  formatNumberToKMBPlus(
+                                    item.statistics?.commentCount,
+                                  ).replace("+", "")}
+                              </span>{" "}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <br />
+                      {item.snippet?.tags && (
+                        <Tags items={item.snippet?.tags} />
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <Loader />
+                )}
+                <div className="flex flex-col gap-5 mt-8">
+                  <div className="text-xs text-gray-800 font-bold">
+                    Popular tags
+                  </div>
+                  <hr />
+                  {competitionInsights.topTags && (
+                    <Tags items={competitionInsights.topTags} ml={"ml-0"} />
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* <div className="w-1/4 border-2 p-10 rounded-md mt-5">
               <div className="flex flex-col gap-5 mt-8">
                 <div className="text-lg text-gray-800 font-bold">
                   Average Video Length
@@ -450,7 +631,7 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
                   <Tags items={competitionInsights.topTags} ml={"ml-0"} />
                 )}
               </div>
-            </div>
+            </div> */}
           </div>
         </section>
       </div>

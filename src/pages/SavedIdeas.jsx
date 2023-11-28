@@ -36,7 +36,11 @@ import {
 import { FaYoutube, FaGoogle, FaPlus, FaVideo, FaHeart } from "react-icons/fa";
 import CryptoJS from "crypto-js";
 import showToast from "../utils/toastUtils";
-import { getCategorySavedIdeas, getSavedIdeas, userFullDataDecrypted } from "../data/api/calls";
+import {
+  getCategorySavedIdeas,
+  getSavedIdeas,
+  userFullDataDecrypted,
+} from "../data/api/calls";
 import { BiArrowBack, BiLoaderCircle } from "react-icons/bi";
 import { FiTrendingUp } from "react-icons/fi";
 import { BsArrowDownShort, BsArrowUpShort, BsDot } from "react-icons/bs";
@@ -54,7 +58,7 @@ const SavedIdeas = () => {
 
   const customData = location.state?.customData;
   if (!customData) {
-    navigate('/saved-ideas-cat');
+    navigate("/saved-ideas-cat");
   }
   console.log("customDatacustomDatacustomDatacustomDatacustomData", customData);
 
@@ -215,7 +219,9 @@ const SavedIdeas = () => {
     setSearchQuery(newSearchQuery);
 
     if (!newSearchQuery) {
-      const originalData = JSON.parse(localStorage.getItem("savedCatIdeasData"));
+      const originalData = JSON.parse(
+        localStorage.getItem("savedCatIdeasData"),
+      );
       setFilterableSavedIdeasData(originalData);
     } else {
       // Filter the data based on the new search query
@@ -493,14 +499,14 @@ const SavedIdeas = () => {
       >
         <div className="w-full flex">
           <div className="w-1/2 flex py-2">
-          <div className="flex items-center justify-between mb-5">
-                <span
-                  className="mr-3 flex items-center cursor-pointer"
-                  onClick={() => navigate('/saved-ideas-cat')}
-                >
-                  <BiArrowBack color="#7472C2" className="mr-2" /> Back to list
-                </span>
-              </div>
+            <div className="flex items-center justify-between mb-5">
+              <span
+                className="mr-3 flex items-center cursor-pointer"
+                onClick={() => navigate("/saved-ideas-cat")}
+              >
+                <BiArrowBack color="#7472C2" className="mr-2" /> Back to list
+              </span>
+            </div>
           </div>
           <div className="w-1/2 flex justify-end py-2">
             {/* <div className="flex justify-start items-center">
@@ -543,74 +549,71 @@ const SavedIdeas = () => {
             )}
             <br />
             <div className="rounded-md bg-white p-5">
-            <Header
-                title={`${customData}`}
-                size="text-1xl"
-              />
-            <GridComponent
-              dataSource={filterableSavedIdeasData}
-              allowExcelExport
-              allowPdfExport
-              allowPaging
-              allowSorting
-              style={{ borderRadius: '10px' }}
-            >
-              <ColumnsDirective>
-                <ColumnDirective
-                  field="isFavorite"
-                  headerText=""
-                  width="80"
-                  template={gridOrderStars}
-                  tooltip="Hover over for more information"
-                  headerTemplate={actionTitleTemplate}
+              <Header title={`${customData}`} size="text-1xl" />
+              <GridComponent
+                dataSource={filterableSavedIdeasData}
+                allowExcelExport
+                allowPdfExport
+                allowPaging
+                allowSorting
+                style={{ borderRadius: "10px" }}
+              >
+                <ColumnsDirective>
+                  <ColumnDirective
+                    field="isFavorite"
+                    headerText=""
+                    width="80"
+                    template={gridOrderStars}
+                    tooltip="Hover over for more information"
+                    headerTemplate={actionTitleTemplate}
+                  />
+                  <ColumnDirective
+                    field="video_ideas"
+                    headerText="Video ideas"
+                    headerTemplate={VideoIconTitleTemplate}
+                    tooltip="Hover over for more information"
+                    template={VideoIconTemplate}
+                  />
+                  <ColumnDirective
+                    field="search_volume"
+                    headerText="Search Volume on youtube"
+                    template={searchVolumeFormat}
+                    headerTemplate={VolumeTitleTemplate}
+                    tooltip="Hover over for more information"
+                  />
+                  <ColumnDirective
+                    field="trend"
+                    headerText="Trends"
+                    headerTemplate={TrendsTitleTemplate}
+                    template={TrendsDataRowTemplate}
+                  />
+                  <ColumnDirective
+                    field="keyword_diff"
+                    headerText="Keyword Difficulty"
+                    template={keywordDiffTemplate}
+                    tooltip="Hover over for more information"
+                  />
+                  <ColumnDirective
+                    field="potential_views"
+                    headerText="Potential views on youtube"
+                    headerTemplate={VideoIconTitleTemplate}
+                    template={formatViews}
+                    tooltip="Hover over for more information"
+                  />
+                </ColumnsDirective>
+                <Inject
+                  services={[
+                    Resize,
+                    Sort,
+                    ContextMenu,
+                    Filter,
+                    Page,
+                    ExcelExport,
+                    Edit,
+                    PdfExport,
+                  ]}
                 />
-                <ColumnDirective
-                  field="video_ideas"
-                  headerText="Video ideas"  
-                  headerTemplate={VideoIconTitleTemplate}
-                  tooltip="Hover over for more information"
-                  template={VideoIconTemplate}
-                />
-                <ColumnDirective
-                  field="search_volume"
-                  headerText="Search Volume on youtube"
-                  template={searchVolumeFormat}
-                  headerTemplate={VolumeTitleTemplate}
-                  tooltip="Hover over for more information"
-                />
-                <ColumnDirective
-                  field="trend"
-                  headerText="Trends"
-                  headerTemplate={TrendsTitleTemplate}
-                  template={TrendsDataRowTemplate}
-                />
-                <ColumnDirective
-                  field="keyword_diff"
-                  headerText="Keyword Difficulty"
-                  template={keywordDiffTemplate}
-                  tooltip="Hover over for more information"
-                />
-                <ColumnDirective
-                  field="potential_views"
-                  headerText="Potential views on youtube"
-                  headerTemplate={VideoIconTitleTemplate}
-                  template={formatViews}
-                  tooltip="Hover over for more information"
-                />
-              </ColumnsDirective>
-              <Inject
-                services={[
-                  Resize,
-                  Sort,
-                  ContextMenu,
-                  Filter,
-                  Page,
-                  ExcelExport,
-                  Edit,
-                  PdfExport,
-                ]}
-              />
-            </GridComponent>
+              </GridComponent>
             </div>
             {showSavedIdeaCategoryPanel && (
               <IdeasCategoryDelete

@@ -807,12 +807,6 @@ const Ideation = () => {
         }`}
       >
         <div className="flex items-center justify-between h-full mb-5 relative">
-          <div className="">
-            <div className="pageTitle text-3xl font-semibold">Ideation</div>
-            <div className="tag text-md mt-2 text-xs font-thin">
-              Search and generate ideas for your next video!
-            </div>
-          </div>
           {/* <div className="flex items-center flex-col ">
             <div className="w-full max-w-xs flex items-center p-2 pl-4 pr-4 border border-gray-300 bg-white rounded-full">
               <input
@@ -890,15 +884,11 @@ const Ideation = () => {
               </span>
             </div>
             <GridComponent
-              // id="gridcomp"
               dataSource={exactKeywordData}
               allowExcelExport
               allowPdfExport
               allowPaging
               allowSorting
-              // contextMenuItems={contextMenuItems}
-              // editSettings={editing}
-              // rowSelected={handleRowSelected}
             >
               <ColumnsDirective>
                 <ColumnDirective
@@ -1010,16 +1000,11 @@ const Ideation = () => {
               </div>
             </div>
             <GridComponent
-              // id="gridcomp"
               dataSource={relatedKeywordData}
               allowExcelExport
               allowPdfExport
               allowPaging
               allowSorting
-              selectionSettings={{ type: "Multiple" }}
-              // contextMenuItems={contextMenuItems}
-              // editSettings={editing}
-              // rowSelected={handleRowSelected}
             >
               <ColumnsDirective>
                 <ColumnDirective
@@ -1032,7 +1017,7 @@ const Ideation = () => {
                   field="keyword"
                   headerText="Video ideas"
                   headerTemplate={VideoIconTitleTemplate}
-                  template={VideoIconTemplate(setShowInsights, setIdeasDataSet)}
+                  template={VideoIconTemplate}
                 />
                 <ColumnDirective
                   field="monthlysearch"

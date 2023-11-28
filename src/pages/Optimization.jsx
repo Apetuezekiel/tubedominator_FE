@@ -452,17 +452,25 @@ const Ideation = () => {
 
   const viewCountTemplate = (props) => {
     const formatedNumber = formatNumberToKMBPlus(props.viewCount);
-    const icon = <FiEye size={15} color="#E87A00" className="mr-2"/>;
-    return <div>{icon}{formatedNumber}</div>;
+    const icon = <FiEye size={15} color="#E87A00" className="mr-2" />;
+    return (
+      <div>
+        {icon}
+        {formatedNumber}
+      </div>
+    );
   };
 
   const gridOrderOptimizationLevel = (props) => {
     const roundedPercentage = Math.round(props.optimizationPercentage);
     const percentageWidth = `${roundedPercentage}%`;
-  
+
     return (
       <div className="h-10 w-full rounded-md flex flex-row items-center justify-between">
-        <div className="h-full w-80 rounded-md mr-2" style={{ backgroundColor: "#DCDCFF" }}>
+        <div
+          className="h-full w-80 rounded-md mr-2"
+          style={{ backgroundColor: "#DCDCFF" }}
+        >
           <div
             className="h-full rounded-tl-md rounded-bl-md flex items-center justify-center"
             style={{ width: percentageWidth, background: "#C8C8FF" }}
@@ -470,12 +478,12 @@ const Ideation = () => {
             <span
               className="text-xs text-gray-700"
               style={{
-                fontFamily: 'Work Sans',
-                fontSize: '13px',
+                fontFamily: "Work Sans",
+                fontSize: "13px",
                 fontWeight: 400,
-                lineHeight: '15px',
-                letterSpacing: '0em',
-                textAlign: 'left',
+                lineHeight: "15px",
+                letterSpacing: "0em",
+                textAlign: "left",
               }}
             >
               {roundedPercentage}%
@@ -586,22 +594,25 @@ const Ideation = () => {
           <div className="flex justify-between">
             <div className="w-full flex py-2">
               <div className="flex w-full justify-between items-center">
-              <div className="">
-                <div className="pageTitle text-3xl font-semibold">Optimization</div>
-                <div className="tag text-md mt-2 text-xs font-thin">
-                Implement our optimization recommendations to increase your organic reach
+                <div className="">
+                  <div className="pageTitle text-3xl font-semibold">
+                    Optimization
+                  </div>
+                  <div className="tag text-md mt-2 text-xs font-thin">
+                    Implement our optimization recommendations to increase your
+                    organic reach
+                  </div>
                 </div>
-              </div>
-              <div className="flex justify-center items-center">
-              <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
-                  <select
-                    id="mySelect"
-                    // value={this.state.selectedOption}
-                    // onChange={this.handleChange}
-                    className="text-xs outline-none"
-                  >
-                    <option value=""> Visibility (All)</option>
-                    {/* <option className="text-xs" value="Public Videos">
+                <div className="flex justify-center items-center">
+                  <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
+                    <select
+                      id="mySelect"
+                      // value={this.state.selectedOption}
+                      // onChange={this.handleChange}
+                      className="text-xs outline-none"
+                    >
+                      <option value=""> Visibility (All)</option>
+                      {/* <option className="text-xs" value="Public Videos">
                       Public Videos
                     </option>
                     <option className="text-xs" value="Private Videos">
@@ -610,28 +621,28 @@ const Ideation = () => {
                     <option className="text-xs" value="Unlisted Videos">
                       Unlisted Videos
                     </option> */}
-                  </select>
-                </div>
-                <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
-                  <select
-                    id="mySelect"
-                    // value={this.state.selectedOption}
-                    // onChange={this.handleChange}
-                    className="text-xs outline-none"
-                  >
-                    <option value="">Playlists (All)</option>
-                    {userPlaylistData.map((playlist, index) => (
-                      <option
-                        className="text-xs"
-                        key={index}
-                        value={playlist.title}
-                      >
-                        {playlist.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {/* <div className="w-52 text-sm h-80">
+                    </select>
+                  </div>
+                  <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
+                    <select
+                      id="mySelect"
+                      // value={this.state.selectedOption}
+                      // onChange={this.handleChange}
+                      className="text-xs outline-none"
+                    >
+                      <option value="">Playlists (All)</option>
+                      {userPlaylistData.map((playlist, index) => (
+                        <option
+                          className="text-xs"
+                          key={index}
+                          value={playlist.title}
+                        >
+                          {playlist.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {/* <div className="w-52 text-sm h-80">
               <div
                 onClick={() => setOpen(!open)}
                 className={`bg-white w-full p-2 flex items-center justify-between rounded-full border border-gray-300 ${
@@ -694,27 +705,27 @@ const Ideation = () => {
                 ))}
               </ul>
             </div> */}
-                <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
-                  <select
-                    id="mySelect"
-                    // value={this.state.selectedOption}
-                    // onChange={this.handleChange}
-                    className="text-xs outline-none"
-                  >
-                    <option value=""> Time (All)</option>
-                    <option className="text-xs" value="Last Week">
-                      Last Week
-                    </option>
-                    <option className="text-xs" value="Last Month">
-                      Last Month
-                    </option>
-                    <option className="text-xs" value="Last Week">
-                      Last Year
-                    </option>
-                  </select>
-                </div>
+                  <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
+                    <select
+                      id="mySelect"
+                      // value={this.state.selectedOption}
+                      // onChange={this.handleChange}
+                      className="text-xs outline-none"
+                    >
+                      <option value=""> Time (All)</option>
+                      <option className="text-xs" value="Last Week">
+                        Last Week
+                      </option>
+                      <option className="text-xs" value="Last Month">
+                        Last Month
+                      </option>
+                      <option className="text-xs" value="Last Week">
+                        Last Year
+                      </option>
+                    </select>
+                  </div>
 
-                {/* <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
+                  {/* <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
                   <span className="mr-2 text-xs">Updated on YT</span>
                   <HiOutlineChevronDown />
                 </div>
@@ -722,7 +733,7 @@ const Ideation = () => {
                   <span className="mr-2 text-xs">Drafts</span>
                   <HiOutlineChevronDown />
                 </div> */}
-              </div>
+                </div>
               </div>
             </div>
             {/* IMPORTANT COMMENT */}
@@ -744,64 +755,66 @@ const Ideation = () => {
           )}
           <div>
             {/* Header component */}
-            <div className="text-xs font-thin mt-5 mb-5">Results: {`${userYoutubeData.length} videos`}</div>
+            <div className="text-xs font-thin mt-5 mb-5">
+              Results: {`${userYoutubeData.length} videos`}
+            </div>
             <div className="rounded-md bg-white p-5">
-            <GridComponent
-              dataSource={userYoutubeData}
-              // id="gridcomp"
-              allowExcelExport
-              allowPdfExport
-              allowPaging
-              allowSorting
-              // contextMenuItems={contextMenuItems}
-              editSettings={editing}
-              rowSelected={handleRowSelected}
-            >
-              <ColumnsDirective>
-                <ColumnDirective
-                  field="title"
-                  headerText="Videos"
-                  template={ThumbnailTitleTemplate}
-                  width="300"
-                />
-                <ColumnDirective
-                  field="optimizationLevel"
-                  headerText="Optimization level"
-                  template={gridOrderOptimizationLevel}
-                  // width="300"
-                />
-                {/* <ColumnDirective
+              <GridComponent
+                dataSource={userYoutubeData}
+                // id="gridcomp"
+                allowExcelExport
+                allowPdfExport
+                allowPaging
+                allowSorting
+                // contextMenuItems={contextMenuItems}
+                editSettings={editing}
+                rowSelected={handleRowSelected}
+              >
+                <ColumnsDirective>
+                  <ColumnDirective
+                    field="title"
+                    headerText="Videos"
+                    template={ThumbnailTitleTemplate}
+                    width="300"
+                  />
+                  <ColumnDirective
+                    field="optimizationLevel"
+                    headerText="Optimization level"
+                    template={gridOrderOptimizationLevel}
+                    // width="300"
+                  />
+                  {/* <ColumnDirective
                   field="optimizationImpact"
                   headerText="Optimization impact"
                   template={gridOrderOptimizationImpact}
                   // width="300"
                 /> */}
-                <ColumnDirective
-                  field="viewCount"
-                  headerText="View Count"
-                  template={viewCountTemplate}
-                  width="150"
+                  <ColumnDirective
+                    field="viewCount"
+                    headerText="View Count"
+                    template={viewCountTemplate}
+                    width="150"
+                  />
+                  <ColumnDirective
+                    field="publishedAt"
+                    headerText="Published At"
+                    // width="150"
+                    template={formatDate}
+                  />
+                </ColumnsDirective>
+                <Inject
+                  services={[
+                    Resize,
+                    Sort,
+                    ContextMenu,
+                    Filter,
+                    Page,
+                    ExcelExport,
+                    Edit,
+                    PdfExport,
+                  ]}
                 />
-                <ColumnDirective
-                  field="publishedAt"
-                  headerText="Published At"
-                  // width="150"
-                  template={formatDate}
-                />
-              </ColumnsDirective>
-              <Inject
-                services={[
-                  Resize,
-                  Sort,
-                  ContextMenu,
-                  Filter,
-                  Page,
-                  ExcelExport,
-                  Edit,
-                  PdfExport,
-                ]}
-              />
-            </GridComponent>
+              </GridComponent>
             </div>
           </div>
         </div>

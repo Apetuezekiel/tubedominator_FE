@@ -100,7 +100,7 @@ const SavedIdeas = () => {
 
   const handleMoreClick = (item) => {
     // Navigate to /saved-ideas and pass the value of 'item'
-    navigate('/saved-ideas', { state: { customData: item } });
+    navigate("/saved-ideas", { state: { customData: item } });
   };
 
   useEffect(() => {
@@ -197,7 +197,6 @@ const SavedIdeas = () => {
 
   const editing = { allowDeleting: true, allowEditing: true };
 
-
   return (
     <section>
       <div
@@ -205,14 +204,16 @@ const SavedIdeas = () => {
           (showInsights || showCompetition) && "hidden"
         }`}
       >
-         <div className="w-full flex">
+        <div className="w-full flex">
           <div className="w-1/2 flex py-2">
-          <div className="">
-            <div className="pageTitle text-3xl font-semibold">Saved Ideas</div>
-            <div className="tag text-md mt-2 text-xs font-thin">
-            Find here all your video ideas and briefings
+            <div className="">
+              <div className="pageTitle text-3xl font-semibold">
+                Saved Ideas
+              </div>
+              <div className="tag text-md mt-2 text-xs font-thin">
+                Find here all your video ideas and briefings
+              </div>
             </div>
-          </div>
           </div>
           <div className="w-1/2 flex justify-end py-2">
             {/* <div className="flex justify-start items-center">
@@ -255,32 +256,40 @@ const SavedIdeas = () => {
             )}
             <br />
             <div className="rounded-md bg-white p-5">
-              <Header
-                title={`Folders`}
-                size="text-1xl"
-              />
-                <div className="flex flex-wrap -mx-2">
-                <div className="m-2 flex flex-col items-center justify-center cursor-pointer" onClick={() => handleMoreClick("all")}>
-                    <div
-                      className="rounded-md p-2 w-40"
-                      style={{ backgroundColor: "#EAEAF5" }}
-                    >
-                      <div className="flex items-center justify-end">
-                        <span className="py-1 px-1 rounded-full bg-white flex items-center justify-center cursor-pointer">
-                          <MdMoreHoriz color="black" className="m-auto" />
-                        </span>
-                      </div>
-                      <div className="w-full text-center">
-                        <div className="flex folder-container items-center justify-center">
-                          <IoFolderOpenOutline color="#C8C8DD" size={48} className="folder-container mt-5 mb-5"/>
-                        </div>
-                      </div>
-                      <div className="py-1 text-xs font-bold">{"All"}</div>
-                      {/* <div className="text-xs">{"Date created"}</div> */}
+              <Header title={`Folders`} size="text-1xl" />
+              <div className="flex flex-wrap -mx-2">
+                <div
+                  className="m-2 flex flex-col items-center justify-center cursor-pointer"
+                  onClick={() => handleMoreClick("all")}
+                >
+                  <div
+                    className="rounded-md p-2 w-40"
+                    style={{ backgroundColor: "#EAEAF5" }}
+                  >
+                    <div className="flex items-center justify-end">
+                      <span className="py-1 px-1 rounded-full bg-white flex items-center justify-center cursor-pointer">
+                        <MdMoreHoriz color="black" className="m-auto" />
+                      </span>
                     </div>
+                    <div className="w-full text-center">
+                      <div className="flex folder-container items-center justify-center">
+                        <IoFolderOpenOutline
+                          color="#C8C8DD"
+                          size={48}
+                          className="folder-container mt-5 mb-5"
+                        />
+                      </div>
+                    </div>
+                    <div className="py-1 text-xs font-bold">{"All"}</div>
+                    {/* <div className="text-xs">{"Date created"}</div> */}
                   </div>
-                  {categories.map((item, index) => (
-                  <div key={index} className="m-2 flex flex-col items-center justify-center cursor-pointer" onClick={() => handleMoreClick("all")}>
+                </div>
+                {categories.map((item, index) => (
+                  <div
+                    key={index}
+                    className="m-2 flex flex-col items-center justify-center cursor-pointer"
+                    onClick={() => handleMoreClick("all")}
+                  >
                     <div
                       className="rounded-md p-2 w-40"
                       style={{ backgroundColor: "#EAEAF5" }}
@@ -292,16 +301,19 @@ const SavedIdeas = () => {
                       </div>
                       <div className="w-full text-center">
                         <div className="flex items-center justify-center">
-                          <IoFolderOpenOutline color="#C8C8DD" size={48} className="mt-5 mb-5"/>
+                          <IoFolderOpenOutline
+                            color="#C8C8DD"
+                            size={48}
+                            className="mt-5 mb-5"
+                          />
                         </div>
                       </div>
                       <div className="py-1 text-xs font-bold">{item}</div>
                       {/* <div className="text-xs">{"Date created"}</div> */}
                     </div>
                   </div>
-                   ))}
-                </div>
-
+                ))}
+              </div>
             </div>
           </div>
         )}
