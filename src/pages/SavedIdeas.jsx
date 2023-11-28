@@ -36,8 +36,8 @@ import {
 import { FaYoutube, FaGoogle, FaPlus, FaVideo, FaHeart } from "react-icons/fa";
 import CryptoJS from "crypto-js";
 import showToast from "../utils/toastUtils";
-import { getSavedIdeas, userFullDataDecrypted } from "../data/api/calls";
-import { BiLoaderCircle } from "react-icons/bi";
+import { getCategorySavedIdeas, getSavedIdeas, userFullDataDecrypted } from "../data/api/calls";
+import { BiArrowBack, BiLoaderCircle } from "react-icons/bi";
 import { FiTrendingUp } from "react-icons/fi";
 import { BsArrowDownShort, BsArrowUpShort, BsDot } from "react-icons/bs";
 import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
@@ -46,8 +46,18 @@ import Loader from "../components/Loader";
 import CubeLoader from "../components/CubeLoader";
 import Insights from "./keywords/Insights";
 import Competition from "./keywords/Competition";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const SavedIdeas = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const customData = location.state?.customData;
+  if (!customData) {
+    navigate('/saved-ideas-cat');
+  }
+  console.log("customDatacustomDatacustomDatacustomDatacustomData", customData);
+
   const decryptAndRetrieveData = (data) => {
     const secretKey = "+)()^77---<@#$>";
 
@@ -98,7 +108,7 @@ const SavedIdeas = () => {
     setFetchedSavedIdeas(true);
     const fetchSavedIdeas = async () => {
       try {
-        const userSavedIdeas = await getSavedIdeas();
+        const userSavedIdeas = await getCategorySavedIdeas(customData);
         console.log("userSavedIdeas", userSavedIdeas);
         setSavedIdeasData(userSavedIdeas);
         setFilterableSavedIdeasData(userSavedIdeas);
@@ -133,10 +143,6 @@ const SavedIdeas = () => {
 
     fetchSavedIdeas();
   }, [updatedSavedIdea]);
-
-  useEffect(() => {
-    console.log("savedIdeasData", "savedIdeasData");
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -209,7 +215,7 @@ const SavedIdeas = () => {
     setSearchQuery(newSearchQuery);
 
     if (!newSearchQuery) {
-      const originalData = JSON.parse(localStorage.getItem("savedIdeasData"));
+      const originalData = JSON.parse(localStorage.getItem("savedCatIdeasData"));
       setFilterableSavedIdeasData(originalData);
     } else {
       // Filter the data based on the new search query
@@ -481,13 +487,23 @@ const SavedIdeas = () => {
   return (
     <section>
       <div
-        className={`m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl ${
+        className={`m-2 md:m-10 mt-24 p-2 md:p-10  ${
           (showInsights || showCompetition) && "hidden"
         }`}
       >
         <div className="w-full flex">
           <div className="w-1/2 flex py-2">
-            <div className="flex justify-start items-center">
+          <div className="flex items-center justify-between mb-5">
+                <span
+                  className="mr-3 flex items-center cursor-pointer"
+                  onClick={() => navigate('/saved-ideas-cat')}
+                >
+                  <BiArrowBack color="#7472C2" className="mr-2" /> Back to list
+                </span>
+              </div>
+          </div>
+          <div className="w-1/2 flex justify-end py-2">
+            {/* <div className="flex justify-start items-center">
               <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
                 <select
                   className="rounded-full w-full py-2 pl-4 pr-8 border"
@@ -503,30 +519,7 @@ const SavedIdeas = () => {
                   ))}
                 </select>
               </div>
-              {/* <div className="bg-white rounded-tl-full rounded-bl-full border border-gray-300 px-4 py-2 flex items-center">
-              <span className="mr-2 text-xs">All ideas</span>
-            </div>
-            <div className="bg-white rounded-tr-full rounded-br-full border border-gray-300 px-4 py-2 flex items-center">
-              <span className="mr-2 text-xs">Ideas with script</span>
             </div> */}
-            </div>
-          </div>
-          <div className="w-1/2 flex justify-end py-2">
-            {/* <div className="flex items-center w-2/4 border border-gray-300 bg-white rounded-full px-4 py-2">
-            <input
-              type="text"
-              placeholder="Search video idea"
-              className="flex-grow bg-transparent pr-2 text-xs"
-              value={searchQuery}
-              onChange={handleSearchChange}
-
-            />
-            <HiSearch className={`text-gray-500 text-sm ${
-            isSearchEmpty
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-purple-500 cursor-pointer"
-          }`}/>
-          </div> */}
             <div className="w-full max-w-xs flex items-center p-2 pl-4 pr-4 border border-gray-300 bg-white rounded-full">
               <input
                 type="text"
@@ -543,20 +536,17 @@ const SavedIdeas = () => {
           <Loader marginTop={10} />
         ) : (
           <div>
-            <Header
-              title={`All saved ideas (${
-                filterableSavedIdeasData && filterableSavedIdeasData.length
-                  ? filterableSavedIdeasData.length
-                  : 0
-              } ideas)`}
-              size="text-1xl"
-            />
             {fetchedSavedIdeas && (
               <div>
                 <Loader message={"Loading your Saved Ideas. Hang on"} />
               </div>
             )}
             <br />
+            <div className="rounded-md bg-white p-5">
+            <Header
+                title={`${customData}`}
+                size="text-1xl"
+              />
             <GridComponent
               dataSource={filterableSavedIdeasData}
               allowExcelExport
@@ -621,6 +611,7 @@ const SavedIdeas = () => {
                 ]}
               />
             </GridComponent>
+            </div>
             {showSavedIdeaCategoryPanel && (
               <IdeasCategoryDelete
                 dataSet={ideasDataSet}

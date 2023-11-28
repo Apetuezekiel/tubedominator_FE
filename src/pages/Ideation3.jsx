@@ -15,14 +15,7 @@ import {
   Edit,
   Inject,
 } from "@syncfusion/ej2-react-grids";
-import {
-  HiOutlineChevronDown,
-  HiOutlineTrendingDown,
-  HiOutlineTrendingUp,
-  HiSearch,
-} from "react-icons/hi";
 import { Header } from "../components";
-import { HiOutlineRefresh } from "react-icons/hi";
 import IdeasCategoryView from "../components/IdeasCategoryView";
 import {
   useUserYoutubeInfo,
@@ -32,6 +25,21 @@ import {
   useUserLoggedin,
   useAllUserDeets,
 } from "../state/state";
+import Spinner from "../components/Spinner";
+import { useStateContext } from "../contexts/ContextProvider";
+import { useUser } from "@clerk/clerk-react";
+import showToast from "../utils/toastUtils";
+// import { getUserEncryptedData } from "../data/api/calls";
+import CryptoJS from "crypto-js";
+import { getSavedIdeas, userFullDataDecrypted } from "../data/api/calls";
+import countriesWithLanguages from "../data/countries";
+import {
+  HiOutlineChevronDown,
+  HiOutlineTrendingDown,
+  HiOutlineTrendingUp,
+  HiSearch,
+} from "react-icons/hi";
+import { HiOutlineRefresh } from "react-icons/hi";
 import { AiOutlineStar, AiFillStar } from "react-icons/ai";
 import {
   FaYoutube,
@@ -40,15 +48,7 @@ import {
   FaVideo,
   FaFolderPlus,
 } from "react-icons/fa";
-import Spinner from "../components/Spinner";
 import { BiSearch, BiWorld, BiStar, BiLoaderCircle } from "react-icons/bi";
-import { useStateContext } from "../contexts/ContextProvider";
-import { useUser } from "@clerk/clerk-react";
-import showToast from "../utils/toastUtils";
-// import { getUserEncryptedData } from "../data/api/calls";
-import CryptoJS from "crypto-js";
-import { getSavedIdeas, userFullDataDecrypted } from "../data/api/calls";
-import countriesWithLanguages from "../data/countries";
 import { FiEye, FiSearch, FiTrendingUp } from "react-icons/fi";
 import {
   BsArrowDownShort,
@@ -56,12 +56,13 @@ import {
   BsDot,
   BsLightningChargeFill,
 } from "react-icons/bs";
+import { RiKey2Fill } from "react-icons/ri";
 import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
 import Insights from "./keywords/Insights";
 import Competition from "./keywords/Competition";
 import Loader from "../components/Loader";
-import { RiKey2Fill } from "react-icons/ri";
 import GenerateIdeasPanel from "../components/GenerateIdeasPanel";
+// import { PotentialViewsTitleTemplate, TrendsTitleTemplate, VideoIconTitleTemplate, VolumeTitleTemplate, keywordDiffTitleTemplate } from "../data/api/tableHelper";
 
 const Ideation = () => {
   const apiUrl = process.env.REACT_APP_API_BASE_URL;
@@ -1031,7 +1032,7 @@ const Ideation = () => {
                   field="keyword"
                   headerText="Video ideas"
                   headerTemplate={VideoIconTitleTemplate}
-                  template={VideoIconTemplate}
+                  template={VideoIconTemplate(setShowInsights, setIdeasDataSet)}
                 />
                 <ColumnDirective
                   field="monthlysearch"

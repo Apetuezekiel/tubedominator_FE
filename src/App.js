@@ -41,6 +41,7 @@ import Opitimize from "./components/Opitimize";
 import SearchTerm from "./components/SearchTerm";
 import Tests from "./components/Tests";
 import IdeasCategoryView from "./components/IdeasCategoryView";
+import SavedIdeasCategories from "./pages/SavedIdeasCategories";
 import Register from "./pages/UserAuth/registration/Register";
 import SignUpPage2 from "./pages/UserAuth/registration/SignUpPage";
 import PreviewKeyword from "./components/PreviewKeyword";
@@ -140,6 +141,7 @@ const App = () => {
 
         {/* User-Specific Routes */}
         <Route path="/ideascategory" element={<IdeasCategoryView />} />
+        <Route path="/saved-ideas-cat" element={<SavedIdeasCategories />} />
         <Route path="/preview" element={<PreviewKeyword />} />
         <Route path="/tests" element={<Testss />} />
         <Route path="/register" element={<Register />} />

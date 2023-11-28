@@ -1232,7 +1232,7 @@ export const menuLinks = [
       },
       {
         name: "Saved Ideas",
-        link: "saved-ideas",
+        link: "saved-ideas-cat",
         icon: <AiOutlineStar />,
       },
       {

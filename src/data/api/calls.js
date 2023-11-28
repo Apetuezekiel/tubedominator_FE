@@ -73,6 +73,37 @@ export const userFullDataDecrypted = () => {
 //   }
 // }
 
+export async function getCategorySavedIdeas(category) {
+  try {
+    const decryptedFullData = userFullDataDecrypted();
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_BASE_URL}/getCategorySavedIdeas?email=${decryptedFullData.email}&category=${category}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.REACT_APP_X_API_KEY,
+          Authorization: `Bearer ${decryptedFullData.token}`,
+        },
+      }
+    );
+
+    if (response.data.success) {
+      console.log('Category Ideas', response.data.data);
+      localStorage.setItem("savedCatIdeasData", JSON.stringify(response.data.data));
+      return response.data.data;
+
+    } else {
+      console.log('No ideas for this category');
+      showToast('error', response.data.message, 2000);
+      return [];
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    // You can handle the error here or rethrow it if needed
+    throw error;
+  }
+}
+
 export async function getSavedIdeas() {
   const decryptedFullData = userFullDataDecrypted();
   try {

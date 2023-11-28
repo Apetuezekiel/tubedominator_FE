@@ -276,3 +276,15 @@
   background: linear-gradient(270deg, #9999FF 99.97%, #4B49AC 0.05%);
   cursor: pointer; /* Add this line to change the cursor on hover */
 }
+
+.folder-container {
+  color: #C8C8DD;
+  transition: color 0.3s; /* Add a transition for a smooth color change */
+
+  /* Hover effect */
+  &:hover {
+    color: yellow; /* Change this to your desired hover color */
+  }
+}
+
+/* .folder-container:hover {} */
