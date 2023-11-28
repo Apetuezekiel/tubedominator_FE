@@ -662,14 +662,19 @@ function Insights({
             </section>
 
             <section className="section1 m-2 mt-14 p-2 px-5 py-5 bg-white rounded-md flex">
-              <div className="w-3/6 rounded-md p-5" style={{ backgroundColor: "#F1F1FA" }}>
+              <div
+                className="w-3/6 rounded-md p-5"
+                style={{ backgroundColor: "#F1F1FA" }}
+              >
                 <div className="flex items-center mb-2">
                   <span className="text-xl mr-2 font-bold">
                     Video on Google
                   </span>
                   <AiOutlineInfoCircle size={15} />
                 </div>
-                <div className="text-xs">Top videos ranking on Google for this idea</div>
+                <div className="text-xs">
+                  Top videos ranking on Google for this idea
+                </div>
                 <div className="mt-8">
                   {isSerpGoogleLoaded === "data" ? (
                     keywordVideosInfo.map((item, index) => {
@@ -698,12 +703,15 @@ function Insights({
                     })
                   ) : isSerpGoogleLoaded === "nodata" ? (
                     <div className="flex flex-col items-center justify-center mt-5 w-full h-48 bg-black rounded-md">
-                      <div className="p-3 mb-5 rounded-md" style={{backgroundColor: "#1C1C2F"}}>
-                      <img
-                        src={tubeDominatorLogo}
-                        alt="Tubedominator logo"
-                        className="h-7"
-                      />
+                      <div
+                        className="p-3 mb-5 rounded-md"
+                        style={{ backgroundColor: "#1C1C2F" }}
+                      >
+                        <img
+                          src={tubeDominatorLogo}
+                          alt="Tubedominator logo"
+                          className="h-7"
+                        />
                       </div>
                       <div className="text-xs whitespace-normal ml-5 text-white">
                         Google doesn't have video snippets for this keyword
@@ -783,16 +791,22 @@ function Insights({
                 <div className="flex flex-wrap -mx-2">
                   {savedIdeasData.related_keywords.map((item, index) => (
                     <div key={index} className="m-2 flex">
-                      <div className="rounded-tl-md rounded-bl-md bg-gray-200 p-2" style={{backgroundColor: "#EAEAF5"}}>
-                        <div className="px-3 py-1 text-xs">
-                          {item.string}
-                        </div>
+                      <div
+                        className="rounded-tl-md rounded-bl-md bg-gray-200 p-2"
+                        style={{ backgroundColor: "#EAEAF5" }}
+                      >
+                        <div className="px-3 py-1 text-xs">{item.string}</div>
                       </div>
-                        <div className="bg-gray-400 rounded-tl-md rounded-bl-md p-3 pt-3 py-1 text-xs transform translate-x-[-5px]" style={{backgroundColor: "#E0E0F6"}}>
-                          {formatNumberToKMBPlus(item.volume)}
-                        </div>
-                        <div className="bg-gray-400 rounded-md px-2 py-1 text-xs transform translate-x-[-10px]" style={{backgroundColor: "#D7D7F7"}}>
-                        </div>
+                      <div
+                        className="bg-gray-400 rounded-tl-md rounded-bl-md p-3 pt-3 py-1 text-xs transform translate-x-[-5px]"
+                        style={{ backgroundColor: "#E0E0F6" }}
+                      >
+                        {formatNumberToKMBPlus(item.volume)}
+                      </div>
+                      <div
+                        className="bg-gray-400 rounded-md px-2 py-1 text-xs transform translate-x-[-10px]"
+                        style={{ backgroundColor: "#D7D7F7" }}
+                      ></div>
                     </div>
                   ))}
                 </div>

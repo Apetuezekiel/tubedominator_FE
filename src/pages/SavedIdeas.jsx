@@ -563,6 +563,7 @@ const SavedIdeas = () => {
               allowPdfExport
               allowPaging
               allowSorting
+              style={{ borderRadius: '10px' }}
             >
               <ColumnsDirective>
                 <ColumnDirective

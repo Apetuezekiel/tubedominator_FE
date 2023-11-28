@@ -1247,7 +1247,7 @@ export const menuLinks = [
       // },
       {
         name: "Keywords Ranking",
-        link: "rankings",
+        link: "keywords",
         icon: <BsBarChart />,
       },
       {

@@ -247,7 +247,7 @@ const Navbar = () => {
   return (
     <div
       // style={{backgroundColor: 'black'}}
-      className={`w-full flex justify-between py-2 mt-5 md:ml-6 md:mr-6 relative ${
+      className={`w-full flex justify-between py-2 md:ml-6 md:mr-6 relative ${
         userLoggedIn ? "" : "shadow-xl"
       }`}
     >
@@ -267,8 +267,8 @@ const Navbar = () => {
             
           /> */}
           <div className="ml-5">
-            <div className="pageTitle text-3xl font-semibold">{pageTitle}</div>
-            <div className="tag text-md mt-2 text-xs">{pageTag}</div>
+            {/* <div className="pageTitle text-3xl font-semibold">{pageTitle}</div>
+            <div className="tag text-md mt-2 text-xs">{pageTag}</div> */}
           </div>
           <div className="flex">
             <TooltipComponent content="Profile" position="BottomCenter">
@@ -278,7 +278,7 @@ const Navbar = () => {
                 style={{ backgroundColor: "#EAEAFF" }}
               >
                 <img
-                  className="rounded-full w-10 h-10"
+                  className="rounded-full w-5 h-5"
                   src={userData.channel_image_link}
                   alt="user-profile"
                 />

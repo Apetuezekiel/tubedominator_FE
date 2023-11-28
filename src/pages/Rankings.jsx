@@ -601,32 +601,46 @@ const Keyword2 = () => {
         <div className=""></div>
       )}
       <div>
-        <div className="flex items-center mb-5 w-full border-b border-solid border-gray-300">
-          <NavLink to="/rankings">
-            <div className="flex justify-between items-center mr-5 pr-5 pb-2 selectedMenuKwPg">
-              Rankings
+        <div className="flex items-center justify-start">
+          <div className="flex items-center">
+            <div
+              className="flex mt-10 rounded-md"
+              style={{ border: "solid 1px #9999FF" }}
+            >
+              <NavLink
+                className="mr-3 pb-3 px-7 cursor-pointer rounded-tl-sm rounded-bl-sm rounded-br-md rounded-tr-md m-auto pt-2"
+                style={{
+                  border: "#9999FF 1px solid",
+                  color: "white",
+                  backgroundColor: "#9999FF",
+                }}
+                to="/rankings"
+              >
+                Rankings
+              </NavLink>
+              <NavLink
+                className="mr-3 pb-3 pr-5 cursor-pointer pt-2 rounded-md m-auto"
+                to="/keywords"
+              >
+                Keywords
+              </NavLink>
             </div>
-          </NavLink>
-          <NavLink to="/keywords">
-            <div className="flex justify-between items-center pb-2">
-              Keywords
-            </div>
-          </NavLink>
-        </div>
-        <div className="flex items-center mb-5">
-          <div className="flex justify-between items-center mr-5 pr-5 border-r border-solid border-gray-300">
-            <span className="mr-2">Source:</span>{" "}
-            <span className="mr-2">
-              <FaYoutube style={{ color: "red" }} />
-            </span>{" "}
-            <span>Youtube</span>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="mr-2">location:</span>{" "}
-            <span className="mr-2">
-              <BiWorld style={{ color: "blue" }} />
-            </span>{" "}
-            <span>Global</span>
+          <div className="flex items-center mt-10 ml-10">
+            <div className="flex justify-between items-center mr-5 pr-5 border-r border-solid border-gray-300">
+              <span className="mr-1">Source:</span>{" "}
+              <span className="mr-1">
+                <FaYoutube style={{ color: "red" }} />
+              </span>{" "}
+              <span>Youtube</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="mr-1">location:</span>{" "}
+              <span className="mr-1">
+                <BiWorld style={{ color: "#9999FF" }} />
+              </span>{" "}
+              <span>Global</span>
+            </div>
           </div>
         </div>
         <div className="flex justify-between items-center w-full mt-10">

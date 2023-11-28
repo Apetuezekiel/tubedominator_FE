@@ -45,6 +45,7 @@ import { TiDelete } from "react-icons/ti";
 import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
 import { MdCancel } from "react-icons/md";
 import Loader from "../components/Loader";
+import exportIcon from "../data/icons/export.png";
 // import deleteChannelKeyword from "../data/api/calls";
 
 const Keyword2 = () => {
@@ -603,7 +604,7 @@ const Keyword2 = () => {
   };
 
   return (
-    <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
+    <div className="m-2 md:m-10 mt-24 p-2 md:p-10">
       {isLoading ? (
         <div className="loading-container">
           <Spinner />
@@ -612,56 +613,84 @@ const Keyword2 = () => {
         <div className=""></div>
       )}
       <div>
-        <div className="flex items-center mb-5 w-full border-b border-solid border-gray-300">
-          <NavLink to="/rankings">
-            <div className="flex justify-between items-center mr-5 pr-5 pb-2">
-              Rankings
-            </div>
-          </NavLink>
-          <NavLink to="/keywords">
-            <div className="flex justify-between items-center selectedMenuKwPg pb-2">
-              Keywords
-            </div>
-          </NavLink>
-        </div>
-        <div className="flex items-center mb-5">
-          <div className="flex justify-between items-center mr-5 pr-5 border-r border-solid border-gray-300">
-            <span className="mr-2">Source:</span>{" "}
-            <span className="mr-2">
-              <FaYoutube style={{ color: "red" }} />
-            </span>{" "}
-            <span>Youtube</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="mr-2">location:</span>{" "}
-            <span className="mr-2">
-              <BiWorld style={{ color: "blue" }} />
-            </span>{" "}
-            <span>Global</span>
+        <div className="">
+          <div className="pageTitle text-3xl font-semibold">Keywords</div>
+          <div className="tag text-md mt-2 text-xs font-thin">
+            Set up and manage your channel keywords
           </div>
         </div>
-        <div className="w-full flex">
-          <div className="w-1/2 py-2">
-            <Header title="Keywords" size="text-1xl" />
-            <span className="text-xs">From 18 Aug - 25 Aug 2023</span>
+        <div className="flex items-center justify-start">
+          <div className="w-1/2 flex items-center justify-start">
+            <div className="flex items-center">
+              {/* <div
+              className="flex mt-10 rounded-md"
+              style={{ border: "solid 1px #9999FF" }}
+            >
+              <NavLink
+                className="mr-3 pb-3 px-3 cursor-pointer rounded-md m-auto pt-2"
+                to="/rankings"
+              >
+                Rankings
+              </NavLink>
+              <NavLink
+                className="pb-3 px-7 pr-5 cursor-pointer pt-2 rounded-tl-md rounded-bl-md rounded-br-sm rounded-tr-sm m-auto"
+                to="/keywords"
+                style={{
+                  border: "#9999FF 1px solid",
+                  color: "white",
+                  backgroundColor: "#9999FF",
+                }}
+              >
+                Keywords
+              </NavLink>
+            </div> */}
+            </div>
+            <div className="flex items-center mt-10">
+              <div className="flex justify-between items-center mr-5 pr-5 border-r border-solid border-gray-300">
+                <span className="mr-1">Source:</span>{" "}
+                <span className="mr-1">
+                  <FaYoutube style={{ color: "red" }} />
+                </span>{" "}
+                <span>Youtube</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="mr-1">location:</span>{" "}
+                <span className="mr-1">
+                  <BiWorld style={{ color: "#9999FF" }} />
+                </span>{" "}
+                <span>Global</span>
+              </div>
+            </div>
           </div>
+
           <div className="w-1/2 flex justify-end py-2">
             <div>
               <div className="flex justify-start items-center">
                 <div
                   className="text-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4 cursor-pointer"
-                  style={{ backgroundColor: "#7352FF" }}
+                  style={{
+                    border: "0.5px solid #9999FF",
+                  }}
                   onClick={addUserKeyword}
                 >
                   <span className="mr-2 text-xs flex justify-between items-center">
                     {" "}
-                    <FaPlus /> <span className="ml-2">ADD KEYWORDS</span>
+                    <FaPlus color="#9999FF" />{" "}
+                    <span className="ml-2" style={{ color: "#9999FF" }}>
+                      Add Keyword
+                    </span>
                   </span>
                 </div>
-                <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
+                <div
+                  style={{
+                    background:
+                      "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                  }}
+                  className="rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4"
+                >
                   <span className="mr-2 text-xs flex justify-between items-center">
-                    <FaDownload />
-                    <span className="ml-2">Export</span>
+                    <img src={exportIcon} alt="" className="h-4" />
+                    <span className="ml-2 text-white">Export</span>
                   </span>
                 </div>
               </div>
@@ -678,7 +707,11 @@ const Keyword2 = () => {
                   />
                   <button
                     onClick={submitUserKeyword}
-                    style={{ backgroundColor: "#7352FF" }}
+                    style={{
+                      border: "0.5px solid #9999FF",
+                      background:
+                        "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                    }}
                     className="w-full text-white p-2 rounded mt-2 flex justify-center items-center"
                   >
                     Add Keyword{" "}
@@ -697,40 +730,49 @@ const Keyword2 = () => {
             </div>
           </div>
         </div>
-        {loadingUserChannelKeyword && (
-          <Loader
-            message={"Loading your saved Keywords. Hold Tight"}
-            marginBottom={20}
-          />
-        )}
-        <br />
-        <GridComponent
-          dataSource={userChannelKeywords}
-          allowExcelExport
-          allowPdfExport
-          allowPaging
-          allowSorting
-        >
-          <ColumnsDirective>
-            <ColumnDirective
-              field=""
-              headerText="#"
-              template={actionTemplate}
-              width={100}
-              headerTemplate={actionTitleTemplate}
+
+        <div className="rounded-md bg-white px-5 pb-5 mt-10">
+          <div className="w-full flex">
+            <div className="w-1/2">
+              <Header title="Keywords" size="text-1xl" />
+              <span className="text-xs">From 18 Aug - 25 Aug 2023</span>
+            </div>
+            <div className="w-1/2 flex justify-end py-2"></div>
+          </div>
+          {loadingUserChannelKeyword && (
+            <Loader
+              message={"Loading your saved Keywords. Hold Tight"}
+              marginBottom={20}
             />
-            <ColumnDirective
-              field="keyword"
-              headerText="Keywords"
-              // template={keywordTemplate}
-            />
-            <ColumnDirective
-              field=""
-              headerText="Youtube Results"
-              headerTemplate={VideoIconTitleTemplate}
-              template={previewYoutubeKwSearch}
-            />
-            {/* <ColumnDirective
+          )}
+          <br />
+          <GridComponent
+            dataSource={userChannelKeywords}
+            allowExcelExport
+            allowPdfExport
+            allowPaging
+            allowSorting
+          >
+            <ColumnsDirective>
+              <ColumnDirective
+                field=""
+                headerText="#"
+                template={actionTemplate}
+                width={100}
+                headerTemplate={actionTitleTemplate}
+              />
+              <ColumnDirective
+                field="keyword"
+                headerText="Keywords"
+                // template={keywordTemplate}
+              />
+              <ColumnDirective
+                field=""
+                headerText="Youtube Results"
+                headerTemplate={VideoIconTitleTemplate}
+                template={previewYoutubeKwSearch}
+              />
+              {/* <ColumnDirective
                 field=""
                 headerText="Rank"
                 headerTemplate={VolumeTitleTemplate}
@@ -741,29 +783,30 @@ const Keyword2 = () => {
                 headerText="Video Result"
                 headerTemplate={VideoIconTitleTemplate}
               /> */}
-            <ColumnDirective
-              field="search_volume"
-              headerText="Volume"
-              template={formatViews}
+              <ColumnDirective
+                field="search_volume"
+                headerText="Volume"
+                template={formatViews}
+              />
+              <ColumnDirective
+                field="created_at_formatted"
+                headerText="Date added"
+              />
+            </ColumnsDirective>
+            <Inject
+              services={[
+                Resize,
+                Sort,
+                ContextMenu,
+                Filter,
+                Page,
+                ExcelExport,
+                Edit,
+                PdfExport,
+              ]}
             />
-            <ColumnDirective
-              field="created_at_formatted"
-              headerText="Date added"
-            />
-          </ColumnsDirective>
-          <Inject
-            services={[
-              Resize,
-              Sort,
-              ContextMenu,
-              Filter,
-              Page,
-              ExcelExport,
-              Edit,
-              PdfExport,
-            ]}
-          />
-        </GridComponent>
+          </GridComponent>
+        </div>
         {displayPreviewKeyword && (
           <PreviewKeyword
             keywordd={unconventionalKeywordd}
