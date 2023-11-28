@@ -576,7 +576,7 @@ const SavedIdeas = () => {
                 />
                 <ColumnDirective
                   field="video_ideas"
-                  headerText="Video ideas"
+                  headerText="Video ideas"  
                   headerTemplate={VideoIconTitleTemplate}
                   tooltip="Hover over for more information"
                   template={VideoIconTemplate}

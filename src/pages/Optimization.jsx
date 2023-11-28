@@ -35,6 +35,7 @@ import { BiChevronDown, BiEdit, BiTrendingUp } from "react-icons/bi";
 import { AiOutlineSearch } from "react-icons/ai";
 import Opitimize from "../components/Opitimize";
 import Loader from "../components/Loader";
+import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
 
 const Ideation = () => {
   const decryptAndRetrieveData = (data) => {
@@ -450,25 +451,37 @@ const Ideation = () => {
   }
 
   const viewCountTemplate = (props) => {
-    const formatedNumber = formatNumberToKPlus(props.viewCount);
-    return <div>{formatedNumber}</div>;
+    const formatedNumber = formatNumberToKMBPlus(props.viewCount);
+    const icon = <FiEye size={15} color="#E87A00" className="mr-2"/>;
+    return <div>{icon}{formatedNumber}</div>;
   };
 
   const gridOrderOptimizationLevel = (props) => {
     const roundedPercentage = Math.round(props.optimizationPercentage);
     const percentageWidth = `${roundedPercentage}%`;
-
+  
     return (
-      <div className="h-2 w-full rounded-full flex flex-row items-center justify-between">
-        <div className="h-full w-80 bg-gray-300 rounded-full mr-2">
+      <div className="h-10 w-full rounded-md flex flex-row items-center justify-between">
+        <div className="h-full w-80 rounded-md mr-2" style={{ backgroundColor: "#DCDCFF" }}>
           <div
-            className="h-full rounded-full"
-            style={{ width: percentageWidth, background: "#6B46C1" }}
-          ></div>
+            className="h-full rounded-tl-md rounded-bl-md flex items-center justify-center"
+            style={{ width: percentageWidth, background: "#C8C8FF" }}
+          >
+            <span
+              className="text-xs text-gray-700"
+              style={{
+                fontFamily: 'Work Sans',
+                fontSize: '13px',
+                fontWeight: 400,
+                lineHeight: '15px',
+                letterSpacing: '0em',
+                textAlign: 'left',
+              }}
+            >
+              {roundedPercentage}%
+            </span>
+          </div>
         </div>
-        <span className="w-20 text-xs text-purple-600">
-          {roundedPercentage}%
-        </span>
       </div>
     );
   };
@@ -569,11 +582,18 @@ const Ideation = () => {
           />
         )
       ) : (
-        <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl overflow-hidden">
+        <div className="m-2 md:m-10 mt-24 p-2 md:p-10 rounded-md overflow-hidden">
           <div className="flex justify-between">
-            <div className="w-3/4 flex py-2">
-              <div className="flex justify-start items-center">
-                {/* <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
+            <div className="w-full flex py-2">
+              <div className="flex w-full justify-between items-center">
+              <div className="">
+                <div className="pageTitle text-3xl font-semibold">Optimization</div>
+                <div className="tag text-md mt-2 text-xs font-thin">
+                Implement our optimization recommendations to increase your organic reach
+                </div>
+              </div>
+              <div className="flex justify-center items-center">
+              <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
                   <select
                     id="mySelect"
                     // value={this.state.selectedOption}
@@ -581,7 +601,7 @@ const Ideation = () => {
                     className="text-xs outline-none"
                   >
                     <option value=""> Visibility (All)</option>
-                    <option className="text-xs" value="Public Videos">
+                    {/* <option className="text-xs" value="Public Videos">
                       Public Videos
                     </option>
                     <option className="text-xs" value="Private Videos">
@@ -589,9 +609,9 @@ const Ideation = () => {
                     </option>
                     <option className="text-xs" value="Unlisted Videos">
                       Unlisted Videos
-                    </option>
+                    </option> */}
                   </select>
-                </div> */}
+                </div>
                 <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
                   <select
                     id="mySelect"
@@ -703,17 +723,19 @@ const Ideation = () => {
                   <HiOutlineChevronDown />
                 </div> */}
               </div>
+              </div>
             </div>
-            <div className="w-1/4 flex justify-end py-2">
-              {/* <div className="flex items-center w-2/4 border border-gray-300 bg-white rounded-full px-4 py-2">
+            {/* IMPORTANT COMMENT */}
+            {/* <div className="w-1/4 flex justify-end py-2">
+              <div className="flex items-center w-2/4 border border-gray-300 bg-white rounded-full px-4 py-2">
                 <input
                   type="text"
                   placeholder="Search"
                   className="flex-grow bg-transparent pr-2 text-xs"
                 />
                 <HiSearch className="text-gray-500 text-xs" />
-              </div> */}
-            </div>
+              </div>
+            </div> */}
           </div>
           {!isUserDataLoaded ? (
             <Loader message={"Loading your channel Videos. Hold tight"} />
@@ -722,7 +744,8 @@ const Ideation = () => {
           )}
           <div>
             {/* Header component */}
-            <Header title={`${userYoutubeData.length} videos`} />
+            <div className="text-xs font-thin mt-5 mb-5">Results: {`${userYoutubeData.length} videos`}</div>
+            <div className="rounded-md bg-white p-5">
             <GridComponent
               dataSource={userYoutubeData}
               // id="gridcomp"
@@ -779,6 +802,7 @@ const Ideation = () => {
                 ]}
               />
             </GridComponent>
+            </div>
           </div>
         </div>
       )}
