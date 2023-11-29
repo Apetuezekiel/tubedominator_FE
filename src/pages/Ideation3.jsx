@@ -807,6 +807,12 @@ const Ideation = () => {
         }`}
       >
         <div className="flex items-center justify-between h-full mb-5 relative">
+          <div className="">
+            <div className="pageTitle text-3xl font-semibold">Ideation</div>
+            <div className="tag text-md mt-2 text-xs font-thin">
+              Search and generate ideas for your next video!
+            </div>
+          </div>
           {/* <div className="flex items-center flex-col ">
             <div className="w-full max-w-xs flex items-center p-2 pl-4 pr-4 border border-gray-300 bg-white rounded-full">
               <input
