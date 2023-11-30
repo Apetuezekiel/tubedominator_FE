@@ -40,13 +40,17 @@ import {
 import { GoLightBulb, GoRocket } from "react-icons/go";
 import { BiColorFill } from "react-icons/bi";
 import { IoMdContacts } from "react-icons/io";
-import { RiContactsLine, RiStockLine } from "react-icons/ri";
-import { MdOutlineSupervisorAccount } from "react-icons/md";
+import {
+  RiContactsLine,
+  RiLightbulbFlashLine,
+  RiStockLine,
+} from "react-icons/ri";
+import { MdOutlineSupervisorAccount, MdPowerSettingsNew } from "react-icons/md";
 import { HiOutlineRefresh } from "react-icons/hi";
 import { TiTick } from "react-icons/ti";
 import { GiLouvrePyramid } from "react-icons/gi";
 import { GrLocation } from "react-icons/gr";
-import { FaUserAlt } from "react-icons/fa";
+import { FaRegHeart, FaUserAlt } from "react-icons/fa";
 // import { FaYoutube, FaGoogle, FaPlus } from 'react-iconcs/fa';
 import avatar from "./avatar.jpg";
 import avatar2 from "./avatar2.jpg";
@@ -60,6 +64,7 @@ import product5 from "./product5.jpg";
 import product6 from "./product6.jpg";
 import product7 from "./product7.jpg";
 import product8 from "./product8.jpg";
+import { IoRocketOutline, IoSettings } from "react-icons/io5";
 
 export const gridOrderImage = (props) => (
   <div className="flex items-center justify-left">
@@ -1228,17 +1233,17 @@ export const menuLinks = [
       {
         name: "ideation",
         link: "ideation",
-        icon: <GoLightBulb />,
+        icon: <RiLightbulbFlashLine />,
       },
       {
         name: "Saved Ideas",
         link: "saved-ideas-cat",
-        icon: <AiOutlineStar />,
+        icon: <FaRegHeart />,
       },
       {
         name: "optimization",
         link: "optimization",
-        icon: <GoRocket />,
+        icon: <IoRocketOutline />,
       },
       // {
       //   name: "Reporting",
@@ -1254,6 +1259,24 @@ export const menuLinks = [
         name: "AI Generator",
         link: "ai-generator",
         icon: <BsYoutube />,
+      },
+    ],
+  },
+];
+
+export const accountActions = [
+  {
+    title: "",
+    links: [
+      {
+        name: "Settings",
+        link: "#",
+        icon: <IoSettings />,
+      },
+      {
+        name: "Log Out",
+        link: "#",
+        icon: <MdPowerSettingsNew />,
       },
     ],
   },

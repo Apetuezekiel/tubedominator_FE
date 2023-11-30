@@ -9,7 +9,7 @@ import { FaYoutube, FaGoogle, FaPlus } from "react-icons/fa";
 import tubedominatorLogo from "../assets/images/TDLogo.png";
 import GoogleLoginComp from "../pages/UserAuth/GoogleLogin";
 
-import { menuLinks } from "../data/dummy";
+import { accountActions, menuLinks } from "../data/dummy";
 import { useStateContext } from "../contexts/ContextProvider";
 import { FcGoogle } from "react-icons/fc";
 import GoogleLogOut from "../pages/UserAuth/GoogleLogOut";
@@ -39,7 +39,8 @@ const Sidebar = () => {
     "flex items-center gap-5 pl-4 pt-3 pb-2.5 rounded-lg text-md text-gray-700 dark:text-gray-200 dark:hover:text-black hover:bg-light-gray m-2";
 
   return (
-    <div className="ml-3 h-screen md:overflow-hidden overflow-auto md:hover:overflow-auto pb-10 width-sidebar">
+    // <div className="ml-3 h-screen md:overflow-hidden overflow-auto md:hover:overflow-auto pb-10 width-sidebar">
+    <div className="bg-white w-fit rounded-lg flex justify-center items-center fixed mx-auto ml-16">
       {activeMenu && (
         <>
           <div className="flex justify-between items-center">
@@ -61,7 +62,7 @@ const Sidebar = () => {
               </button>
             </TooltipComponent>
           </div>
-          <div className="mt-10 ">
+          <div className="">
             {accessLevel === "L1" || accessLevel === null ? (
               <div>
                 <div className="-mb-24 ml-8 opacity-0">
@@ -90,7 +91,7 @@ const Sidebar = () => {
                 </p>
                 {item.links.map((link, index) => (
                   <div
-                    className="flex flex-col w-20 justify-center m-auto"
+                    className="flex flex-col w-16 justify-center m-auto"
                     key={index}
                   >
                     <NavLink
@@ -98,7 +99,12 @@ const Sidebar = () => {
                       key={link.name}
                       onClick={handleCloseSideBar}
                       style={({ isActive }) => ({
-                        backgroundColor: isActive ? currentColor : "",
+                        backgroundColor: isActive ? "#EAEAFE" : "",
+                        border: isActive
+                          ? "#9999FF 1px solid"
+                          : "#E5E4E2 1px solid",
+                        color: isActive ? "#9999FF" : "#000000",
+                        borderRadius: "6px",
                         pointerEvents: isDisabled ? "none" : "auto",
                         opacity: isDisabled ? 0.5 : 1,
                       })}
@@ -106,7 +112,50 @@ const Sidebar = () => {
                         isActive ? activeLink : normalLink
                       }
                     >
-                      <div>{link.icon}</div>
+                      <div className="">{link.icon}</div>
+                      {/* <div className="capitalize pr-4">{link.name}</div> */}
+                    </NavLink>
+                    {isDisabled && ( // Show a message on hover if accessLevel is not 'L2'
+                      <div className="tooltip bg-white">
+                        Connect to Youtube to access feature
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+            <br />
+            <br />
+            <br />
+            {accountActions.map((item, index) => (
+              <div key={index} className="">
+                <p className="text-gray-400 dark:text-gray-400 m-3 mt-4 uppercase">
+                  {item.title}
+                </p>
+                {item.links.map((link, index) => (
+                  <div
+                    className="flex flex-col w-16 justify-center m-auto"
+                    key={index}
+                  >
+                    <NavLink
+                      to={`/${link.link}`}
+                      key={link.name}
+                      onClick={handleCloseSideBar}
+                      style={({ isActive }) => ({
+                        backgroundColor: isActive ? "#EAEAFE" : "",
+                        border: isActive
+                          ? "#9999FF 1px solid"
+                          : "#E5E4E2 1px solid",
+                        color: isActive ? "#9999FF" : "#000000",
+                        borderRadius: "6px",
+                        pointerEvents: isDisabled ? "none" : "auto",
+                        opacity: isDisabled ? 0.5 : 1,
+                      })}
+                      className={({ isActive }) =>
+                        isActive ? activeLink : normalLink
+                      }
+                    >
+                      <div className="">{link.icon}</div>
                       {/* <div className="capitalize pr-4">{link.name}</div> */}
                     </NavLink>
                     {isDisabled && ( // Show a message on hover if accessLevel is not 'L2'

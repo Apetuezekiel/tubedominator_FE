@@ -9,7 +9,8 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 import { GoogleLogin } from "react-google-login";
 
-import avatar from "../assets/images/TDLogo.png";
+import TDLogo from "../assets/images/TDLogo.png";
+import TDLogoWhite from "../assets/images/TDLogoWhite.png";
 import { UserProfile } from ".";
 import PreviewKeyword from "./PreviewKeyword";
 // import PreviewKeyword from
@@ -36,6 +37,7 @@ import { useRef } from "react";
 import { pagesInfo } from "../data/pagesInfo";
 import userAvatar from "../assets/images/man-avatar-profile-picture-vector-illustration_268834-538.avif";
 import Loader from "./Loader";
+import { GoPlus } from "react-icons/go";
 
 const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
   <TooltipComponent content={title} position="BottomCenter">
@@ -247,9 +249,7 @@ const Navbar = () => {
   return (
     <div
       // style={{backgroundColor: 'black'}}
-      className={`w-full flex justify-between py-2 md:ml-6 md:mr-6 relative ${
-        userLoggedIn ? "" : "shadow-xl"
-      }`}
+      className={`w-full flex justify-between navBar relative`}
     >
       {userLoggedIn && accessLevel === "L2" && !userData ? (
         <Loader
@@ -266,11 +266,12 @@ const Navbar = () => {
             icon={<AiOutlineMenu />}
             
           /> */}
-          <div className="ml-5">
+          <div className="ml-5 my-auto py-5">
             {/* <div className="pageTitle text-3xl font-semibold">{pageTitle}</div>
             <div className="tag text-md mt-2 text-xs">{pageTag}</div> */}
+            <img src={TDLogo} alt="TubeDominator Logo" className="h-6"/>
           </div>
-          <div className="flex">
+          <div className="flex my-auto">
             <TooltipComponent content="Profile" position="BottomCenter">
               <div
                 className="flex items-center gap-2 cursor-pointer hover:bg-light-gray rounded-full px-2 py-2 mr-10"
@@ -282,8 +283,7 @@ const Navbar = () => {
                   src={userData.channel_image_link}
                   alt="user-profile"
                 />
-                <p>
-                  {/* <span className="text-gray-400 text-14">Hi,</span>{" "} */}
+                <p className="">
                   <span className="text-gray-400 font-bold ml-1 text-14">
                     {userData.firstName}
                   </span>
@@ -295,7 +295,7 @@ const Navbar = () => {
           </div>
         </>
       ) : userLoggedIn && accessLevel === "L1" ? (
-        <div className="w-5/6 flex justify-between p-2 md:ml-6 md:mr-6 relative homeHeader">
+        <div className="w-full flex justify-between p-2 md:ml-6 md:mr-6 relative homeHeader">
           <div className="navbar-nav ms-auto py-0 flex justify-between items-center text-lg">
             Welcome,{" "}
             <span className="text-2xl ml-2 font-semibold">
@@ -311,15 +311,18 @@ const Navbar = () => {
           </div>
         </div>
       ) : (
-        <div className="w-5/6 flex justify-between p-2 md:ml-6 md:mr-6 relative homeHeader">
-          <img
-            className="w-15"
-            src={avatar}
-            alt="user-profile"
-            height={50}
-            width={50}
-          />
-          <div className="navbar-nav ms-auto py-0 flex justify-between items-center">
+        <div
+          className="w-full flex justify-between p-2 relative homeHeader"
+          style={{ backgroundColor: "#1C1F33", borderRadius: "0 0 20px 20px" }}
+        >
+          <Link to={"/"}>
+            <img
+              className="h-8 my-auto"
+              src={TDLogoWhite}
+              alt="Tubedominator Logo"
+            />
+          </Link>
+          {/* <div className="navbar-nav ms-auto py-0 flex justify-between items-center">
             <a href="/project" className="nav-item nav-link mr-8">
               Services
             </a>
@@ -335,24 +338,28 @@ const Navbar = () => {
             <a href="/contact" className="nav-item nav-link">
               About
             </a>
-          </div>
+          </div> */}
           <div className="flex">
-            <div className="flex items-center gap-2 cursor-pointer p-1 hover:bg-light-gray rounded-lg">
+            <div className="flex items-center gap-2 cursor-pointer p-1 rounded-lg">
               <Link
-                className="text-lg mr-4 text-black py-2 px-5 rounded-full"
+                className="text-xs mr-4 py-2 px-5 rounded-full text-white flex items-center"
                 to="/sign-up"
-                style={{ backgroundColor: "#F2F2F2" }}
+                style={{
+                  backgroundColor: "transparent",
+                  border: "1px white solid",
+                }}
               >
+                <GoPlus className="mr-2" />
                 Register
               </Link>
               <Link
-                className="text-lg mr-4 text-black py-2 px-5 rounded-full"
+                className="text-xs mr-4 text-black py-2 px-8 rounded-full"
                 to="/sign-in"
-                style={{ backgroundColor: "#F2F2F2" }}
+                style={{ backgroundColor: "#9999ff" }}
               >
                 Log In
               </Link>
-              <p>
+              {/* <p>
                 <button
                   type="submit"
                   style={{ backgroundColor: "#7438FF" }}
@@ -360,7 +367,7 @@ const Navbar = () => {
                 >
                   Talk to an Expert
                 </button>
-              </p>
+              </p> */}
             </div>
           </div>
         </div>

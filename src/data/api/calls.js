@@ -73,10 +73,45 @@ export const userFullDataDecrypted = () => {
 //   }
 // }
 
+export async function generateThumbnail(prompt) {
+  try {
+    const response = await axios.post(
+      `${process.env.REACT_APP_API_BASE_URL}/generateThumbnail`,
+      {
+        prompt,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+          Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
+        },
+      },
+    );
+
+    if (response.data.success) {
+      console.log("Thumbnail", response);
+      const thumbnailUrl = response.data.data.data[0].url;
+      console.log("Thumbnail URL", thumbnailUrl);
+      localStorage.setItem("generatedThumbnail", JSON.stringify(thumbnailUrl));
+      return thumbnailUrl;
+    } else {
+      console.log("Error generating thumbnail");
+      return [];
+    }
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    // You can handle the error here or rethrow it if needed
+    throw error;
+  }
+}
+
+// generateThumbnail("\n\n\"Create an eye-catching thumbnail for beginners to master email marketing strategies and boost their business growth!\"");
+
 export async function getCategorySavedIdeas(category) {
   try {
     const decryptedFullData = userFullDataDecrypted();
-    const response = await axios.get(
+    const response = await axios.post(
       `${process.env.REACT_APP_API_BASE_URL}/getCategorySavedIdeas?email=${decryptedFullData.email}&category=${category}`,
       {
         headers: {

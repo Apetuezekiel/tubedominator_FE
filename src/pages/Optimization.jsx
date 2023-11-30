@@ -36,6 +36,7 @@ import { AiOutlineSearch } from "react-icons/ai";
 import Opitimize from "../components/Opitimize";
 import Loader from "../components/Loader";
 import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
+import { FiEye } from "react-icons/fi";
 
 const Ideation = () => {
   const decryptAndRetrieveData = (data) => {
@@ -452,11 +453,21 @@ const Ideation = () => {
 
   const viewCountTemplate = (props) => {
     const formatedNumber = formatNumberToKMBPlus(props.viewCount);
+    // const icon = <FiEye size={15} color="#E87A00" className="mr-2" />;
+    return (
+      <div className="flex items-center">
+        {/* {icon} */}
+        {formatedNumber}
+      </div>
+    );
+  };
+
+  const viewCountHeaderTemplate = (props) => {
     const icon = <FiEye size={15} color="#E87A00" className="mr-2" />;
     return (
-      <div>
+      <div className="flex items-center">
         {icon}
-        {formatedNumber}
+        {props.headerText}
       </div>
     );
   };
@@ -793,6 +804,7 @@ const Ideation = () => {
                     field="viewCount"
                     headerText="View Count"
                     template={viewCountTemplate}
+                    headerTemplate={viewCountHeaderTemplate}
                     width="150"
                   />
                   <ColumnDirective

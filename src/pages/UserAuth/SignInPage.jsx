@@ -12,9 +12,8 @@ import {
   getUserEncryptedDataFromDb,
   isChannelRegistered,
 } from "../../data/api/calls";
-import makeYoutubeWork from "../../assets/images/We Make YouTube Work for Businesses.png"
-import signInAppBanner from "../../assets/images/SignInAppBanner.png"
-
+import makeYoutubeWork from "../../assets/images/We Make YouTube Work for Businesses.png";
+import signInAppBanner from "../../assets/images/SignInAppBanner.png";
 
 const SignInPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -113,7 +112,9 @@ const SignInPage = () => {
             <img src={appLogo} className="w-28 mx-auto" alt="logo" />
           </div>
           <div className="mt-12 flex flex-col items-center">
-            <h1 className="text-2xl xl:text-3xl font-extrabold">Login to your Account</h1>
+            <h1 className="text-2xl xl:text-3xl font-extrabold">
+              Login to your Account
+            </h1>
             <div className="w-full flex-1 mt-8">
               <div className="mx-auto max-w-xs">
                 {/* {validationErrors.email && (
@@ -134,25 +135,6 @@ const SignInPage = () => {
                     setFormData({ ...formData, email: e.target.value })
                   }
                 />
-
-                {/* {validationErrors.password && (
-                  <div className="text-red-500 text-sm mb-1">
-                    {validationErrors.password}
-                  </div>
-                )} */}
-                {/* <input
-                  className={`w-full px-8 py-4 mb-5 rounded-lg font-medium bg-gray-100 border ${
-                    validationErrors.password
-                      ? "border-red-500"
-                      : "border-gray-200"
-                  } placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white`}
-                  type="password"
-                  placeholder="Password"
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                /> */}
                 <div className="text-xs mb-1 ml-1 text-gray-500">Password</div>
                 <input
                   className={`w-full px-8 py-4 mb-5 rounded-full font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white  ${
@@ -169,37 +151,39 @@ const SignInPage = () => {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                  <img
-                    src={signInBtn}
-                    alt="Sign in Button"
-                    className={`h-8 ${
-                      (formData.email === "" || formData.password === "") ?
-                      "cursor-not-allowed" : "cursor-pointer"
-                    }`}
-                    onClick={handleSubmit}
-                    style={{
-                      filter: `${
-                        (formData.email === "" || formData.password === "") && "grayscale(1)"
-                      }`,
-                    }}
-                  />
-                  {isLoading && (
-                    <BiLoaderCircle
-                      className="animate-spin text-center ml-3"
-                      color="#9999FF"
-                      size={20}
+                    <img
+                      src={signInBtn}
+                      alt="Sign in Button"
+                      className={`h-8 ${
+                        formData.email === "" || formData.password === ""
+                          ? "cursor-not-allowed"
+                          : "cursor-pointer"
+                      }`}
+                      onClick={handleSubmit}
+                      style={{
+                        filter: `${
+                          (formData.email === "" || formData.password === "") ?
+                          "grayscale(1)" : ""
+                        }`,
+                      }}
                     />
-                  )}
+                    {isLoading && (
+                      <BiLoaderCircle
+                        className="animate-spin text-center ml-3"
+                        color="#9999FF"
+                        size={20}
+                      />
+                    )}
                   </div>
                   <div className="border-b-1 text-center text-xs mb-3">
-                  <Link
-                    to="/sign-up"
-                    className="leading-none px-2 inline-block text-xs text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2"
-                  >
-                    Sign in Here
-                  </Link>
-                  <hr />
-                </div>
+                    <Link
+                      to="/sign-up"
+                      className="leading-none px-2 inline-block text-xs text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2"
+                    >
+                      Sign Up Here
+                    </Link>
+                    <hr />
+                  </div>
                 </div>
 
                 {loginError && (
@@ -216,12 +200,19 @@ const SignInPage = () => {
           style={{ backgroundColor: "#000015" }}
         >
           <div>
-            <img src={makeYoutubeWork} alt="" className="translate-x-32 mt-12 ml-2"/>
+            <img
+              src={makeYoutubeWork}
+              alt=""
+              className="translate-x-32 mt-12 ml-20"
+            />
           </div>
           <div>
-            <img src={signInAppBanner} alt="" className="h-96 text-right absolute bottom-0 right-0"/>
+            <img
+              src={signInAppBanner}
+              alt=""
+              className="h-96 text-right absolute bottom-0 right-0"
+            />
           </div>
- 
         </div>
       </div>
     </div>

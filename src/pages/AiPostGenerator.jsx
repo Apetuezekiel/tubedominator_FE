@@ -1,12 +1,13 @@
 import { BiArrowBack, BiLoaderCircle, BiSearch } from "react-icons/bi";
 import axios from "axios";
 import { useEffect } from "react";
-import { userFullDataDecrypted } from "../data/api/calls";
+import { generateThumbnail, userFullDataDecrypted } from "../data/api/calls";
 import { useState } from "react";
 import Loader from "../components/Loader";
 import { IoCopy } from "react-icons/io5";
 import showToast from "../utils/toastUtils";
 import { Tooltip } from "react-tooltip";
+import TDLogo from "../assets/images/TubeDominator 500x500.png"
 
 function AiPostGenerator({ display }) {
   const decryptedFullData = userFullDataDecrypted();
@@ -14,6 +15,7 @@ function AiPostGenerator({ display }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(null);
   const [loadedYoutubePost, setLoadedYoutubePost] = useState(false);
+  const [generatedThumbnail, setGeneratedThumbnail] = useState("");
   const [copiedStates, setCopiedStates] = useState({
     title: false,
     script: false,
@@ -97,6 +99,8 @@ function AiPostGenerator({ display }) {
       localStorage.setItem("lastGeneratedPost", JSON.stringify(updatedData));
 
       setLoadedYoutubePost(true);
+      const thumbnail = await generateThumbnail(updatedData.thumbnail);
+      setGeneratedThumbnail(thumbnail);
     } catch (error) {
       console.error("Error fetching data:", error);
       showToast(
@@ -134,10 +138,27 @@ function AiPostGenerator({ display }) {
     setSearchQuery(event.target.value);
   };
 
+  const handleDownload = () => {
+    if (generatedThumbnail) {
+      const downloadLink = document.createElement("a");
+      downloadLink.href = generatedThumbnail;
+      downloadLink.download = "generated_thumbnail.png";
+      downloadLink.click();
+    }
+  };
+
   return (
-    <section className={`w-full z-50 ${display}`}>
+    <section className={`w-full z-50 ${display} min-h-screen`}>
       <div className="m-2 md:m-10 mt-10 p-2 md:p-10 rounded-3xl">
         <div>
+          <div className="mb-10">
+            <div className="pageTitle text-3xl font-semibold">
+              AI Post Generator
+            </div>
+            <div className="tag text-md mt-2 text-xs font-thin">
+              Generate your next youtube post with ease
+            </div>
+          </div>
           <header>
             <div className="flex items-center justify-center h-full mb-5 w-full">
               <div className="flex items-center flex-col w-1/2">
@@ -163,7 +184,7 @@ function AiPostGenerator({ display }) {
                 disabled={isSearchEmpty}
                 style={{
                   background:
-                    "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                    "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))", color: "white"
                 }}
               >
                 Generate Post{" "}
@@ -362,6 +383,32 @@ function AiPostGenerator({ display }) {
                       ))}
                     </div>
                   </div>
+
+                  <div className="section1 m-2 mt-5 p-2 px-5 py-10 border-2 bg-white rounded-md w-full">
+                    <div className="ml-2">
+                      {generatedThumbnail ? (
+                        <div>
+                          <img
+                            src={
+                              generatedThumbnail
+                                ? generatedThumbnail
+                                : localStorage.getItem("generatedThumbnail")
+                            }
+                            alt="Generated Thumbnail"
+                            className="h-48 w-48"
+                          />
+                          <div
+                            onClick={handleDownload}
+                            className="mt-2 cursor-pointer text-xs font-bold py-2 px-4 rounded"
+                          >
+                            Download Thumbnail
+                          </div>
+                        </div>
+                      ) : (
+                        <Loader message={"Generating your Thumbnail"} />
+                      )}
+                    </div>
+                  </div>
                 </div>
                 <div className="section2 m-2 mt-14 p-2 px-5 py-10 border-2 bg-white rounded-md w-2/5">
                   <header className="flex justify-between w-full">
@@ -482,8 +529,9 @@ color="#514FB2"
           ) : isLoading ? (
             <Loader />
           ) : (
-            <div className="flex m-auto w-full justify-center items-center mt-20">
-              Use search bar to generate Youtube post for your Idea
+            <div className="flex m-auto w-full justify-center items-center mt-48">
+              <img src={TDLogo} alt="" className="h-8 mr-3 my-auto"/>
+                Use search bar to generate Youtube post for your Idea
             </div>
           )}
         </div>

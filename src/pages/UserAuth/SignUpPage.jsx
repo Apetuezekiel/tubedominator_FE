@@ -15,7 +15,7 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useUserAccessLevel, useUserLoggedin } from "../../state/state";
-import makeYoutubeWork from "../../assets/images/We Make YouTube Work for Businesses.png"
+import makeYoutubeWork from "../../assets/images/We Make YouTube Work for Businesses.png";
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
@@ -124,12 +124,16 @@ const SignUpPage = () => {
   };
 
   return (
-<div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
-  <div className="max-w-screen-xl w-full m-0 sm:m-10 bg-white shadow sm:rounded-lg flex-1 flex">
-    <div className="w-1/2 p-6 mx-auto flex flex-col items-center justify-center">
-        <div className="flex items-center justify-start w-full">
-          <img src={appLogo} className="w-20" alt="logo" />
-        </div>
+    <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
+      <div className="max-w-screen-xl w-full m-0 sm:m-10 bg-white shadow sm:rounded-lg flex-1 flex relative">
+        <div className="w-1/2 p-6 mx-auto flex flex-col items-center justify-center">
+          <div className="flex items-center justify-start w-full">
+            <img
+              src={appLogo}
+              className="w-32 absolute top-5 left-5"
+              alt="logo"
+            />
+          </div>
           <div className="mt-12 flex flex-col items-center">
             <h1 className="text-xl xl:text-3xl font-extrabold">
               Create an Account
@@ -307,18 +311,22 @@ const SignUpPage = () => {
                   </label>
                 </div>
 
-
                 <div className="flex items-center justify-between">
-                  <img src={signInBtn} alt="Sign in Button" className="h-8 cursor-pointer" onClick={handleSubmit}/>
+                  <img
+                    src={signInBtn}
+                    alt="Sign in Button"
+                    className="h-8 cursor-pointer"
+                    onClick={handleSubmit}
+                  />
                   <div className="border-b-1 text-center text-xs mb-3">
-                  <Link
-                    to="/sign-in"
-                    className="leading-none px-2 inline-block text-xs text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2"
-                  >
-                    Sign in Here
-                  </Link>
-                  <hr />
-                </div>
+                    <Link
+                      to="/sign-in"
+                      className="leading-none px-2 inline-block text-xs text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2"
+                    >
+                      Sign in Here
+                    </Link>
+                    <hr />
+                  </div>
                 </div>
 
                 {/* <button
@@ -351,16 +359,24 @@ const SignUpPage = () => {
             </div>
           </div>
         </div>
-        <div className="w-1/2" style={{ backgroundColor: "#000015" }}>
+        <div className="w-1/2 relative" style={{ backgroundColor: "#000015" }}>
           {/* <div
             className="xl:m-16 w-full bg-contain bg-center bg-no-repeat z-50"
             style={{ backgroundImage: `url(${signInImage})` }}
           ></div> */}
           <div>
-            <img src={signInImage} alt="" className="h-96 transform translate-x-32 ml-3"/>
+            <img
+              src={signInImage}
+              alt=""
+              className="h-96 absolute top-0 right-0"
+            />
           </div>
           <div>
-            <img src={makeYoutubeWork} alt="" className="translate-x-32 mt-8 ml-2"/>
+            <img
+              src={makeYoutubeWork}
+              alt=""
+              className="absolute bottom-16 left-32 ml-16"
+            />
           </div>
         </div>
       </div>

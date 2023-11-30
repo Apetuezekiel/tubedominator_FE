@@ -249,16 +249,44 @@ const SavedIdeas = () => {
           <Loader marginTop={10} />
         ) : (
           <div>
-            {fetchedSavedIdeas && (
-              <div>
-                <Loader message={"Loading your Saved Ideas. Hang on"} />
-              </div>
-            )}
             <br />
             <div className="rounded-md bg-white p-5">
               <Header title={`Folders`} size="text-1xl" />
+              {fetchedSavedIdeas ? (
+              <div>
+                <Loader message={"Loading your Saved Ideas. Hang on"} />
+              </div>
+              ) : (
               <div className="flex flex-wrap -mx-2">
+              <div
+                className="m-2 flex flex-col items-center justify-center cursor-pointer"
+                onClick={() => handleMoreClick("all")}
+              >
                 <div
+                  className="rounded-md p-2 w-40"
+                  style={{ backgroundColor: "#EAEAF5" }}
+                >
+                  <div className="flex items-center justify-end">
+                    <span className="py-1 px-1 rounded-full bg-white flex items-center justify-center cursor-pointer">
+                      <MdMoreHoriz color="black" className="m-auto" />
+                    </span>
+                  </div>
+                  <div className="w-full text-center">
+                    <div className="flex folder-container items-center justify-center">
+                      <IoFolderOpenOutline
+                        color="#C8C8DD"
+                        size={48}
+                        className="folder-container mt-5 mb-5"
+                      />
+                    </div>
+                  </div>
+                  <div className="py-1 text-xs font-bold">{"All"}</div>
+                  {/* <div className="text-xs">{"Date created"}</div> */}
+                </div>
+              </div>
+              {categories.map((item, index) => (
+                <div
+                  key={index}
                   className="m-2 flex flex-col items-center justify-center cursor-pointer"
                   onClick={() => handleMoreClick("all")}
                 >
@@ -267,53 +295,27 @@ const SavedIdeas = () => {
                     style={{ backgroundColor: "#EAEAF5" }}
                   >
                     <div className="flex items-center justify-end">
-                      <span className="py-1 px-1 rounded-full bg-white flex items-center justify-center cursor-pointer">
+                      <span className="folder-container py-1 px-1 rounded-full bg-white flex items-center justify-center cursor-pointer">
                         <MdMoreHoriz color="black" className="m-auto" />
                       </span>
                     </div>
                     <div className="w-full text-center">
-                      <div className="flex folder-container items-center justify-center">
+                      <div className="flex items-center justify-center">
                         <IoFolderOpenOutline
                           color="#C8C8DD"
                           size={48}
-                          className="folder-container mt-5 mb-5"
+                          className="mt-5 mb-5"
                         />
                       </div>
                     </div>
-                    <div className="py-1 text-xs font-bold">{"All"}</div>
+                    <div className="py-1 text-xs font-bold">{item}</div>
                     {/* <div className="text-xs">{"Date created"}</div> */}
                   </div>
                 </div>
-                {categories.map((item, index) => (
-                  <div
-                    key={index}
-                    className="m-2 flex flex-col items-center justify-center cursor-pointer"
-                    onClick={() => handleMoreClick("all")}
-                  >
-                    <div
-                      className="rounded-md p-2 w-40"
-                      style={{ backgroundColor: "#EAEAF5" }}
-                    >
-                      <div className="flex items-center justify-end">
-                        <span className="folder-container py-1 px-1 rounded-full bg-white flex items-center justify-center cursor-pointer">
-                          <MdMoreHoriz color="black" className="m-auto" />
-                        </span>
-                      </div>
-                      <div className="w-full text-center">
-                        <div className="flex items-center justify-center">
-                          <IoFolderOpenOutline
-                            color="#C8C8DD"
-                            size={48}
-                            className="mt-5 mb-5"
-                          />
-                        </div>
-                      </div>
-                      <div className="py-1 text-xs font-bold">{item}</div>
-                      {/* <div className="text-xs">{"Date created"}</div> */}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              ))}
+            </div>
+            )}
+
             </div>
           </div>
         )}

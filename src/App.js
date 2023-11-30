@@ -59,6 +59,7 @@ import Testss from "./pages/Testss";
 import axios from "axios";
 import { userFullDataDecrypted } from "./data/api/calls";
 import GenerateIdeasPanel from "./components/GenerateIdeasPanel";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const App = () => {
   const decryptedFullData = userFullDataDecrypted();
@@ -91,9 +92,6 @@ const App = () => {
       <Routes>
         {/* Authentication */}
         <Route path="/auth" element={<Auth />} />
-
-        {/* Home */}
-        <Route path="/" element={<Home />} />
 
         {/* Pages */}
         <Route path="/ideation" element={<ProtectedRoute />}>
@@ -146,10 +144,6 @@ const App = () => {
         <Route path="/tests" element={<Testss />} />
         <Route path="/register" element={<Register />} />
         <Route path="/youtube" element={<ConnectYoutube />} />
-
-        {/* Sign-In and Sign-Up */}
-        <Route path="/sign-in/*" element={<SignInPage />} />
-        <Route path="/sign-up/*" element={<SignUpPage />} />
       </Routes>
     );
   }
@@ -222,48 +216,36 @@ const App = () => {
         // pauseOnHover
       ></ToastContainer>
       <BrowserRouter>
-        <div className="flex relative">
-          {/* <div className="fixed right-4 bottom-4" style={{ zIndex: "1000" }}>
-            <TooltipComponent content="Settings" position="Top">
-              <button
-                type="button"
-                onClick={() => setThemeSettings(true)}
-                style={{ background: currentColor, borderRadius: "50%" }}
-                className="text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray"
-              >
-                <FiSettings />
-              </button>
-            </TooltipComponent>
-          </div> */}
-          {
-            userLoggedIn && (
-              <div className="fixed sidebar mt-36">
-                <Sidebar />
-              </div>
-            )
-            // : (
-            //   <div className="w-0 dark:bg-secondary-dark-bg">
-            //     <Sidebar />
-            //   </div>
-            // )
-          }
+        <div className="relative w-full">
+          <div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full">
+            <Navbar />
+          </div>
+          <Routes>
+            {/* Home */}
+            <Route path="/" element={<Home />} />
+
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            {/* Sign-In and Sign-Up */}
+            <Route path="/sign-in/*" element={<SignInPage />} />
+            <Route path="/sign-up/*" element={<SignUpPage />} />
+          </Routes>
           <div
-            className={
-              userLoggedIn
-                ? "dark:bg-main-dark-bg bg-main-bg min-h-screen md:ml-72 w-full"
-                : "bg-main-bg dark:bg-main-dark-bg w-full min-h-screen flex-2 "
-            }
+            className="flex w-full"
             style={{ backgroundColor: `${userLoggedIn && "#F1F1FA"}` }}
           >
-            <div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full">
-              <Navbar />
+            <div className="" style={{ width: "5vw" }}>
+              {userLoggedIn && (
+                <div className="flex justify-center mt-20 h-72">
+                  <Sidebar />
+                </div>
+              )}
             </div>
-            <div>
-              {themeSettings && <ThemeSettings />}
+            <div className="" style={{ width: "95vw" }}>
+              {/* {themeSettings && <ThemeSettings />} */}
               <AppRoutes />
             </div>
-            <Footer />
           </div>
+          <Footer />
         </div>
       </BrowserRouter>
     </div>
