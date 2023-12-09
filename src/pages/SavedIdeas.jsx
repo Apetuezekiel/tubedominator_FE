@@ -493,7 +493,7 @@ const SavedIdeas = () => {
   return (
     <section>
       <div
-        className={`m-2 md:m-10 mt-24 p-2 md:p-10  ${
+        className={`m-2 md:m-10 mt-24 p-2 md:p-10 min-h-screen  ${
           (showInsights || showCompetition) && "hidden"
         }`}
       >

@@ -9,6 +9,7 @@ const GenerateIdeasPanel = ({
   onSearchChange,
   setShowSearchPanel,
   setSearchQueryComplete,
+  handleGetIdeas,
 }) => {
   const initialCountry = {
     countryCode: "GLB",
@@ -42,7 +43,7 @@ const GenerateIdeasPanel = ({
       className="fixed top-0 left-0 w-full h-full flex justify-center items-center z-50"
       style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
     >
-      <div className="bg-white w-2/6 p-5 rounded-md">
+      <div className="bg-white min-w-fit p-5 rounded-md">
         <div className="flex justify-between">
           <div></div>
           <span
@@ -112,6 +113,7 @@ const GenerateIdeasPanel = ({
           onClick={() => {
             setSearchQueryComplete(true);
             setShowSearchPanel(false);
+            handleGetIdeas();
           }}
           disabled={isSearchEmpty}
           style={{

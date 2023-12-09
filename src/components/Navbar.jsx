@@ -269,7 +269,7 @@ const Navbar = () => {
           <div className="ml-5 my-auto py-5">
             {/* <div className="pageTitle text-3xl font-semibold">{pageTitle}</div>
             <div className="tag text-md mt-2 text-xs">{pageTag}</div> */}
-            <img src={TDLogo} alt="TubeDominator Logo" className="h-6"/>
+            <img src={TDLogo} alt="TubeDominator Logo" className="h-6" />
           </div>
           <div className="flex my-auto">
             <TooltipComponent content="Profile" position="BottomCenter">
@@ -341,7 +341,7 @@ const Navbar = () => {
           </div> */}
           <div className="flex">
             <div className="flex items-center gap-2 cursor-pointer p-1 rounded-lg">
-              <Link
+              {/* <Link
                 className="text-xs mr-4 py-2 px-5 rounded-full text-white flex items-center"
                 to="/sign-up"
                 style={{
@@ -351,11 +351,15 @@ const Navbar = () => {
               >
                 <GoPlus className="mr-2" />
                 Register
-              </Link>
+              </Link> */}
               <Link
                 className="text-xs mr-4 text-black py-2 px-8 rounded-full"
                 to="/sign-in"
-                style={{ backgroundColor: "#9999ff" }}
+                style={{
+                  background:
+                    "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                  color: "white",
+                }}
               >
                 Log In
               </Link>

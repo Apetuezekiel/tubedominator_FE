@@ -1268,11 +1268,11 @@ export const accountActions = [
   {
     title: "",
     links: [
-      {
-        name: "Settings",
-        link: "#",
-        icon: <IoSettings />,
-      },
+      // {
+      //   name: "Settings",
+      //   link: "settings",
+      //   icon: <IoSettings />,
+      // },
       {
         name: "Log Out",
         link: "#",
@@ -1646,10 +1646,11 @@ export const themeColors = [
 export const userProfileData = [
   {
     icon: <FaUserAlt />,
-    title: "My Profile",
-    desc: "Account Settings",
-    iconColor: "#03C9D7",
-    iconBg: "#E5FAFB",
+    title: "Account Settings",
+    desc: "Manage your Account",
+    iconColor: "#9999FF",
+    iconBg: "#EAEAFF",
+    link: "/settings",
   },
   // {
   //   icon: <BsShield />,

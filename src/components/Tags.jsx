@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 
-const Tags = ({ items, ml }) => {
+const Tags = ({ items, ml, slice }) => {
   const [showAll, setShowAll] = useState(false);
 
-  const displayedItems = showAll ? items : items.slice(0, 3);
+  // Conditionally use slicing based on the 'slice' prop
+  const displayedItems =
+    slice === true ? (showAll ? items : items.slice(0, 3)) : items;
 
   const handleToggle = () => {
     setShowAll(!showAll);
@@ -25,7 +27,7 @@ const Tags = ({ items, ml }) => {
           ></div>
         </div>
       ))}
-      {items.length > 3 && (
+      {slice === true && items.length > 3 && (
         <button
           className="mt-2 ml-2 cursor-pointer text-xs underline"
           onClick={handleToggle}

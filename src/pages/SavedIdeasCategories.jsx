@@ -49,6 +49,7 @@ import Competition from "./keywords/Competition";
 import { IoFolderOpenOutline } from "react-icons/io5";
 import { MdMoreHoriz } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import TDLogo from "../assets/images/TubeDominator 500x500.png";
 
 const SavedIdeas = () => {
   const decryptAndRetrieveData = (data) => {
@@ -96,6 +97,7 @@ const SavedIdeas = () => {
   const [updatedSavedIdea, setUpdatedSavedIdea] = useState(false);
   const [showInsights, setShowInsights] = useState(false);
   const [showCompetition, setShowCompetition] = useState(false);
+  const [loadingSavedIdeas, setLoadingSavedIdeas] = useState(false);
   const navigate = useNavigate();
 
   const handleMoreClick = (item) => {
@@ -104,6 +106,7 @@ const SavedIdeas = () => {
   };
 
   useEffect(() => {
+    setLoadingSavedIdeas(true);
     setFetchedSavedIdeas(true);
     const fetchSavedIdeas = async () => {
       try {
@@ -115,7 +118,7 @@ const SavedIdeas = () => {
         // Create a Set to store unique categories
         const uniqueCategories = new Set();
 
-        userSavedIdeas.forEach((item) => {
+        userSavedIdeas?.forEach((item) => {
           uniqueCategories.add(item.category);
         });
 
@@ -124,8 +127,11 @@ const SavedIdeas = () => {
 
         // Set the unique categories in the state
         setCategories(uniqueCategoriesArray);
+        console.log("uniqueCategoriesArray", uniqueCategoriesArray);
+        setLoadingSavedIdeas(false);
         console.log("uniqueCategoriesArrayyyyyyyyyyy", uniqueCategoriesArray);
       } catch (error) {
+        setLoadingSavedIdeas(false);
         setFetchedSavedIdeas(false);
         console.error("Error fetching saved ideas:", error);
       }
@@ -200,7 +206,7 @@ const SavedIdeas = () => {
   return (
     <section>
       <div
-        className={`m-2 md:m-10 mt-24 p-2 md:p-10  ${
+        className={`m-2 md:m-10 mt-24 p-2 md:p-10 min-h-screen ${
           (showInsights || showCompetition) && "hidden"
         }`}
       >
@@ -245,48 +251,17 @@ const SavedIdeas = () => {
             </div>
           </div>
         </div>
-        {!filterableSavedIdeasData ? (
-          <Loader marginTop={10} />
-        ) : (
-          <div>
-            <br />
-            <div className="rounded-md bg-white p-5">
-              <Header title={`Folders`} size="text-1xl" />
-              {fetchedSavedIdeas ? (
+        <div>
+          <br />
+          <div className="rounded-md bg-white p-5">
+            <Header title={`Folders`} size="text-1xl" mt={0} />
+            {loadingSavedIdeas ? (
               <div>
                 <Loader message={"Loading your Saved Ideas. Hang on"} />
               </div>
-              ) : (
+            ) : categories.length > 0 ? (
               <div className="flex flex-wrap -mx-2">
-              <div
-                className="m-2 flex flex-col items-center justify-center cursor-pointer"
-                onClick={() => handleMoreClick("all")}
-              >
                 <div
-                  className="rounded-md p-2 w-40"
-                  style={{ backgroundColor: "#EAEAF5" }}
-                >
-                  <div className="flex items-center justify-end">
-                    <span className="py-1 px-1 rounded-full bg-white flex items-center justify-center cursor-pointer">
-                      <MdMoreHoriz color="black" className="m-auto" />
-                    </span>
-                  </div>
-                  <div className="w-full text-center">
-                    <div className="flex folder-container items-center justify-center">
-                      <IoFolderOpenOutline
-                        color="#C8C8DD"
-                        size={48}
-                        className="folder-container mt-5 mb-5"
-                      />
-                    </div>
-                  </div>
-                  <div className="py-1 text-xs font-bold">{"All"}</div>
-                  {/* <div className="text-xs">{"Date created"}</div> */}
-                </div>
-              </div>
-              {categories.map((item, index) => (
-                <div
-                  key={index}
                   className="m-2 flex flex-col items-center justify-center cursor-pointer"
                   onClick={() => handleMoreClick("all")}
                 >
@@ -295,30 +270,61 @@ const SavedIdeas = () => {
                     style={{ backgroundColor: "#EAEAF5" }}
                   >
                     <div className="flex items-center justify-end">
-                      <span className="folder-container py-1 px-1 rounded-full bg-white flex items-center justify-center cursor-pointer">
+                      <span className="py-1 px-1 rounded-full bg-white flex items-center justify-center cursor-pointer">
                         <MdMoreHoriz color="black" className="m-auto" />
                       </span>
                     </div>
                     <div className="w-full text-center">
-                      <div className="flex items-center justify-center">
+                      <div className="flex folder-container items-center justify-center">
                         <IoFolderOpenOutline
                           color="#C8C8DD"
                           size={48}
-                          className="mt-5 mb-5"
+                          className="folder-container mt-5 mb-5"
                         />
                       </div>
                     </div>
-                    <div className="py-1 text-xs font-bold">{item}</div>
+                    <div className="py-1 text-xs font-bold">{"All"}</div>
                     {/* <div className="text-xs">{"Date created"}</div> */}
                   </div>
                 </div>
-              ))}
-            </div>
+                {categories.map((item, index) => (
+                  <div
+                    key={index}
+                    className="m-2 flex flex-col items-center justify-center cursor-pointer"
+                    onClick={() => handleMoreClick(item)}
+                  >
+                    <div
+                      className="rounded-md p-2 w-40"
+                      style={{ backgroundColor: "#EAEAF5" }}
+                    >
+                      <div className="flex items-center justify-end">
+                        <span className="folder-container py-1 px-1 rounded-full bg-white flex items-center justify-center cursor-pointer">
+                          <MdMoreHoriz color="black" className="m-auto" />
+                        </span>
+                      </div>
+                      <div className="w-full text-center">
+                        <div className="flex items-center justify-center">
+                          <IoFolderOpenOutline
+                            color="#C8C8DD"
+                            size={48}
+                            className="mt-5 mb-5"
+                          />
+                        </div>
+                      </div>
+                      <div className="py-1 text-xs font-bold">{item}</div>
+                      {/* <div className="text-xs">{"Date created"}</div> */}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex gap-2 justify-center items-center mb-20">
+                <img src={TDLogo} alt="" className="h-10" />
+                <span>You do not have any saved Ideas</span>
+              </div>
             )}
-
-            </div>
           </div>
-        )}
+        </div>
       </div>
       {showInsights && (
         <Insights

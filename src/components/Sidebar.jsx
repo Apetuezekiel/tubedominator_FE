@@ -14,6 +14,7 @@ import { useStateContext } from "../contexts/ContextProvider";
 import { FcGoogle } from "react-icons/fc";
 import GoogleLogOut from "../pages/UserAuth/GoogleLogOut";
 import { useUserAccessLevel } from "../state/state";
+import { GoogleLogout } from "react-google-login";
 
 const Sidebar = () => {
   const { currentColor, activeMenu, setActiveMenu, screenSize } =
@@ -63,7 +64,7 @@ const Sidebar = () => {
             </TooltipComponent>
           </div>
           <div className="">
-            {accessLevel === "L1" || accessLevel === null ? (
+            {/* {accessLevel === "L1" || accessLevel === null ? (
               <div>
                 <div className="-mb-24 ml-8 opacity-0">
                   <GoogleLoginComp />
@@ -83,7 +84,7 @@ const Sidebar = () => {
               </div>
             ) : (
               ""
-            )}
+            )} */}
             {menuLinks.map((item, index) => (
               <div key={index}>
                 <p className="text-gray-400 dark:text-gray-400 m-3 mt-4 uppercase">
@@ -134,7 +135,9 @@ const Sidebar = () => {
                 </p>
                 {item.links.map((link, index) => (
                   <div
-                    className="flex flex-col w-16 justify-center m-auto"
+                    className={`flex flex-col w-16 justify-center m-auto ${
+                      link.name === "Log Out" ? "relative" : ""
+                    }`}
                     key={index}
                   >
                     <NavLink
@@ -158,11 +161,9 @@ const Sidebar = () => {
                       <div className="">{link.icon}</div>
                       {/* <div className="capitalize pr-4">{link.name}</div> */}
                     </NavLink>
-                    {isDisabled && ( // Show a message on hover if accessLevel is not 'L2'
-                      <div className="tooltip bg-white">
-                        Connect to Youtube to access feature
-                      </div>
-                    )}
+                    <div className="absolute opacity-0">
+                      {link.name === "Log Out" && <GoogleLogOut />}
+                    </div>
                   </div>
                 ))}
               </div>

@@ -15,10 +15,10 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogout } from "react-google-login";
 import { useRef } from "react";
+import GoogleLogOut from "../pages/UserAuth/GoogleLogOut";
 
 const UserProfile = () => {
-  const clientId =
-    "372673946018-lu1u3llu6tqi6hmv8m2226ri9qev8bb8.apps.googleusercontent.com";
+  const clientId = process.env.REACT_APP_CLIENT_ID;
   const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
   const accessLevel = useUserAccessLevel((state) => state.accessLevel);
   const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
@@ -32,7 +32,11 @@ const UserProfile = () => {
 
   const onLogoutSuccess = (res) => {
     console.log("Logout Success, res:", res);
+    setIsClicked(initialState);
     localStorage.clear();
+    setUserLoggedIn("");
+    setAccessLevel("");
+    setUserData(null);
     navigate("/");
   };
 
@@ -48,6 +52,11 @@ const UserProfile = () => {
 
   const handleLogOutClick = () => {
     dismissProfileBtn.current.click();
+  };
+
+  const goToSettings = () => {
+    setIsClicked(initialState);
+    navigate("/settings");
   };
 
   return (
@@ -86,10 +95,11 @@ const UserProfile = () => {
         </div>
       </div>
       <div>
-        {userProfileData.map((item, index) => (
+        {/* {userProfileData.map((item, index) => (
           <div
             key={index}
             className="flex gap-5 border-b-1 border-color p-4 hover:bg-light-gray cursor-pointer  dark:hover:bg-[#42464D]"
+            onClick={goToSettings}
           >
             <button
               type="button"
@@ -107,26 +117,19 @@ const UserProfile = () => {
               </p>
             </div>
           </div>
-        ))}
+        ))} */}
       </div>
-      <div className="mt-5">
-        <div id="signoutButton">
-          {/* <GoogleLogout
-            clientId={clientId}
-            buttonText="Logout"
-            onLogoutSuccess={onLogoutSuccess}
-          ></GoogleLogout> */}
+      <div className="mt-5 flex flex-col justify-center items-center relative">
+        <div className="top-1 opacity-0 ml-8 absolute left-1/2 transform -translate-x-1/2 w-1/2">
+          <GoogleLogOut />
         </div>
-        {/* <Button
-            color="white"
-            bgColor={currentColor}
-            text="Logout"
-            borderRadius="10px"
-            width="full"
-          /> */}
         <button
-          className="w-full rounded-md py-3 text-white"
-          style={{ backgroundColor: "#7352FF" }}
+          className="w-1/2 rounded-md py-3 text-white"
+          style={{
+            background:
+              "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+            color: "white",
+          }}
           onClick={() => {
             setIsClicked(initialState);
             handleLogOut();

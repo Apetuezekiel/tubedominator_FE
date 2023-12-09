@@ -3,7 +3,7 @@ import { useState } from "react";
 import heroImage from "../data/avatar3.png";
 import { FaChevronDown, FaChevronUp, FaYoutube } from "react-icons/fa";
 import { TiDelete } from "react-icons/ti";
-import { BiCopy, BiEdit, BiLoaderCircle } from "react-icons/bi";
+import { BiArrowBack, BiCopy, BiEdit, BiLoaderCircle } from "react-icons/bi";
 import { thingsToFix, itemsFixed } from "../data/optimizeData";
 import { useEffect } from "react";
 import {
@@ -17,6 +17,9 @@ import {
   getYoutubePost,
   saveYoutubePost,
   userFullDataDecrypted,
+  deleteDraftPost,
+  checkDraftExistence,
+  getDraftPost,
 } from "../data/api/calls";
 import axios from "axios";
 import { FiCamera, FiLoader } from "react-icons/fi";
@@ -53,32 +56,36 @@ import { useNavigate } from "react-router-dom";
 import { IoPencil } from "react-icons/io5";
 import { MdDeleteSweep } from "react-icons/md";
 import countriesWithLanguages from "../data/countries";
+import { useLocation } from "react-router-dom";
+import Loader from "./Loader";
 // const exactKeywordData = useKeywordStore((state) => state.exactKeywordData);
 // const setExactKeywordData = useKeywordStore(
 //   (state) => state.setExactKeywordData,
 // );
 // import Spinner from "../components/Spinner";
 
-function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
-  console.log(videoId, likeCount, commentCount, viewCount);
+function Opitimize() {
+  const { state } = useLocation();
+  const navigate = useNavigate();
+  const { videoId, likeCount, commentCount, viewCount } =
+    state && state.customData ? state.customData : {};
+
+  if (
+    typeof videoId === "undefined" ||
+    typeof likeCount === "undefined" ||
+    typeof commentCount === "undefined" ||
+    typeof viewCount === "undefined"
+  ) {
+    navigate("/optimization");
+  }
+
+  // console.log("videoId, likeCount, commentCount, viewCount", videoId, likeCount, commentCount, viewCount);
   const initialCountry = {
     countryCode: "GLB",
     languageCode: "en",
   };
   const [selectedCountry, setSelectedCountry] = useState(initialCountry);
-  // showToast("warning", videoId, 2000)
-  // const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   if (!videoId) {
-  //     showToast('warning', 'No video was selected. Redirecting you now', 2000);
-  //     setTimeout(() => {
-  //       navigate("/optimization");
-  //     }, 2000);
-  //   }
-  // }, [videoId, navigate]);
   const decryptedFullData = userFullDataDecrypted();
-  const [isUserDataLoaded, setIsuserDataLoaded] = useState(false);
   const userYoutubeData = useUserYoutubeInfo((state) => state.userYoutubeData);
   const setUserYoutubeData = useUserYoutubeInfo(
     (state) => state.setUserYoutubeData,
@@ -90,25 +97,6 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
     (state) => state.setShowSearchTermPanel,
   );
   const [revertToOriginalPost, setRevertToOriginalPost] = useState(false);
-  const [formData, setFormData] = useState({
-    title:
-      userYoutubeData[0]?.title !== undefined
-        ? String(userYoutubeData[0].title)
-        : "",
-    description:
-      userYoutubeData[0]?.description !== undefined
-        ? String(userYoutubeData[0].description)
-        : "",
-    tags:
-      userYoutubeData[0]?.tags !== undefined
-        ? String(userYoutubeData[0].tags)
-        : "",
-    thumbnail: revertToOriginalPost
-      ? String(userYoutubeData[0]?.video_thumbnail)
-      : userYoutubeData[0]?.thumbnails.url !== undefined
-      ? String(userYoutubeData[0].thumbnails.url)
-      : "",
-  });
   const [newTemplateData, setNewTemplateData] = useState({
     title: "",
     content: "",
@@ -117,7 +105,6 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [unfixed, setUnfixed] = useState([]);
   const [fixed, setFixed] = useState([]);
-  const searchTerm = "church";
   const [activeView, setActiveView] = useState("thingsToFix");
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -141,17 +128,85 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
   const [saveUserTemplatesSuccess, setSaveUserTemplatesSuccess] =
     useState(false);
   const [fetchingUserTemplates, setFetchingUserTemplates] = useState(false);
+  const [isUserDataLoaded, setIsUserDataLoaded] = useState(false);
   const [editUserTemplate, setEditUserTemplate] = useState(-1);
   const [userChannelTemplates, setUserChannelTemplates] = useState([]);
+  const [selectedYoutubePost, setSelectedYoutubePost] = useState({
+    title: "",
+    thumbnail: "",
+  });
   const [processedUserSearchTerms, setProcessedUserSearchTerms] = useState([]);
   const userSavedSearchTerm = useUserSavedSearchTerm(
     (state) => state.userSavedSearchTerm,
   );
+  const [draftExists, setDraftExists] = useState(false);
+  const [youtubeDraftPost, setYoutubeDraftPost] = useState([]);
+
+  const targetVideoData = userYoutubeData.find(
+    (videoData) => videoData.videoId === videoId,
+  );
+
+  // const [formData, setFormData] = useState({
+  //   title: targetVideoData?.title !== undefined ? String(targetVideoData.title) : "",
+  //   description: targetVideoData?.description !== undefined
+  //     ? String(targetVideoData.description)
+  //     : "",
+  //   tags: targetVideoData?.tags !== undefined ? String(targetVideoData.tags) : "",
+  //   thumbnail: targetVideoData?.thumbnails?.url !== undefined
+  //     ? String(targetVideoData.thumbnails.url)
+  //     : "",
+  // });
+  // const [formData, setFormData] = useState({
+  //   title:
+  //     userYoutubeData[0]?.title !== undefined
+  //       ? String(userYoutubeData[0].title)
+  //       : "",
+  //   description:
+  //     userYoutubeData[0]?.description !== undefined
+  //       ? String(userYoutubeData[0].description)
+  //       : "",
+  //   tags:
+  //     userYoutubeData[0]?.tags !== undefined
+  //       ? String(userYoutubeData[0].tags)
+  //       : "",
+  //   thumbnail: userYoutubeData[0]?.thumbnails.url !== undefined
+  //     ? String(userYoutubeData[0].thumbnails.url)
+  //     : "",
+  // });
+
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    tags: "",
+    thumbnail: "",
+  });
+  // const [formData, setFormData] = useState({
+  //   title: String(youtubeDraftPost[0]?.video_title)
+  //     ? userYoutubeData[0]?.title !== undefined
+  //       ? String(userYoutubeData[0].title)
+  //       : ""
+  //     : "",
+  //   description: String(youtubeDraftPost[0]?.video_description)
+  //     ? userYoutubeData[0]?.description !== undefined
+  //       ? String(userYoutubeData[0].description)
+  //       : ""
+  //     : "",
+  //   tags: String(youtubeDraftPost[0]?.video_tags)
+  //     ? userYoutubeData[0]?.tags !== undefined
+  //       ? String(userYoutubeData[0].tags)
+  //       : ""
+  //     : "",
+  //   thumbnail: String(youtubeDraftPost[0]?.video_thumbnail)
+  //     ? userYoutubeData[0]?.thumbnails.url !== undefined
+  //       ? String(userYoutubeData[0].thumbnails.url)
+  //       : ""
+  //     : "",
+  // });
 
   let savedData;
 
   const goBack = () => {
-    window.history.goBack();
+    navigate("/optimization");
   };
 
   const staticData = [
@@ -166,70 +221,133 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
 
   let savedSearchTermData;
   useEffect(() => {
-    savedSearchTermData = JSON.parse(
+    let isMounted = true;
+
+    const savedSearchTermData = JSON.parse(
       localStorage.getItem(`${videoId}searchTermData`),
     );
     const savedSearchTerm = JSON.parse(
       localStorage.getItem(`${videoId}searchTerm`),
     );
-    setSearchQuery(savedSearchTerm);
-    setProcessedUserSearchTerms(savedSearchTermData);
-    if (!savedSearchTermData) {
-      return null;
-    } else {
-      console.log(
-        "now serving search term from local storage",
-        savedSearchTermData,
-      );
+
+    if (isMounted) {
+      setSearchQuery(savedSearchTerm);
+      setProcessedUserSearchTerms(savedSearchTermData);
+
+      if (savedSearchTermData) {
+        console.log(
+          "now serving search term from local storage",
+          savedSearchTermData,
+        );
+      }
     }
-  }, []);
+
+    return () => {
+      // Set the flag to false when the component is unmounted
+      isMounted = false;
+    };
+  }, [videoId]);
 
   useEffect(() => {
-    userSavedSearchTerm ? null : setShowSearchTermPanel(true);
-    let isMounted = true;
-    const fetchMyYoutubeVideo = async () => {
+    const fetchData = async () => {
       try {
-        axios
-          .get(`${process.env.REACT_APP_API_BASE_URL}/fetchMyYoutubeVideo`, {
-            params: {
-              channel_id: decryptedFullData.channelId,
-              video_id: videoId,
-            },
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": process.env.REACT_APP_X_API_KEY,
-              Authorization: `Bearer ${decryptedFullData.token}`,
-              gToken: decryptedFullData.gToken,
-            },
-          })
-          .then((response) => {
-            if (isMounted) {
-              console.log("setUserYoutubeData", response.data);
-              console.log("videoId", videoId);
-              setUserYoutubeData(response.data);
-              saveYoutubePost(
-                videoId,
-                response.data[0]?.title,
-                response.data[0]?.description,
-                response.data[0]?.tags,
-                response.data[0]?.thumbnails?.url,
-                likeCount,
-                commentCount,
-                viewCount,
-              );
-              setIsuserDataLoaded(true);
-              console.log(response);
-            }
-          })
-          .catch((error) => {
-            console.error("Error fetching data:", error);
+        const youtubePostDraft = await getDraftPost(videoId);
+
+        if (youtubePostDraft && youtubePostDraft.length >= 1) {
+          const draftData = youtubePostDraft[0];
+          setDraftExists(true);
+          setYoutubeDraftPost(youtubePostDraft);
+          setFormData({
+            title: String(draftData.video_title) || "",
+            description: String(draftData.video_description) || "",
+            tags: String(draftData.video_tags) || "",
+            thumbnail: String(draftData.video_thumbnail) || "",
           });
+          setSelectedYoutubePost((prev) => ({
+            ...prev,
+            title: String(draftData.video_title) || "",
+            thumbnail: String(draftData.video_thumbnail) || "",
+          }));
+          setIsUserDataLoaded(true);
+        }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching draft data:", error);
+        // Handle errors as needed
       }
     };
 
-    fetchMyYoutubeVideo();
+    const fetchMyYoutubeVideo = async () => {
+      try {
+        // const response = await axios.get(
+        //   `${process.env.REACT_APP_API_BASE_URL}/fetchMyYoutubeVideo`,
+        //   {
+        //     params: {
+        //       channel_id: decryptedFullData.channelId,
+        //       video_id: videoId,
+        //     },
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //       "x-api-key": process.env.REACT_APP_X_API_KEY,
+        //       Authorization: `Bearer ${decryptedFullData.token}`,
+        //       gToken: decryptedFullData.gToken,
+        //     },
+        //   },
+        // );
+
+        // localStorage.setItem("testVideoData", JSON.stringify(response.data));
+        const targetVideoData = userYoutubeData.find(
+          (videoData) => videoData.videoId === videoId,
+        );
+
+        setFormData({
+          title: String(targetVideoData.title) || "",
+          description: String(targetVideoData.description) || "",
+          tags: String(targetVideoData.tags) || "",
+          thumbnail: String(targetVideoData.thumbnails?.url) || "",
+        });
+        setSelectedYoutubePost((prev) => ({
+          ...prev,
+          title: String(targetVideoData.title) || "",
+          thumbnail: String(targetVideoData.thumbnails?.url) || "",
+        }));
+        // setUserYoutubeData(response.data);
+        saveYoutubePost(
+          videoId,
+          targetVideoData?.title,
+          targetVideoData?.description,
+          targetVideoData?.tags,
+          targetVideoData?.thumbnails?.url,
+          likeCount,
+          commentCount,
+          viewCount,
+        );
+        setIsUserDataLoaded(true);
+        // console.log(response);
+      } catch (error) {
+        console.error("Error fetching YouTube data:", error);
+        // Handle errors as needed
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+
+    if (youtubeDraftPost.length < 1) {
+      if (!userSavedSearchTerm) {
+        setShowSearchTermPanel(true);
+      }
+
+      let isMounted = true;
+
+      fetchMyYoutubeVideo();
+
+      console.log("Got to calling the YouTube post API");
+
+      return () => {
+        isMounted = false;
+      };
+    }
   }, []);
 
   // Loading searchTerms from localstorage
@@ -237,7 +355,7 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
     const fetchUserKeywords = async () => {
       const savedDataJSON = localStorage.getItem("searchedItems");
       if (!savedDataJSON) {
-        showToast("success", "nothing in local storage", 2000);
+        console.log("nothing in local storage");
         return;
       }
 
@@ -303,6 +421,7 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
   }, [saveSuccess]);
 
   useEffect(() => {
+    console.log("I ran omoiyami");
     setFetchingUserTemplates(true);
     const fetchUserTemplates = async () => {
       try {
@@ -324,7 +443,6 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
         console.log("data", response);
         console.log("response", response.data.success === "trueNut");
         if (response.data.success === "trueNut") {
-          showToast("error", "No saved Templates", 2000);
           setFetchingUserTemplates(false);
         } else if (response.data.success == true) {
           setUserChannelTemplates(data.data);
@@ -339,7 +457,6 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        showToast("error", "No saved Templates", 2000);
         setFetchingUserTemplates(false);
       }
     };
@@ -491,7 +608,6 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
     console.log("props", props);
     setProcessingBookmarked(true);
     if (save) {
-      showToast("success", "I WAN SAVE", 2000);
       const response = await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}/bookmarkSearchTerm`,
         {
@@ -526,7 +642,6 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
         showToast("error", "Search Term wasn't saved. Try again", 2000);
       }
     } else {
-      showToast("success", "I WAN DELETE", 2000);
       try {
         const responseDelete = await axios.delete(
           `${process.env.REACT_APP_API_BASE_URL}/deleteSavedIdeaBookmarkSearchTerm`,
@@ -605,18 +720,30 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
     const timestampRegex = /0:00/; // Check for the pattern "0:00"
 
     // Validation and checks for title
-    const titleHasSearchTerm = formData.title.includes(userSavedSearchTerm);
+    const titleHasSearchTerm =
+      formData.title &&
+      userSavedSearchTerm &&
+      formData.title.toLowerCase().includes(userSavedSearchTerm.toLowerCase());
     const titleLengthOkay =
-      formData.title.length > 0 && formData.title.length <= 70;
+      formData.title &&
+      formData.title.length > 0 &&
+      formData.title.length <= 70;
     validateAndAddToFixed(0, titleHasSearchTerm, "Invalid title");
     validateAndAddToFixed(1, titleLengthOkay, "Invalid title");
 
     // Validation and checks for description
     const descriptionHasSearchTerm =
-      formData.description.includes(userSavedSearchTerm);
-    const descriptionHasUrl = formData.description.match(urlRegex);
-    const descriptionHasHashtag = formData.description.match(hashtagRegex);
-    const descriptionHasTimestamps = formData.description.match(timestampRegex);
+      formData.description &&
+      userSavedSearchTerm &&
+      formData.description
+        .toLowerCase()
+        .includes(userSavedSearchTerm.toLowerCase());
+    const descriptionHasUrl =
+      formData.description && formData.description.match(urlRegex);
+    const descriptionHasHashtag =
+      formData.description && formData.description.match(hashtagRegex);
+    const descriptionHasTimestamps =
+      formData.description && formData.description.match(timestampRegex);
 
     validateAndAddToFixed(2, descriptionHasSearchTerm, "Invalid description");
     validateAndAddToFixed(3, descriptionHasTimestamps, "Invalid hashtag");
@@ -624,10 +751,15 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
     validateAndAddToFixed(5, descriptionHasHashtag, "Invalid hashtag");
 
     // Validation and checks for tags
-    const tagsArray = formData.tags.split(",");
-    const tagsLengthOkay = tagsArray.length >= 5;
+    const tagsArray = formData.tags
+      ? formData.tags.split(",").map((tag) => tag.trim().toLowerCase())
+      : null;
+    const tagsLengthOkay = tagsArray && tagsArray.length >= 5;
     console.log("tagsArray", tagsArray, tagsLengthOkay);
-    const tagsHasSearchTerm = formData.tags.includes(userSavedSearchTerm);
+    const tagsHasSearchTerm =
+      tagsArray &&
+      userSavedSearchTerm &&
+      tagsArray.includes(userSavedSearchTerm.toLowerCase());
 
     validateAndAddToFixed(7, formData.tags, "Tags are required");
     validateAndAddToFixed(8, tagsLengthOkay, "Too few tags");
@@ -635,8 +767,8 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
   };
 
   useEffect(() => {
-    AICheck();
-  }, [formData, userSavedSearchTerm]);
+    isUserDataLoaded && AICheck();
+  }, [formData, userSavedSearchTerm, isUserDataLoaded]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -722,45 +854,16 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
     }
   };
 
-  const deleteDraftPost = async () => {
-    try {
-      const responseDelete = await axios.delete(
-        `${process.env.REACT_APP_API_BASE_URL}/deleteDraftPost`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": process.env.REACT_APP_X_API_KEY,
-            Authorization: `Bearer ${decryptedFullData.token}`,
-          },
-          params: {
-            video_id: videoId,
-          },
-        },
-      );
-      console.log("Draft removed successfully");
-      if (responseDelete.data.success) {
-        showToast("success", "Draft post removed from Search Terms", 2000);
-      } else {
-        showToast("error", "Draft post wasn't removed. Try again", 2000);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      throw error;
-    }
-  };
-
   const updateUserVideo = async () => {
     console.log("userYoutubeData", userYoutubeData);
     setUpdatingYtPost(true);
+
     const requestData = {
       videoId: videoId,
       videoTitle: formData.title,
     };
 
-    if (
-      userYoutubeData[0].categoryId !== null &&
-      userYoutubeData[0].categoryId !== undefined
-    ) {
+    if (userYoutubeData[0]?.categoryId != null) {
       requestData.categoryId = userYoutubeData[0].categoryId;
     } else {
       showToast(
@@ -768,41 +871,32 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
         "Cannot be updated due to technical issues. Kindly save draft and refresh page",
         2000,
       );
+      return;
     }
 
-    if (formData.description !== null && formData.description !== undefined) {
+    if (formData.description != null) {
       requestData.videoDescription = formData.description;
     }
 
-    if (formData.tags !== null && formData.tags !== undefined) {
+    if (formData.tags != null) {
       requestData.videoTags = formData.tags;
     }
 
     if (/^data:image\/\w+;base64,/.test(formData.thumbnail)) {
-      showToast("success", "GOTTEN", 5000);
-      // If formData.thumbnail is a valid Base64 string
-      requestData.videoThumbnail = formData.thumbnail;
-
-      // Create an image element to get the image dimensions
       const image = new Image();
-
-      // When the image is loaded, get the dimensions
       image.onload = () => {
         const width = image.width;
         const height = image.height;
 
-        // Add the dimensions to the requestData object
         requestData.videoThumbnailHeight = height;
         requestData.videoThumbnailWidth = width;
 
-        showToast("success", width, 5000); // Show the width
-        showToast("success", height, 5000); // Show the height
         console.log("Width:", width);
         console.log("Height:", height);
       };
 
-      // Set the source after the onload handler is defined
       image.src = formData.thumbnail;
+      requestData.videoThumbnail = formData.thumbnail;
     }
 
     console.log("requestData", requestData);
@@ -815,31 +909,23 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
     };
 
     try {
-      axios
-        .put(
-          `${process.env.REACT_APP_API_BASE_URL}/updateMyYoutubeVideos`,
-          requestData,
-          {
-            headers: requestHeaders,
-          },
-        )
-        .then((response) => {
-          console.log("updateMyYoutubeVideos response", response);
-          if (response.data.status === "success") {
-            deleteDraftPost();
-            showToast("success", "Post updated successfully", 2000);
-            setUpdatingYtPost(false);
-          } else {
-            showToast("error", "Post updating failed", 2000);
-            setUpdatingYtPost(false);
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-          setUpdatingYtPost(false);
-        });
+      const response = await axios.put(
+        `${process.env.REACT_APP_API_BASE_URL}/updateMyYoutubeVideos`,
+        requestData,
+        { headers: requestHeaders },
+      );
+
+      console.log("updateMyYoutubeVideos response", response);
+
+      if (response.data.status === "success") {
+        await deleteDraftPost();
+        showToast("success", "Post updated successfully", 2000);
+      } else {
+        showToast("error", "Post updating failed", 2000);
+      }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error updating YouTube videos:", error);
+    } finally {
       setUpdatingYtPost(false);
     }
   };
@@ -893,7 +979,6 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
       textField.remove();
       setIsCopied(true);
 
-      // Reset the "Copied" state after a brief delay
       setTimeout(() => {
         setIsCopied(false);
       }, 2000);
@@ -942,18 +1027,29 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
     const formatedNumber = formatNumberToKMBPlus(monthlysearch);
 
     const copyToClipboard = () => {
-      const textField = document.createElement("textarea");
-      textField.innerText = props.keyword;
-      document.body.appendChild(textField);
-      textField.select();
-      document.execCommand("copy");
-      textField.remove();
-      setIsCopied(true);
+      try {
+        // Create a temporary DOM element (input) to copy the text
+        const textField = document.createElement("textarea");
+        textField.value = props.keyword;
+        document.body.appendChild(textField);
 
-      // Reset the "Copied" state after a brief delay
-      setTimeout(() => {
-        setIsCopied(false);
-      }, 2000);
+        // Select and copy the text using the Clipboard API
+        textField.select();
+        document.execCommand("copy");
+
+        // Clean up: remove the temporary DOM element
+        textField.remove();
+
+        setIsCopied(true);
+
+        // Reset the "Copied" state after a brief delay
+        setTimeout(() => {
+          setIsCopied(false);
+        }, 2000);
+      } catch (error) {
+        // Handle any errors that might occur during the copying process
+        console.error("Unable to copy to clipboard:", error);
+      }
     };
 
     return (
@@ -1524,7 +1620,7 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
 
       if (updateUserTemplateResponse.data.success) {
         setUpdateUserTemplate(false);
-        setUpdateUserTemplateSuccess(true);
+        setUpdateUserTemplateSuccess((prevValue) => !prevValue);
         setEditUserTemplate(-1);
         setAddTemplateBox(false);
         showToast("success", "Template updated successfully", 2000);
@@ -1565,7 +1661,7 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
 
       if (deleteUserTemplateResponse.data.success) {
         setDeleteUserTemplate(-1);
-        setDeleteUserTemplateSuccess(true);
+        setDeleteUserTemplateSuccess((prevValue) => !prevValue);
         showToast("success", "Template deleted successfully", 2000);
       }
     } catch (error) {
@@ -1593,8 +1689,11 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
                       clearNewTemplateData();
                       setAddTemplateBox(true);
                     }}
-                    style={{ border: "#7438FF 1px solid" }}
-                    className="text-md py-2 px-5 rounded ml-10 mr-3 flex items-center"
+                    style={{
+                      backgroundColor: "transparent",
+                      border: "1px #4F4EB1 solid",
+                    }}
+                    className="text-md py-2 px-5 rounded-full ml-10 mr-3 flex items-center"
                   >
                     <BsFillPlusCircleFill
                       color="#7438FF"
@@ -1618,17 +1717,16 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
                         CANCEL
                       </span>
                       <button
-                        onClick={() => {
-                          showToast("message", newTemplateData.title, 2000);
+                        onClick={addNewUserTemplate}
+                        style={{
+                          background:
+                            "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                          color: "white",
                         }}
-                        style={{ backgroundColor: "#7438FF" }}
-                        className="text-md text-white py-2 px-5 rounded ml-10 mr-3"
+                        className="text-md text-white py-2 px-5 rounded-full ml-10 mr-3"
                       >
                         {/* <span className="flex items-center" onClick={addNewUserTemplate}>Save <AiFillCheckCircle color="white" className="ml-2"/> {saveUserTemplateSuccess === false && <FiLoader/>}</span> */}
-                        <span
-                          className={`flex items-center`}
-                          onClick={addNewUserTemplate}
-                        >
+                        <span className={`flex items-center rounded-full`}>
                           Save{" "}
                           <AiFillCheckCircle color="white" className="ml-2" />
                           {saveUserTemplateSuccess && (
@@ -1677,8 +1775,12 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
                             <span style={{ color: "#7438FF" }}>CANCEL</span>
                             <button
                               onClick={updateUserTemplate}
-                              style={{ backgroundColor: "#7438FF" }}
-                              className="text-md text-white py-2 px-5 rounded ml-10 mr-3"
+                              style={{
+                                background:
+                                  "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                                color: "white",
+                              }}
+                              className="text-md text-white py-2 px-5 rounded-full ml-10 mr-3"
                             >
                               <span
                                 className={`flex items-center`}
@@ -1766,248 +1868,280 @@ function Opitimize({ videoId, likeCount, commentCount, viewCount }) {
   };
 
   return (
-    <div className="flex h-screen flex-col px-10 py-5">
-      <div className="flex pl-5 pb-5 pt-5">
-        <div className="w-1/2 items-center flex">
-          <AiOutlineRollback
-            onClick={goBack}
-            className="mr-3"
-            color="#7352FF"
-            size={20}
-          />
-          <img
-            src={
-              revertToOriginalPost
-                ? userYoutubeData[0]?.video_thumbnail
-                : userYoutubeData[0]?.thumbnails.url
-            }
-            alt=""
-            height="20"
-            width="50"
-            className="mr-3"
-          />
-          <div className="underline">{userYoutubeData[0]?.title}</div>
-          {/* <span
-            className="ml-3 text-xs px-5 py-1 rounded-lg text-white"
-            style={{ backgroundColor: "#9D88FF" }}
-          >
-            Draft
-          </span> */}
-          <span
-            className="ml-3 text-xs px-5 py-1 rounded-lg text-white cursor-pointer"
-            style={{ backgroundColor: "#7438FF" }}
-            onClick={() => {
-              setRevertToOriginalPost(!revertToOriginalPost);
-              revertBackToOriginalPost();
-            }}
-          >
-            Revert to original
-          </span>
-        </div>
-        <div className="w-1/2 flex justify-end items-center">
-          <button
-            onClick={saveDraftPost}
-            style={{ backgroundColor: "#7438FF" }}
-            className="text-md text-white py-2 px-5 rounded mr-3"
-          >
-            Save to Draft
-          </button>
-          {savingDraft ? (
-            <BiLoaderCircle
-              className="animate-spin"
-              color="#7438FF"
-              size={20}
-            />
-          ) : (
-            ""
-          )}
+    <div className="flex flex-col px-10 py-5">
+      <span className="my-3 flex items-center cursor-pointer" onClick={goBack}>
+        <BiArrowBack color="#7472C2" className="mr-2" /> Back to list
+      </span>
+      {isUserDataLoaded ? (
+        <div>
+          <div className="flex pl-5 pb-5 pt-5">
+            <div className="w-1/2 items-center flex">
+              {/* <AiOutlineRollback
+                onClick={goBack}
+                className="mr-3"
+                color="#7352FF"
+                size={20}
+              /> */}
 
-          <button
-            onClick={updateUserVideo}
-            style={{ backgroundColor: "#7438FF" }}
-            className="text-md text-white py-2 px-5 rounded ml-10 mr-3"
-          >
-            Update on Youtube
-          </button>
-          {updatingYtPost ? (
-            <BiLoaderCircle
-              className="animate-spin"
-              color="#7438FF"
-              size={20}
-            />
-          ) : (
-            ""
-          )}
-        </div>
-      </div>
-      <div className="flex pl-5 pb-5 border-b border-t pt-5">
-        <div className="w-1/2 items-center flex">
-          Search Term:
-          {userSavedSearchTerm ? (
-            <span className="flex justify-center items-center ml-2">
-              <span className="underline">{userSavedSearchTerm}</span>{" "}
-              <div className="relative">
-                <Tooltip
-                  title="Edit the search term  for your video"
-                  position="top"
-                  trigger="mouseenter"
-                  animation="fade"
-                  theme="translucent"
-                >
-                  <BiEdit
-                    color="#7352FF"
-                    onClick={() => setShowSearchTermPanel(true)}
-                  />
-                </Tooltip>
+              <img
+                src={selectedYoutubePost && selectedYoutubePost.thumbnail}
+                alt=""
+                height="20"
+                width="50"
+                className="mr-3"
+              />
+              <div className="underline">
+                {selectedYoutubePost && selectedYoutubePost.title}
               </div>
-            </span>
-          ) : (
-            <div className="relative">
-              <Tooltip
-                title="Set a search term  for your video"
-                position="top"
-                trigger="mouseenter"
-                animation="fade"
-                theme="translucent"
+              {draftExists && (
+                <span
+                  className="ml-3 text-xs px-5 py-1 rounded-lg text-white"
+                  style={{ backgroundColor: "#9D88FF" }}
+                >
+                  Draft
+                </span>
+              )}
+              {/* <span
+                className="ml-3 text-xs px-5 py-1 rounded-full text-white cursor-pointer"
+                style={{
+                  background:
+                    "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                  color: "white",
+                }}
+                onClick={() => {
+                  setRevertToOriginalPost(!revertToOriginalPost); 
+                  revertBackToOriginalPost();
+                }}
               >
-                <AiFillWarning
-                  className="ml-3"
-                  color="#F49C0E"
+                Revert to original
+              </span> */}
+            </div>
+            <div className="w-1/2 flex justify-end items-center">
+              <button
+                onClick={saveDraftPost}
+                style={{
+                  background:
+                    "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                  color: "white",
+                }}
+                className="text-md text-white py-2 px-5 rounded-full mr-3"
+              >
+                Save to Draft
+              </button>
+              {savingDraft ? (
+                <BiLoaderCircle
+                  className="animate-spin"
+                  color="#7438FF"
                   size={20}
-                  onClick={() => setShowSearchTermPanel(true)}
                 />
-              </Tooltip>
+              ) : (
+                ""
+              )}
+
+              <button
+                onClick={updateUserVideo}
+                style={{
+                  background:
+                    "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                  color: "white",
+                }}
+                className="text-md text-white py-2 px-5 rounded-full ml-10 mr-3"
+              >
+                Update on Youtube
+              </button>
+              {updatingYtPost ? (
+                <BiLoaderCircle
+                  className="animate-spin"
+                  color="#7438FF"
+                  size={20}
+                />
+              ) : (
+                ""
+              )}
+            </div>
+          </div>
+          <div className="flex pl-5 pb-5 border-b border-t pt-5">
+            <div className="w-1/2 items-center flex">
+              Search Term:
+              {userSavedSearchTerm ? (
+                <span className="flex justify-center items-center ml-2">
+                  <span className="underline">{userSavedSearchTerm}</span>{" "}
+                  <div className="relative">
+                    <Tooltip
+                      title="Edit the search term  for your video"
+                      position="top"
+                      trigger="mouseenter"
+                      animation="fade"
+                      theme="translucent"
+                    >
+                      <BiEdit
+                        color="#7352FF"
+                        onClick={() => setShowSearchTermPanel(true)}
+                      />
+                    </Tooltip>
+                  </div>
+                </span>
+              ) : (
+                <div className="relative">
+                  <Tooltip
+                    title="Set a search term  for your video"
+                    position="top"
+                    trigger="mouseenter"
+                    animation="fade"
+                    theme="translucent"
+                  >
+                    <AiFillWarning
+                      className="ml-3"
+                      color="#F49C0E"
+                      size={20}
+                      onClick={() => setShowSearchTermPanel(true)}
+                    />
+                  </Tooltip>
+                </div>
+              )}
+            </div>
+            <div className="w-1/2 flex justify-around items-center">
+              <button
+                className={`text-center px-7 h-full ${
+                  activeView === "thingsToFix" && "chosenView"
+                }`}
+                onClick={() => handleViewChange("thingsToFix")}
+              >
+                Things to fix
+              </button>
+              {/* <button className="text-center px-7 h-full">AI</button> */}
+              <button
+                className={`text-center px-7 h-full ${
+                  activeView === "KeywordsView" && "chosenView"
+                }`}
+                onClick={() => handleViewChange("KeywordsView")}
+              >
+                Keywords
+              </button>
+              <button
+                className={`text-center px-7 h-full ${
+                  activeView === "TemplatesView" && "chosenView"
+                }`}
+                onClick={() => handleViewChange("TemplatesView")}
+              >
+                Templates
+              </button>
+            </div>
+          </div>
+          {showSearchTermPanel ? (
+            <SearchTerm videoId={videoId} />
+          ) : (
+            <div className="flex h-screen">
+              <div className="w-1/2 h-full overflow-y-auto p-4 pr-8 mt-7">
+                <form>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="title"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Video Title ({formData.title.length}/{maxTitleCharacters})
+                    </label>
+                    <input
+                      type="text"
+                      id="title"
+                      name="title"
+                      value={formData.title ?? ""}
+                      onChange={handleChange}
+                      maxLength={maxTitleCharacters}
+                      className="mt-1 p-2 border rounded w-full text-xs"
+                      placeholder="Enter a Title for your Video"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="description"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Video Description ({formData.description.length}/
+                      {maxDescriptionCharacters})
+                    </label>
+                    <textarea
+                      type="text"
+                      id="description"
+                      name="description"
+                      rows="10"
+                      value={formData.description ?? ""}
+                      onChange={handleChange}
+                      maxLength={maxDescriptionCharacters}
+                      className="mt-1 p-2 border rounded w-full text-xs"
+                      placeholder="Enter a Description for your Video"
+                    ></textarea>
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="tags"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Video Tags ({formData.tags.length}/{maxTagsCharacters})
+                    </label>
+                    <textarea
+                      type="text"
+                      id="tags"
+                      name="tags"
+                      rows="5"
+                      value={
+                        formData.tags !== "undefined" &&
+                        formData.tags !== "null"
+                          ? formData.tags
+                          : ""
+                      }
+                      onChange={handleChange}
+                      maxLength={maxTagsCharacters}
+                      className="mt-1 p-2 border rounded w-full text-xs"
+                      placeholder="Enter a comma after each tag"
+                    ></textarea>
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="tags"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Thumbnail
+                    </label>
+                    <img
+                      className="mt-4"
+                      src={
+                        selectedFile
+                          ? URL.createObjectURL(selectedFile)
+                          : selectedYoutubePost.thumbnail
+                      }
+                      alt="Video Thumbnail"
+                    />
+                  </div>
+                  <div
+                    className="relative px-5 py-2 border-2 w-2/4 rounded-md"
+                    style={{
+                      background:
+                        "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                      color: "white",
+                    }}
+                  >
+                    <label className="cursor-pointer flex items-center">
+                      <FiCamera className="camera-icon mr-3" />
+                      Update your thumbnail
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
+                        onChange={handleFileChange}
+                      />
+                    </label>
+                  </div>
+                </form>
+              </div>
+              {activeView === "thingsToFix" && ThingsToFixView()}
+              {activeView === "KeywordsView" && KeywordsView()}
+              {activeView === "TemplatesView" && TemplatesView()}
             </div>
           )}
         </div>
-        <div className="w-1/2 flex justify-around items-center">
-          <button
-            className={`text-center px-7 h-full ${
-              activeView === "thingsToFix" && "chosenView"
-            }`}
-            onClick={() => handleViewChange("thingsToFix")}
-          >
-            Things to fix
-          </button>
-          {/* <button className="text-center px-7 h-full">AI</button> */}
-          <button
-            className={`text-center px-7 h-full ${
-              activeView === "KeywordsView" && "chosenView"
-            }`}
-            onClick={() => handleViewChange("KeywordsView")}
-          >
-            Keywords
-          </button>
-          <button
-            className={`text-center px-7 h-full ${
-              activeView === "TemplatesView" && "chosenView"
-            }`}
-            onClick={() => handleViewChange("TemplatesView")}
-          >
-            Templates
-          </button>
-        </div>
-      </div>
-      {showSearchTermPanel ? (
-        <SearchTerm videoId={videoId} />
       ) : (
-        <div className="flex h-screen">
-          <div className="w-1/2 h-full overflow-y-auto p-4 pr-8 mt-7">
-            <form>
-              <div className="mb-4">
-                <label
-                  htmlFor="title"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Video Title ({formData.title.length}/{maxTitleCharacters})
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  maxLength={maxTitleCharacters}
-                  className="mt-1 p-2 border rounded w-full"
-                  placeholder="Enter a Title for your Video"
-                />
-              </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="description"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Video Description ({formData.description.length}/
-                  {maxDescriptionCharacters})
-                </label>
-                <textarea
-                  type="text"
-                  id="description"
-                  name="description"
-                  rows="10"
-                  value={formData.description}
-                  onChange={handleChange}
-                  maxLength={maxDescriptionCharacters}
-                  className="mt-1 p-2 border rounded w-full"
-                  placeholder="Enter a Description for your Video"
-                ></textarea>
-              </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="tags"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Video Tags ({formData.tags.length}/{maxTagsCharacters})
-                </label>
-                <textarea
-                  type="text"
-                  id="tags"
-                  name="tags"
-                  rows="5"
-                  value={formData.tags}
-                  onChange={handleChange}
-                  maxLength={maxTagsCharacters}
-                  className="mt-1 p-2 border rounded w-full"
-                  placeholder="Enter a comma after each tag"
-                ></textarea>
-              </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="tags"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Thumbnail
-                </label>
-                <img
-                  className="mt-4"
-                  src={
-                    selectedFile
-                      ? URL.createObjectURL(selectedFile)
-                      : revertToOriginalPost
-                      ? userYoutubeData[0]?.video_thumbnail
-                      : userYoutubeData[0]?.thumbnails.url
-                  }
-                  alt="Video Thumbnail"
-                />
-              </div>
-              <div className="relative px-5 py-2 border-2 w-2/4 border-gray-400 rounded-md">
-                <label className="cursor-pointer flex items-center">
-                  <FiCamera className="camera-icon mr-3" />
-                  Update your thumbnail
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
-                    onChange={handleFileChange}
-                  />
-                </label>
-              </div>
-            </form>
-          </div>
-          {activeView === "thingsToFix" && ThingsToFixView()}
-          {activeView === "KeywordsView" && KeywordsView()}
-          {activeView === "TemplatesView" && TemplatesView()}
-        </div>
+        <Loader message={"Fetching your youtube post"} />
       )}
     </div>
   );

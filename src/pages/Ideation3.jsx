@@ -166,61 +166,62 @@ const Ideation = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const handleGetIdeas = async () => {
-      if (!searchQuery.trim()) {
-        return;
-      }
+  // useEffect(() => {
+  //   const handleGetIdeas = async () => {
+  //     if (!searchQuery.trim()) {
+  //       console.log("I got here and cant rn the second time")
+  //       return;
+  //     }
 
-      const postData = {
-        keyword: searchQuery,
-        countryCode: selectedCountry.countryCode,
-        languageCode: selectedCountry.languageCode,
-      };
+  //     const postData = {
+  //       keyword: searchQuery,
+  //       countryCode: selectedCountry.countryCode,
+  //       languageCode: selectedCountry.languageCode,
+  //     };
 
-      console.log("postData", postData);
+  //     console.log("postData", postData);
 
-      try {
-        setIsLoading(true);
-        console.log("handleGetIdeas", decryptedFullData.token);
+  //     try {
+  //       setIsLoading(true);
+  //       console.log("handleGetIdeas", decryptedFullData.token);
 
-        const response = await axios.post(
-          `${process.env.REACT_APP_API_BASE_URL}/fetchKeywordStat`,
-          postData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": process.env.REACT_APP_X_API_KEY,
-              Authorization: `Bearer ${decryptedFullData.token}`,
-            },
-          },
-        );
+  //       const response = await axios.post(
+  //         `${process.env.REACT_APP_API_BASE_URL}/fetchKeywordStat`,
+  //         postData,
+  //         {
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             "x-api-key": process.env.REACT_APP_X_API_KEY,
+  //             Authorization: `Bearer ${decryptedFullData.token}`,
+  //           },
+  //         },
+  //       );
 
-        const data = response.data;
-        console.log("response.data", response.data);
-        console.log("response", response);
-        setIsLoading(false);
+  //       const data = response.data;
+  //       console.log("response.data", response.data);
+  //       console.log("response", response);
+  //       setIsLoading(false);
 
-        // Update state with the API response
-        setExactKeywordData(data.response.exact_keyword);
-        setRelatedKeywordData(data.response.related_keywords);
-        localStorage.setItem("lastVideoIdeas", JSON.stringify(data.response));
-        setLoadedLocalStorage(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        showToast(
-          "error",
-          `Couldn't fetch results for your search "${searchQuery}"`,
-          5000,
-        );
-        setIsLoading(false);
-      }
-    };
+  //       // Update state with the API response
+  //       setExactKeywordData(data.response.exact_keyword);
+  //       setRelatedKeywordData(data.response.related_keywords);
+  //       localStorage.setItem("lastVideoIdeas", JSON.stringify(data.response));
+  //       setLoadedLocalStorage(false);
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //       showToast(
+  //         "error",
+  //         `Couldn't fetch results for your search "${searchQuery}"`,
+  //         5000,
+  //       );
+  //       setIsLoading(false);
+  //     }
+  //   };
 
-    if (searchQueryComplete) {
-      handleGetIdeas();
-    }
-  }, [searchQueryComplete]);
+  //   if (searchQueryComplete) {
+  //     handleGetIdeas();
+  //   }
+  // }, []);
 
   // useEffect(() => {
   //   console.log("userAuthToken 1 decryptedFullData", decryptedFullData);
@@ -813,46 +814,6 @@ const Ideation = () => {
               Search and generate ideas for your next video!
             </div>
           </div>
-          {/* <div className="flex items-center flex-col ">
-            <div className="w-full max-w-xs flex items-center p-2 pl-4 pr-4 border border-gray-300 bg-white rounded-full">
-              <input
-                type="text"
-                placeholder="Enter a topic, brand, or product"
-                className="flex-grow bg-transparent outline-none pr-2 text-xs"
-                value={searchQuery}
-                onChange={handleSearchChange}
-              />
-              <BiSearch className="text-gray-500 text-xs" />
-            </div>
-          </div> */}
-
-          {/* <div className="relative ml-4">
-          <select className="rounded-full py-2 pl-4 pr-8 border border-gray-300 bg-white text-xs">
-            <option value="en">Global (English)</option>
-            <option value="es">Español </option>
-            <option value="fr">Français</option>
-            <option value="de">Deutsch</option>
-          </select>
-        </div> */}
-
-          {/* <div className="relative ml-4">
-            <select
-              id="countrySelect"
-              className="rounded-full py-2 pl-4 pr-8 border border-gray-300 bg-white text-xs"
-              value={`${selectedCountry.countryCode}:${selectedCountry.languageCode}`}
-              onChange={handleCountryChange}
-            >
-              <option value="GLB:en">Global (English)</option>
-              {countriesWithLanguages.map((item, index) => (
-                <option
-                  key={index}
-                  value={`${item.countryCode}:${item.languageCode}`}
-                >
-                  {`${item.country} (${item.language})`}
-                </option>
-              ))}
-            </select>
-          </div> */}
 
           <button
             className={`text-white rounded-md px-4 py-2 ml-4 flex items-center text-xs getIdeasBtn`}
@@ -873,6 +834,7 @@ const Ideation = () => {
               onSearchChange={handleSearchChange}
               setShowSearchPanel={setShowSearchPanel}
               setSearchQueryComplete={setSearchQueryComplete}
+              handleGetIdeas={handleGetIdeas}
             />
           )}
         </div>
@@ -965,7 +927,7 @@ const Ideation = () => {
               <div className="flex">
                 <div className="flex py-2">
                   <div className="flex justify-start items-center">
-                    <span className="text-xs">Filter:</span>
+                    {/* <span className="text-xs">Filter:</span>
 
                     <div className="relative ml-4">
                       <select
@@ -977,7 +939,8 @@ const Ideation = () => {
                         <option value="questions">Questions Only</option>
                         <option value="keywords">Keywords Only</option>
                       </select>
-                    </div>
+                    </div> */}
+
                     {/* <div
                       className="bg-white rounded-tl-full rounded-bl-full border border-gray-300 px-4 py-2 flex items-center w-24"
                       onClick={serveAllVideoIdeas}

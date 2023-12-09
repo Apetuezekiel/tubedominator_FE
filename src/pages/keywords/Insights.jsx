@@ -309,7 +309,7 @@ function Insights({
   const difficultyColor = difficultyColors[dataSet.difficulty];
 
   return (
-    <section className={`w-full z-50 ${display}`}>
+    <section className={`w-full z-50 ${display} min-h-screen`}>
       <div className="m-2 md:m-10 mt-10 p-2 md:p-10 rounded-3xl">
         {isSerpYoutubeLoaded ? (
           <div>

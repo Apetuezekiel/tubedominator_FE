@@ -327,7 +327,8 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
                 </span>
               </div>
               <div className="text-lg font-bold pt-3 text-gray-800">
-                {competitionInsights.averageLikesComments != null
+                {competitionInsights.averageLikesComments != null &&
+                !isNaN(competitionInsights.averageLikesComments)
                   ? formatNumberToKMBPlus(
                       Math.ceil(competitionInsights.averageLikesComments),
                     )
@@ -335,7 +336,8 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
               </div>
               <div className="text-xs text-gray-800 flex items-center mt-3">
                 Least:{" "}
-                {competitionInsights.leastLikesComments != null
+                {competitionInsights.leastLikesComments != null &&
+                !isNaN(competitionInsights.leastLikesComments)
                   ? formatNumberToKMBPlus(
                       Math.ceil(competitionInsights.leastLikesComments),
                     )
@@ -343,7 +345,8 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
               </div>
               <div className="text-xs text-gray-800 flex items-center mt-1">
                 Most:{" "}
-                {competitionInsights.mostLikesComments != null
+                {competitionInsights.mostLikesComments != null &&
+                !isNaN(competitionInsights.mostLikesComments)
                   ? formatNumberToKMBPlus(
                       Math.ceil(competitionInsights.mostLikesComments),
                     )

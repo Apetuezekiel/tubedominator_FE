@@ -44,7 +44,7 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
         setFetchedSavedIdeas(true); // Data fetched successfully
         console.log("categories, categories", categories);
       } catch (error) {
-        setFetchedSavedIdeas(false); // Handle the error
+        setFetchedSavedIdeas(true); // Handle the error
         console.error("Error fetching saved ideas:", error);
       }
     };
@@ -80,9 +80,9 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
       search_volume: dataSet.monthlysearch || "",
       keyword_diff: dataSet.difficulty || "",
       potential_views: dataSet.estimated_views || "",
-      trend: dataSet.trend || "",
+      trend: dataSet.trend || "0",
       email: decryptedFullData.email || "",
-      category: selectedCategory || "",
+      category: selectedCategory || "Uncategorized Ideas",
       cpc: dataSet.cpc || "",
       cmp: dataSet.cmp || "",
       languageCode: dataSet.languageCode || "",
@@ -162,7 +162,7 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
       className="fixed top-0 left-0 w-full h-full flex justify-center items-center z-50"
       style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
     >
-      <div className="w-2/4 border border-gray-200 rounded-lg p-4 bg-white relative">
+      <div className="w-fit border border-gray-200 rounded-lg p-4 bg-white relative">
         <button
           className="absolute top-0 right-0 m-3 text-gray-500 hover:text-gray-700 cursor-pointer"
           onClick={() => setShowSavedIdeaCategoryPanel(false)}
@@ -209,7 +209,7 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
             </select>
           </div>
         </div>
-        <div className="flex mt-5">
+        <div className="lg:flex mt-5">
           <div className="w-1/2">
             <button
               onClick={() => setShowInputTag(true)}
@@ -221,7 +221,7 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
               <div className="flex items-center">
                 <input
                   type="text"
-                  className="rounded-full border mt-3 mr-3 border-purple-600 focus:border-purple-800 h-10 pl-4 pr-20 focus:outline-none"
+                  className="w-4/5 rounded-full text-xs border mt-3 mr-3 border-purple-600 focus:border-purple-800 h-10 pl-4 pr-20 focus:outline-none"
                   placeholder="Name your new category folder"
                   value={newFolderName}
                   onChange={handleFolderName}
@@ -230,12 +230,12 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
                   onClick={addNewFolder}
                   color="#7438FF"
                   size={30}
-                  className="mt-2 cursor-pointer"
+                  className="mt-2 cursor-pointer w-1/5"
                 />
               </div>
             )}
           </div>
-          <div className="w-1/2 text-right ml-3 flex items-center">
+          <div className="w-1/2 text-right ml-3 flex items-center md:mt-5">
             <button
               style={{ border: "1px solid #CC0000", color: "#CC0000" }}
               className="mr-3 py-2 px-5 rounded-full text-md"
@@ -243,13 +243,16 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
             >
               Cancel
             </button>
-            <div className="flex items-center">
+            <div className="flex items-center justify-center">
               <button
                 style={{
-                  backgroundColor:
-                    fetchedSavedIdeas === false ? "gray" : "#7438FF",
+                  background:
+                    fetchedSavedIdeas === false
+                      ? "#7438FF"
+                      : "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                  color: "white",
                 }}
-                className="text-center text-md text-white py-2 px-5 rounded-full"
+                className="text-center text-md text-white py-2 px-5 rounded-full flex items-center justify-center gap-2"
                 onClick={addSavedIdea}
                 disabled={fetchedSavedIdeas === false}
               >

@@ -60,6 +60,11 @@ import axios from "axios";
 import { userFullDataDecrypted } from "./data/api/calls";
 import GenerateIdeasPanel from "./components/GenerateIdeasPanel";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Settings from "./pages/Settings";
+import NotFound from "./pages/NotFound";
+import SignUpPremiumPage from "./pages/UserAuth/SignUpPremiumPage";
+import SignUpBundlePage from "./pages/UserAuth/SignUpBundlePage";
+import ConnectYoutubeNotice from "./pages/ConnectYoutubeNotice";
 
 const App = () => {
   const decryptedFullData = userFullDataDecrypted();
@@ -105,6 +110,8 @@ const App = () => {
           <Route path="optimize" element={<Opitimize />} />
         </Route>
 
+        <Route path="optimize" element={<Opitimize />} />
+
         <Route path="/ai-generator" element={<ProtectedRoute />}>
           <Route index element={<AiPostGenerator />} />
           <Route path="ai-generator" element={<AiPostGenerator />} />
@@ -136,14 +143,15 @@ const App = () => {
 
         {/* Navigation */}
         <Route path="/nav" element={<Navbar />} />
-
-        {/* User-Specific Routes */}
         <Route path="/ideascategory" element={<IdeasCategoryView />} />
         <Route path="/saved-ideas-cat" element={<SavedIdeasCategories />} />
+        <Route path="/settings" element={<Settings />} />
+
         <Route path="/preview" element={<PreviewKeyword />} />
         <Route path="/tests" element={<Testss />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/youtube" element={<ConnectYoutube />} />
+
+        {/* <Route path="*" element={<NotFound />} /> */}
       </Routes>
     );
   }
@@ -221,13 +229,37 @@ const App = () => {
             <Navbar />
           </div>
           <Routes>
-            {/* Home */}
-            <Route path="/" element={<Home />} />
+            <Route
+              path="/"
+              element={
+                userLoggedIn ? (
+                  accessLevel === "L2" ? (
+                    <Navigate to="/ideation" />
+                  ) : (
+                    <Navigate to="/thank-you" />
+                  )
+                ) : (
+                  <Navigate to="/home" />
+                )
+              }
+            />
 
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/youtube" element={<ConnectYoutube />} />
+            <Route path="/thank-you" element={<ConnectYoutubeNotice />} />
             {/* Sign-In and Sign-Up */}
             <Route path="/sign-in/*" element={<SignInPage />} />
             <Route path="/sign-up/*" element={<SignUpPage />} />
+            <Route
+              path="/premium-account-create/*"
+              element={<SignUpPremiumPage />}
+            />
+            <Route
+              path="/bundle-account-create/*"
+              element={<SignUpBundlePage />}
+            />
+            {/* <Route path="*" element={<NotFound />} /> */}
           </Routes>
           <div
             className="flex w-full"

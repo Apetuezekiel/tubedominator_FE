@@ -162,8 +162,9 @@ const SignInPage = () => {
                       onClick={handleSubmit}
                       style={{
                         filter: `${
-                          (formData.email === "" || formData.password === "") ?
-                          "grayscale(1)" : ""
+                          formData.email === "" || formData.password === ""
+                            ? "grayscale(1)"
+                            : ""
                         }`,
                       }}
                     />
@@ -175,7 +176,7 @@ const SignInPage = () => {
                       />
                     )}
                   </div>
-                  <div className="border-b-1 text-center text-xs mb-3">
+                  {/* <div className="border-b-1 text-center text-xs mb-3">
                     <Link
                       to="/sign-up"
                       className="leading-none px-2 inline-block text-xs text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2"
@@ -183,7 +184,7 @@ const SignInPage = () => {
                       Sign Up Here
                     </Link>
                     <hr />
-                  </div>
+                  </div> */}
                 </div>
 
                 {loginError && (

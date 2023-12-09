@@ -1,518 +1,322 @@
-/* eslint-disable */
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import profileImage from "../assets/images/demoUserImage.png";
 import axios from "axios";
-import {
-  GridComponent,
-  ColumnsDirective,
-  ColumnDirective,
-  Resize,
-  Sort,
-  ContextMenu,
-  Filter,
-  Page,
-  ExcelExport,
-  PdfExport,
-  Edit,
-  Inject,
-} from "@syncfusion/ej2-react-grids";
-import { HiOutlineChevronDown, HiSearch } from "react-icons/hi";
-import { Header } from "../components";
-import { HiOutlineRefresh } from "react-icons/hi";
-import {
-  useUserYoutubeInfo,
-  useKeywordStore,
-  useSavedIdeasData,
-} from "../state/state";
-import { AiOutlineStar, AiFillStar } from "react-icons/ai";
-import {
-  FaYoutube,
-  FaGoogle,
-  FaPlus,
-  FaVideo,
-  FaDownload,
-} from "react-icons/fa";
-import Spinner from "../components/Spinner";
-import { BiSearch, BiWorld, BiStar } from "react-icons/bi";
-import { useUser } from "@clerk/clerk-react";
+import showToast from "../utils/toastUtils";
+import { Link, useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { BiLoaderCircle } from "react-icons/bi";
+import { IoCloudUploadSharp } from "react-icons/io5";
 
-const Settings = () => {
-  const userYoutubeData = useUserYoutubeInfo((state) => state.userYoutubeData);
-  const setUserYoutubeData = useUserYoutubeInfo(
-    (state) => state.setUserYoutubeData,
-  );
-  const { savedIdeasData, setSavedIdeasData, fetchSavedIdeasData } =
-    useSavedIdeasData();
+function Settings() {
+  const navigate = useNavigate();
+  const [validationErrors, setValidationErrors] = useState({});
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    firstName: "",
+    lastName: "",
+    confirmPassword: "",
+    agreeToTerms: false,
+  });
+  const [showPassword, setShowPassword] = useState(false);
 
-  const exactKeywordData = useKeywordStore((state) => state.exactKeywordData);
-  const setExactKeywordData = useKeywordStore(
-    (state) => state.setExactKeywordData,
-  );
-  const relatedKeywordData = useKeywordStore(
-    (state) => state.relatedKeywordData,
-  );
-  const setRelatedKeywordData = useKeywordStore(
-    (state) => state.setRelatedKeywordData,
-  );
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(null);
-  const [loadedLocalStorage, setLoadedLocalStorage] = useState(false);
+  const [userProfile, setUserProfile] = useState({
+    firstName: "John",
+    lastName: "Doe",
+    email: "john.doe@example.com",
+  });
 
-  function removeUndefinedOrNull(arr) {
-    return arr.filter((item) => item !== undefined && item !== null);
-  }
+  const [isLoading, setIsLoading] = useState(false);
 
-  const toggleSave = async (keyword, save) => {
-    // fetchSavedIdeasData()
+  const validateForm = () => {
+    const errors = {};
 
-    try {
-      const foundObject = relatedKeywordData.find(
-        (item) => item.keyword === keyword,
-      );
+    if (!formData.email) {
+      errors.email = "Email is required";
+    } else if (!isValidEmail(formData.email)) {
+      errors.email = "Invalid email format";
+    }
 
-      console.log("savedIdeasData", savedIdeasData);
-      console.log("foundObject.monthlysearch", foundObject.monthlysearch);
+    if (!formData.password) {
+      errors.password = "Password is required";
+    } else if (formData.password.length < 8) {
+      errors.password = "Password must be at least 8 characters";
+    }
 
-      if (save) {
-        await axios.post(
-          `${process.env.REACT_APP_API_BASE_URL}/addToSavedIdeas`,
-          {
-            video_ideas: foundObject.keyword,
-            search_volume: foundObject.monthlysearch,
-            keyword_diff: foundObject.difficulty,
-            potential_views: foundObject.estimated_views,
-          },
+    if (!formData.firstName) {
+      errors.firstName = "First Name is required";
+    }
+
+    if (!formData.lastName) {
+      errors.lastName = "Last Name is required";
+    }
+
+    if (!formData.confirmPassword) {
+      errors.confirmPassword = "Confirm Password is required";
+    } else if (formData.confirmPassword !== formData.password) {
+      errors.confirmPassword = "Passwords do not match";
+    }
+
+    if (!formData.agreeToTerms) {
+      errors.agreeToTerms = "You must agree to the terms";
+    }
+
+    setValidationErrors(errors);
+
+    return Object.keys(errors).length === 0;
+  };
+
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleSubmit = async () => {
+    if (validateForm()) {
+      setIsLoading(true);
+
+      try {
+        const response = await axios.post(
+          `${process.env.REACT_APP_API_BASE_URL}/sign-up`,
+          formData,
           {
             headers: {
               "Content-Type": "application/json",
+              "x-api-key": process.env.REACT_APP_X_API_KEY,
             },
           },
         );
-        // fetchSavedIdeasData()
 
-        console.log("Data saved successfully", foundObject);
-      } else {
-        try {
-          const response = await axios.get(
-            `${process.env.REACT_APP_API_BASE_URL}/getAllSavedIdeas?email=${decryptedFullData.email}`,
-            {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            },
-          );
-          // return response.data;
-          const data = response.data;
-          const findFoundObjectInSaved = data.find(
-            (item) => item.video_ideas === foundObject.keyword,
-          );
-
-          await axios.delete(
-            `${process.env.REACT_APP_API_BASE_URL}/deleteSavedIdea/${findFoundObjectInSaved.id}`,
-            {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            },
-          );
-          console.log("Data removed successfully", findFoundObjectInSaved);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-          throw error; // Rethrow the error to handle it in the component if needed
+        const data = response.data;
+        console.log("Sign up response", data);
+        if (data.success) {
+        } else {
+          showToast("error", data.message, 3000);
+          setIsLoading(false);
         }
-      }
-    } catch (error) {
-      console.error("Error saving/removing data:", error);
-    }
-  };
-
-  function Example2() {
-    const { isLoaded, isSignedIn, user } = useUser();
-
-    if (!isLoaded || !isSignedIn) {
-      console.log("NOT SIGNED IN");
-      return null;
-    }
-    console.log("SIGNED IN", user);
-
-    return <div>Hello, {user} welcome to Clerk</div>;
-  }
-
-  Example2();
-
-  const formatDate = (props) => {
-    const options = { day: "numeric", month: "short", year: "numeric" };
-    return (
-      <div>
-        {new Date(props.publishedAt).toLocaleDateString("en-US", options)}
-      </div>
-    );
-  };
-
-  const handleRowSelected = async (args) => {
-    try {
-      console.log("saved");
-      // Use selectedRowData here instead of selectedRows
-      await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}/addToSavedIdeas`,
-        {
-          video_ideas: args.data.keyword,
-          search_volume: args.data.monthlysearch,
-          keyword_diff: args.data.difficulty,
-          potential_views: args.data.estimated_views,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      console.log("Data saved successfully");
-      // console.log('selectedRowData', selectedRowData);
-    } catch (error) {
-      console.error("Error saving data:", error);
-      // console.log('selectedRowData', selectedRowData);
-    }
-    // }
-  };
-
-  const editing = { allowDeleting: true, allowEditing: true };
-  const keywordDiffTemplate = (props) => {
-    return (
-      <button
-        type="button"
-        style={{
-          backgroundColor:
-            props.difficulty === "High"
-              ? "#FBDBC8"
-              : props.difficulty === "Low"
-              ? "#D2E7D0"
-              : props.difficulty === "Medium"
-              ? "#FCECBB"
-              : "transparent",
-          // width: "20px !important",
-        }}
-        className="py-1 px-2 capitalize rounded-2xl text-md KwDiffButtonSize"
-      >
-        {props.difficulty}
-      </button>
-    );
-  };
-
-  function gridOrderStars2(props) {
-    const [isFavorite, setIsFavorite] = useState(false);
-
-    const makeFavorite = () => {
-      setIsFavorite(!isFavorite);
-    };
-
-    return (
-      <div className="flex items-center justify-center" onClick={makeFavorite}>
-        {isFavorite ? <AiFillStar /> : <AiOutlineStar />}
-      </div>
-    );
-  }
-
-  const gridOrderStars = (props) => {
-    const keyword = props.keyword;
-    // if (!rowData || typeof rowData.isFavorite === 'undefined') {
-    //   return null; // Handle cases where rowData is missing or isFavorite is undefined
-    // }
-    const [isFavorite, setIsFavorite] = useState(false);
-    const makeFavorite = () => {
-      setIsFavorite(!isFavorite);
-      isFavorite ? toggleSave(keyword, false) : toggleSave(keyword, true);
-    };
-
-    const starIcon = isFavorite ? <AiFillStar /> : <AiOutlineStar />;
-
-    return <div onClick={makeFavorite}>{starIcon}</div>;
-  };
-
-  const formatViews = (props) => {
-    const estimatedViews = parseInt(props.estimated_views);
-    // const formattedViews = estimatedViews.toLocaleString() + "+";
-    return (
-      <span className="flex items-center justify-center">
-        {estimatedViews}+
-      </span>
-    );
-  };
-
-  const searchVolumeDataRowTemplate = (props) => {
-    return (
-      <span className="flex items-center justify-center">
-        {props.monthlysearch}+
-      </span>
-    );
-  };
-
-  const youtubeGooglePlusIcons = [FaYoutube, FaGoogle, FaPlus];
-  const videoIcon = [FaYoutube];
-
-  function IconsWithTitle({ title, icons }) {
-    return (
-      <div className="flex items-center">
-        {title}
-        {icons.map((Icon, index) => (
-          <span key={index} style={{ marginLeft: "5px", display: "flex" }}>
-            <Icon />
-          </span>
-        ))}
-      </div>
-    );
-  }
-
-  const VolumeTitleTemplate = (props) => {
-    return (
-      <div className="flex items-center justify-center">
-        <IconsWithTitle
-          title={props.headerText}
-          icons={youtubeGooglePlusIcons}
-        />
-      </div>
-    );
-  };
-
-  const VideoIconTitleTemplate = (props) => {
-    return (
-      <div className="tooltip-container flex items-center justify-center">
-        <IconsWithTitle title={props.headerText} icons={videoIcon} />
-        <div className="tooltip-text text-black">
-          Information about potential views
-        </div>
-      </div>
-    );
-  };
-
-  const gridInstance = React.createRef();
-
-  const exportToExcel = () => {
-    if (gridInstance.current) {
-      gridInstance.current.excelExport();
-    }
-  };
-
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
-  };
-
-  const handleGetIdeasClick = () => {
-    if (!searchQuery.trim()) {
-      return;
-    }
-
-    setIsLoading(true);
-
-    // Make the API call here
-    axios
-      .get(
-        `${process.env.REACT_APP_API_BASE_URL}/fetchKeywordStat?keywords=${searchQuery}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      )
-      .then((response) => response.data)
-      .then((data) => {
+      } catch (error) {
+        console.error("Error Registering User:", error);
+        showToast("error", `Couldn't Sign you up`, 3000);
         setIsLoading(false);
-
-        // Update the keywordData state with the API response
-        setExactKeywordData(data.response.exact_keyword);
-        setRelatedKeywordData(data.response.related_keywords);
-        localStorage.setItem("lastVideoIdeas", JSON.stringify(data.response));
-        setLoadedLocalStorage(false);
-
-        // console.log(keywordData);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  };
-
-  const isQuestion = (str) => {
-    const questionKeywords = [
-      "what",
-      "when",
-      "where",
-      "who",
-      "why",
-      "how",
-      "is",
-      "are",
-      "can",
-      "could",
-      "should",
-    ];
-    const words = str.toLowerCase().split(" ");
-
-    for (const keyword of questionKeywords) {
-      if (words.includes(keyword)) {
-        return true;
       }
     }
-
-    return false;
   };
 
-  const findQuestions = (keywordsArray) => {
-    const questions = [];
-
-    for (const keywordObj of keywordsArray) {
-      if (isQuestion(keywordObj.keyword)) {
-        questions.push(keywordObj);
-      }
-    }
-
-    console.log(questions);
-    // return questions;
-    setRelatedKeywordData(questions);
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
   };
 
-  const filterBySearchQuery = (keywordsArray, searchQuery) => {
-    const filteredKeywords = keywordsArray.filter((keywordObj) => {
-      const lowerSearchQuery = searchQuery.toLowerCase();
-      const lowerKeyword = keywordObj.keyword.toLowerCase();
-
-      return lowerKeyword.includes(lowerSearchQuery);
-    });
-
-    setRelatedKeywordData(filteredKeywords);
+  // Handler for updating profile information
+  const handleUpdateProfile = () => {
+    // Implement logic to update the user's profile information (API call, etc.)
+    // For now, we'll just log the updated profile to the console
+    console.log("Updated Profile:", userProfile);
   };
 
-  const serveAllVideoIdeas = () => {
-    let savedData = JSON.parse(localStorage.getItem("lastVideoIdeas"));
-
-    setRelatedKeywordData(savedData.related_keywords);
-    setExactKeywordData(savedData.exact_keyword);
+  // Handler for handling form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUserProfile((prevProfile) => ({
+      ...prevProfile,
+      [name]: value,
+    }));
   };
-
-  const isSearchEmpty = searchQuery.trim() === "";
 
   return (
-    <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
-      {isLoading ? (
-        <div className="loading-container">
-          <Spinner />
+    <div className="m-2 md:m-10 mt-24 p-2 md:p-10 rounded-md overflow-hidden min-h-screen">
+      <div className="">
+        <div className="pageTitle text-3xl font-semibold">Profile Settings</div>
+        <div className="tag text-md mt-2 text-xs font-thin">
+          Update your Profile Details
         </div>
-      ) : (
-        <div className=""></div>
-      )}
-      <div>
-        <div className="flex items-center mb-5 w-full border-b border-solid border-gray-300">
-          <div className="flex justify-between items-center mr-5 pr-5">
-            Rankings
-          </div>
-          <div className="flex justify-between items-center selectedMenuKwPg">
-            Keywords
-          </div>
+      </div>
+
+      <header
+        className="flex items-center py-5 px-10 rounded-xl mt-8"
+        style={{
+          background:
+            "linear-gradient(90.07deg, #9999FF 0.05%, rgba(153, 153, 255, 0) 98.56%)",
+        }}
+      >
+        <div className="p-3 rounded-lg">
+          <img src={profileImage} alt="" className="h-24" />
         </div>
-        <div className="flex items-center mb-5">
-          <div className="flex justify-between items-center mr-5 pr-5 border-r border-solid border-gray-300">
-            <span className="mr-2">Source:</span>{" "}
-            <span className="mr-2">
-              <FaYoutube style={{ color: "red" }} />
-            </span>{" "}
-            <span>Youtube</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="mr-2">location:</span>{" "}
-            <span className="mr-2">
-              <BiWorld style={{ color: "blue" }} />
-            </span>{" "}
-            <span>Global</span>
-          </div>
-        </div>
-        <div className="w-full flex">
-          <div className="w-1/2 py-2">
-            <Header title="Keywords" size="text-1xl" />
-            <span className="text-xs">From 18 Aug - 25 Aug 2023</span>
-          </div>
-          <div className="w-1/2 flex justify-end py-2">
-            <div className="flex justify-start items-center">
-              <div
-                className="text-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4"
-                style={{ backgroundColor: "#7352FF" }}
-              >
-                <span className="mr-2 text-xs flex justify-between items-center">
-                  {" "}
-                  <FaPlus /> <span className="ml-2">ADD KEYWORDS</span>
-                </span>
-              </div>
-              <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
-                <span className="mr-2 text-xs flex justify-between items-center">
-                  <FaDownload />
-                  <span className="ml-2">Export</span>
-                </span>
-              </div>
-            </div>
+        <div className="text-xl px-4 mr-4">
+          <div className="font-semibold">Mikel wanger</div>
+          <div className="text-xs">Mikelwanger02@email.com</div>
+          <div className="flex items-center gap-2 cursor-pointer p-1 rounded-lg mt-2">
+            <Link
+              className="text-xs mr-4 py-2 px-5 rounded-md text-black flex items-center"
+              to="/sign-up"
+              style={{
+                backgroundColor: "transparent",
+                border: "1px black solid",
+              }}
+            >
+              <IoCloudUploadSharp className="mr-2" />
+              Upload Image
+            </Link>
+            <Link
+              className="text-xs mr-4 text-black py-2 px-5 rounded-md"
+              to="/sign-in"
+              style={{
+                background:
+                  "linear-gradient(270deg, #FD2E2E 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                color: "white",
+              }}
+            >
+              Delete
+            </Link>
+            {/* <p>
+                <button
+                  type="submit"
+                  style={{ backgroundColor: "#7438FF" }}
+                  className="w-full text-lg text-white py-2 px-5 rounded-full"
+                >
+                  Talk to an Expert
+                </button>
+              </p> */}
           </div>
         </div>
-        <GridComponent
-          // id="gridcomp"
-          dataSource={exactKeywordData}
-          allowExcelExport
-          allowPdfExport
-          allowPaging
-          allowSorting
-          selectionSettings={{ type: "Multiple" }}
-          toolbar={["Delete"]}
-          // contextMenuItems={contextMenuItems}
-          // editSettings={editing}
-          // rowSelected={handleRowSelected}
-        >
-          <ColumnsDirective>
-            <ColumnDirective type="checkbox" width="50" />
-            <ColumnDirective
-              field=""
-              headerText="Youtube Results"
-              headerTemplate={VideoIconTitleTemplate}
-            />
-            <ColumnDirective
-              field="monthlysearch"
-              headerText="Rank"
-              headerTemplate={VolumeTitleTemplate}
-              template={searchVolumeDataRowTemplate}
-            />
-            <ColumnDirective
-              field="difficulty"
-              headerText="Change"
-              template={keywordDiffTemplate}
-            />
-            <ColumnDirective
-              field="estimated_views"
-              headerText="Video Result"
-              headerTemplate={VideoIconTitleTemplate}
-              template={formatViews}
-            />
-            <ColumnDirective
-              field="estimated_views"
-              headerText="Volume"
-              template={formatViews}
-            />
-            <ColumnDirective
-              field="estimated_views"
-              headerText="Date added"
-              template={formatViews}
-            />
-          </ColumnsDirective>
-          <Inject
-            services={[
-              Resize,
-              Sort,
-              ContextMenu,
-              Filter,
-              Page,
-              ExcelExport,
-              Edit,
-              PdfExport,
-            ]}
+      </header>
+
+      <div className="flex items-center gap-3 mt-10">
+        <div className="flex flex-col">
+          <div className="text-xs mb-1 ml-1 text-gray-400">First Name</div>
+          <input
+            className={`w-full px-8 mb-5 py-4 rounded-full font-medium text-xs bg-white border ${
+              validationErrors.firstName ? "border-red-500" : "border-gray-200"
+            } placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white`}
+            type="text"
+            placeholder="John"
+            value={formData.firstName}
+            onChange={(e) =>
+              setFormData({ ...formData, firstName: e.target.value })
+            }
           />
-        </GridComponent>
+        </div>
+
+        <div className="flex flex-col">
+          <div className="text-xs mb-1 ml-1 text-gray-400">Last Name</div>
+          <input
+            className={`w-full px-8 py-4 mb-5 rounded-full font-medium bg-white border text-xs ${
+              validationErrors.lastName ? "border-red-500" : "border-gray-200"
+            } placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white`}
+            type="text"
+            placeholder="Doe"
+            value={formData.lastName}
+            onChange={(e) =>
+              setFormData({ ...formData, lastName: e.target.value })
+            }
+          />
+        </div>
+
+        <div className="flex flex-col">
+          <div className="text-xs mb-1 ml-1 text-gray-400">Email</div>
+          <input
+            className={`w-full px-8 py-4 mb-5 rounded-full font-medium bg-white border border-gray-200 placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white  ${
+              validationErrors.email ? "border-red-500" : "border-gray-200"
+            }`}
+            type="email"
+            placeholder="youremail@email.com"
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <div className="flex flex-col">
+          <div className="text-xs mb-1 ml-1 text-gray-400">Password</div>
+          <div className="relative">
+            <input
+              className={`w-full px-8 mb-5 py-4 rounded-full font-medium bg-white border border-gray-200 placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white ${
+                validationErrors.password ? "border-red-500" : "border-gray-200"
+              }`}
+              type={showPassword ? "text" : "password"}
+              placeholder="********"
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
+            />
+            <span
+              className="absolute top-4 right-3 cursor-pointer"
+              onClick={toggleShowPassword}
+            >
+              {showPassword ? (
+                <FaEyeSlash color="#9999FF" />
+              ) : (
+                <FaEye color="#9999FF" />
+              )}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex flex-col">
+          <div className="text-xs mb-1 ml-1 text-gray-400">
+            Confirm Password
+          </div>
+          <div className="relative">
+            <input
+              className={`w-full px-8 mb-5 py-4 rounded-full font-medium bg-white border border-gray-200 placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white ${
+                validationErrors.confirmPassword
+                  ? "border-red-500"
+                  : "border-gray-200"
+              }`}
+              type={showPassword ? "text" : "password"}
+              placeholder="********"
+              value={formData.confirmPassword}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  confirmPassword: e.target.value,
+                })
+              }
+            />
+            <span
+              className="absolute top-4 right-3 cursor-pointer"
+              onClick={toggleShowPassword}
+            >
+              {showPassword ? (
+                <FaEyeSlash color="#9999FF" />
+              ) : (
+                <FaEye color="#9999FF" />
+              )}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center">
+          <span
+            className="h-7 w-7 rounded-full flex items-center justify-center text-sm cursor-pointer"
+            style={{
+              background:
+                "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+              color: "white",
+            }}
+          >
+            X
+          </span>
+          <button
+            className={`text-white rounded-full px-4 py-2 ml-2 text-xs flex items-center cursor-pointer`}
+            // onClick={handleGetIdeas}
+            style={{
+              background:
+                "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+              color: "white",
+            }}
+          >
+            Save{" "}
+            {isLoading && (
+              <BiLoaderCircle className="ml-2 animate-spin" color="white" />
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
-};
+}
 
 export default Settings;
