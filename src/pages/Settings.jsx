@@ -275,7 +275,7 @@ function Settings() {
               <div className="text-xs">{fetchedUserData.email}</div>
               <div className="flex items-center gap-2 cursor-pointer p-1 rounded-lg mt-2">
                 <label
-                  className="text-xs mr-4 py-2 px-5 rounded-md text-black flex items-center"
+                  className="relative text-xs mr-4 py-2 px-5 rounded-md text-black flex items-center"
                   style={{
                     backgroundColor: "transparent",
                     border: "1px black solid",
