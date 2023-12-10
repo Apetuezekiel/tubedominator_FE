@@ -92,7 +92,7 @@ const SavedIdeas = () => {
     useState(false);
   const [filteredData, setFilteredData] = useState(savedIdeasData);
   const userEncryptedData = localStorage.getItem("encryptedFullData");
-  const decryptedFullData = userFullDataDecrypted();
+  // const decryptedFullData = userFullDataDecrypted();
   const relatedKeywordData = useKeywordStore(
     (state) => state.relatedKeywordData,
   );
@@ -242,10 +242,10 @@ const SavedIdeas = () => {
           headers: {
             "Content-Type": "application/json",
             "x-api-key": process.env.REACT_APP_X_API_KEY,
-            Authorization: `Bearer ${decryptedFullData.token}`,
+            // Authorization: `Bearer ${decryptedFullData.token}`,
           },
           params: {
-            email: decryptedFullData.email,
+            email: localStorage.getItem("userRegEmail"),
           },
         },
       );
@@ -308,10 +308,10 @@ const SavedIdeas = () => {
           headers: {
             "Content-Type": "application/json",
             "x-api-key": process.env.REACT_APP_X_API_KEY,
-            Authorization: `Bearer ${decryptedFullData.token}`,
+            // Authorization: `Bearer ${decryptedFullData.token}`,
           },
           params: {
-            email: decryptedFullData.email,
+            email: localStorage.getItem("userRegEmail"),
           },
         },
       );
@@ -493,7 +493,7 @@ const SavedIdeas = () => {
   return (
     <section>
       <div
-        className={`m-2 md:m-10 mt-24 p-2 md:p-10 min-h-screen  ${
+        className={`m-2 md:m-10 mt-24 p-2 md:p-10  ${
           (showInsights || showCompetition) && "hidden"
         }`}
       >

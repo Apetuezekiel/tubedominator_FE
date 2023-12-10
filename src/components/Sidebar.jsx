@@ -14,7 +14,6 @@ import { useStateContext } from "../contexts/ContextProvider";
 import { FcGoogle } from "react-icons/fc";
 import GoogleLogOut from "../pages/UserAuth/GoogleLogOut";
 import { useUserAccessLevel } from "../state/state";
-import { GoogleLogout } from "react-google-login";
 
 const Sidebar = () => {
   const { currentColor, activeMenu, setActiveMenu, screenSize } =
@@ -100,14 +99,14 @@ const Sidebar = () => {
                       key={link.name}
                       onClick={handleCloseSideBar}
                       style={({ isActive }) => ({
-                        backgroundColor: isActive ? "#EAEAFE" : "",
+                        backgroundColor: isActive ? "#EAEAFE" : !link.available ? "#818589" : "",
                         border: isActive
                           ? "#9999FF 1px solid"
                           : "#E5E4E2 1px solid",
                         color: isActive ? "#9999FF" : "#000000",
                         borderRadius: "6px",
-                        // pointerEvents: isDisabled ? "none" : "auto",
-                        // opacity: isDisabled ? 0.5 : 1,
+                        pointerEvents: !link.available ? "not-allowed" : "auto",
+                        opacity: !link.available ? 0.5 : 1,
                       })}
                       className={({ isActive }) =>
                         isActive ? activeLink : normalLink
@@ -135,9 +134,7 @@ const Sidebar = () => {
                 </p>
                 {item.links.map((link, index) => (
                   <div
-                    className={`flex flex-col w-16 justify-center m-auto ${
-                      link.name === "Log Out" ? "relative" : ""
-                    }`}
+                    className="flex flex-col w-16 justify-center m-auto"
                     key={index}
                   >
                     <NavLink
@@ -161,9 +158,11 @@ const Sidebar = () => {
                       <div className="">{link.icon}</div>
                       {/* <div className="capitalize pr-4">{link.name}</div> */}
                     </NavLink>
-                    <div className="absolute opacity-0">
-                      {link.name === "Log Out" && <GoogleLogOut />}
-                    </div>
+                    {/* {isDisabled && ( // Show a message on hover if accessLevel is not 'L2'
+                      <div className="tooltip bg-white">
+                        Connect to Youtube to access feature
+                      </div>
+                    )} */}
                   </div>
                 ))}
               </div>

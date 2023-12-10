@@ -36,8 +36,6 @@ const GoogleLoginComp = forwardRef((props, ref) => {
   const [fetchUserData, setFetchUserData] = useState(false);
   const accessLevel = useUserAccessLevel((state) => state.accessLevel);
   const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
-  // const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
-  // const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -204,15 +202,15 @@ const GoogleLoginComp = forwardRef((props, ref) => {
         />
       )}
 
-      {(!fetchUserData.apiKey || !fetchUserData.ClientId) &&
+      {/* {(!fetchUserData.apiKey || !fetchUserData.ClientId) &&
         (() => {
-          showToast("error", "You haven't set your ClientId and apiKey");
           console.error("Error: apiKey or ClientId is not available");
-        })()}
+        })()} */}
 
       <button onClick={() => handleLoginClick()}>
         <GoogleLogin
           ClientId={process.env.REACT_APP_CLIENT_ID}
+          // ClientId={fetchUserData.ClientId}
           buttonText="Login with Google"
           onSuccess={onLoginSuccess}
           onFailure={onLoginFailure}

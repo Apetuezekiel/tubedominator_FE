@@ -27,51 +27,8 @@ export const decryptAndRetrieveData = (data) => {
 export const userFullDataDecrypted = () => {
   const encryptedGData = localStorage.getItem("encryptedGData");
   const decryptedFullData = decryptAndRetrieveData(encryptedGData);
-
   return decryptedFullData;
 };
-
-// export async function getSavedIdeas() {
-//   const decryptedFullData = userFullDataDecrypted();
-//   try {
-//     const response = await axios.get(
-//       "${process.env.REACT_APP_API_BASE_URL}/getAllSavedIdeas",
-//       {
-//         params: {
-//           email: decryptedFullData.email,
-//         },
-//         headers: {
-//           "Content-Type": "application/json",
-//           "x-api-key": process.env.REACT_APP_X_API_KEY,
-//           Authorization: `Bearer ${decryptedFullData.token}`,
-//         },
-//       },
-//     );
-//     // return response.data;
-//     const data = response.data.data;
-
-//     // Get saved data from localStorage
-//     let savedData = JSON.parse(localStorage.getItem("savedIdeasData"));
-
-//     // Compare the length of the API data with the localStorage data
-//     if (!savedData || savedData.length < data.length) {
-//       console.log("NOT serving local storage data");
-
-//       // Update localStorage if API data is longer
-//       localStorage.setItem("savedIdeasData", JSON.stringify(data));
-//       return savedData;
-//     } else {
-//       console.log("serving local storage data");
-
-//       localStorage.setItem("savedIdeasData", JSON.stringify(data));
-//       savedData = JSON.parse(localStorage.getItem("savedIdeasData"));
-//       return savedData;
-//     }
-//   } catch (error) {
-//     console.error("Error fetching data:", error);
-//     throw error;
-//   }
-// }
 
 export async function generateThumbnail(prompt) {
   try {
@@ -106,16 +63,17 @@ export async function generateThumbnail(prompt) {
   }
 }
 
-export async function getCategorySavedIdeas(category) {
+export async function getCategorySavedIdeas(category) { 
   try {
-    const decryptedFullData = userFullDataDecrypted();
+    // const decryptedFullData = userFullDataDecrypted();
+  const userEmail = localStorage.getItem("userRegEmail")
     const response = await axios.get(
-      `${process.env.REACT_APP_API_BASE_URL}/getCategorySavedIdeas?email=${decryptedFullData.email}&category=${category}`,
+      `${process.env.REACT_APP_API_BASE_URL}/getCategorySavedIdeas?email=${userEmail}&category=${category}`,
       {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer ${decryptedFullData.token}`,
+          // Authorization: `Bearer ${decryptedFullData.token}`,
         },
       },
     );
@@ -139,88 +97,37 @@ export async function getCategorySavedIdeas(category) {
   }
 }
 
-// export async function getSavedIdeas() {
-//   const decryptedFullData = userFullDataDecrypted();
-//   try {
-//     const response = await axios.get(
-//       `${process.env.REACT_APP_API_BASE_URL}/getAllSavedIdeas?email=${decryptedFullData.email}`,
-//       {
-//         headers: {
-//           "Content-Type": "application/json",
-//           "x-api-key": process.env.REACT_APP_X_API_KEY,
-//           Authorization: `Bearer ${decryptedFullData.token}`,
-//         },
-//       },
-//     );
-
-//     const data = response.data.data;
-//     console.log("response.data.data", response.data.data);
-
-//     // Get saved data from localStorage
-//     let savedData = localStorage.getItem("savedIdeasData");
-
-//     if (!savedData) {
-//       console.log("Local storage data not found.");
-//       // Set "savedIdeasData" if not found
-//       localStorage.setItem("savedIdeasData", JSON.stringify(data));
-//       savedData = data;
-//     } else if (JSON.parse(savedData).length !== data.length) {
-//       localStorage.setItem("savedIdeasData", JSON.stringify(data));
-//       savedData = data;
-//     } else {
-//       try {
-//         savedData = JSON.parse(savedData);
-//       } catch (parseError) {
-//         console.error("Error parsing local storage data:", parseError);
-//         savedData = [];
-//       }
-
-//       if (!Array.isArray(savedData)) {
-//         console.error("Local storage data is not an array.");
-//         savedData = [];
-//       }
-
-//       console.log("Serving local storage data");
-//     }
-
-//     return savedData;
-//   } catch (error) {
-//     console.error("Error fetching data:", error);
-//     return [];
-//   }
-// }
-
 export async function getSavedIdeas() {
-  const decryptedFullData = userFullDataDecrypted();
+  const userEmail = localStorage.getItem("userRegEmail");
 
   try {
     const response = await axios.get(
-      `${process.env.REACT_APP_API_BASE_URL}/getAllSavedIdeas?email=${decryptedFullData.email}`,
+      `${process.env.REACT_APP_API_BASE_URL}/getAllSavedIdeas?email=${userEmail}`,
       {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer ${decryptedFullData.token}`,
         },
       },
     );
 
     const data = response.data.data;
-    console.log("response.data.data", data);
+    console.log("response.data.data", response.data.data);
 
     return data;
   } catch (error) {
     console.error("Error fetching data:", error);
-    return [];
+    throw error;
   }
 }
+
 
 export async function checkClientAndApiKey() {
   const userRegEmail = localStorage.getItem("userRegEmail");
   try {
     const response = await axios.get(
       `${process.env.REACT_APP_API_BASE_URL}/checkClientAndApiKey?email=${
-        userRegEmail || decryptedFullData.email
+        userRegEmail
       }`,
       {
         headers: {
@@ -247,7 +154,7 @@ export async function fetchUser() {
   try {
     const response = await axios.get(
       `${process.env.REACT_APP_API_BASE_URL}/fetchUser?email=${
-        userRegEmail || decryptedFullData.email
+        userRegEmail
       }`,
       {
         headers: {
@@ -295,7 +202,7 @@ export async function getUserEncryptedData() {
   // const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
   // const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
   const userEncryptedData = localStorage.getItem("encryptedFullData");
-  const decryptedFullData = decryptAndRetrieveData(userEncryptedData);
+  // const decryptedFullData = decryptAndRetrieveData(userEncryptedData);
   localStorage.setItem("userLoggedin", true);
   const userLoggedIn = localStorage.getItem("userLoggedin");
   // setUserLoggedIn(true);
@@ -306,7 +213,7 @@ export async function getUserEncryptedData() {
         {
           params: {
             // user_id: "user_2UlxAuRhXLeqwAQUhNMJFittkFD"
-            user_id: decryptedFullData.user_id,
+            // user_id: decryptedFullData.user_id,
           },
           headers: {
             "Content-Type": "application/json",
@@ -835,15 +742,18 @@ export const saveYoutubePost = async (
     console.log("response", response);
 
     if (response.data.success) {
-      console.log("SUCCESS: Youtube Video saved successfully");
-      // showToast("success", "Youtube Video saved successfully", 2000);
+      showToast("success", "Youtube Video saved successfully", 2000);
       // localStorage.setItem(`${videoId}-preserved`, "true");
     } else {
-      console.log("ERROR: Couldn't save youtube Video");
-      // showToast("error", "Youtube Video wasn't saved. Try again", 2000);
+      showToast("error", "Youtube Video wasn't saved. Try again", 2000);
     }
   } catch (error) {
     console.error("Error saving YouTube Video:", error);
+    showToast(
+      "error",
+      "An error occurred saving video. Please try again later.",
+      2000,
+    );
   }
 };
 
@@ -908,92 +818,9 @@ export const getAllYoutubePosts = async () => {
       return response.data.data;
     } else {
       showToast("error", "Youtube videos werent retrieved. Try again", 2000);
-      return [];
     }
   } catch (error) {
     console.error("Error fetching YouTube Video:", error);
-    return [];
-  }
-};
-
-// DRAFT POSTS
-export const checkDraftExistence = async (videoId) => {
-  try {
-    const response = await axios.get(
-      `${process.env.REACT_APP_API_BASE_URL}/checkDraftExistence`,
-      {
-        params: {
-          video_id: videoId,
-        },
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
-        },
-      },
-    );
-
-    return response.data.exists;
-  } catch (error) {
-    console.error("Error confirming if draft post exists", error);
-  }
-};
-
-export const deleteDraftPost = async (videoId) => {
-  try {
-    const responseDelete = await axios.delete(
-      `${process.env.REACT_APP_API_BASE_URL}/deleteDraftPost`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer ${decryptedFullData.token}`,
-        },
-        params: {
-          video_id: videoId,
-        },
-      },
-    );
-    console.log("Draft removed successfully");
-    if (responseDelete.data.success) {
-      showToast("success", "Draft post removed from Search Terms", 2000);
-    } else {
-      showToast("error", "Draft post wasn't removed. Try again", 2000);
-    }
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    throw error;
-  }
-};
-
-export const getDraftPost = async (videoId) => {
-  try {
-    const response = await axios.get(
-      `${process.env.REACT_APP_API_BASE_URL}/getDraftPost`,
-      {
-        params: {
-          email: userFullDataDecrypted()?.email,
-          video_id: videoId,
-        },
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
-        },
-      },
-    );
-
-    console.log("response", response);
-
-    if (response.data.success) {
-      console.log("gottenDraftPost", response.data.data);
-      return response.data.data;
-    } else {
-      showToast("error", "Draft post wasn't retrieved. Try again", 2000);
-      return [];
-    }
-  } catch (error) {
-    console.error("Error fetching Original YouTube post:", error);
     showToast(
       "error",
       "An error occurred fetching video. Please try again later.",
@@ -1002,125 +829,36 @@ export const getDraftPost = async (videoId) => {
   }
 };
 
-// console.log("getDraftPost", await getDraftPost("BdG8R9pqHA0"));
-
-// console.log("checkDraftExistence()", checkDraftExistence("BdG8R9pqHA0"));
-
-// AI
 export async function getVideoTemplates() {
   console.log("Loading video Templates");
 
-  // Check if data exists in local storage
-  const localData = localStorage.getItem("videoTemplates");
-
-  if (localData) {
-    // Parse the data from local storage
-    const localVideoTemplates = JSON.parse(localData);
-    console.log("videoTemplates from localstorage:", localVideoTemplates);
-    return localVideoTemplates;
-
-    // Make the API call
-    try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_BASE_URL}/getAllVideoTemplates`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": process.env.REACT_APP_X_API_KEY,
-            Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
-          },
+  try {
+    const response = await axios.get(
+      `https://apis.elai.io/api/v1/videos?type=template`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.ELAI_API_KEY}`,
         },
-      );
+      },
+    );
 
-      if (response.data.success) {
-        const newData = response.data.data.videos;
-
-        // Check if the new data length is longer than that in local storage
-        if (newData.length > localVideoTemplates.length) {
-          console.log("Updating local storage with new data");
-          localStorage.setItem("videoTemplates", JSON.stringify(newData));
-        }
-
-        console.log("getVideoTemplates", newData);
-        return newData;
-      } else {
-        console.error("Error fetching data:", response.data.error);
-        return localVideoTemplates;
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      return localVideoTemplates;
-    }
-  } else {
-    // If data doesn't exist in local storage, go ahead with the API call
-    try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_BASE_URL}/getAllVideoTemplates`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": process.env.REACT_APP_X_API_KEY,
-            Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
-          },
-        },
-      );
-
-      if (response.data.success) {
-        const newData = response.data.data.videos;
-        console.log("getVideoTemplates", newData);
-        localStorage.setItem("videoTemplates", JSON.stringify(newData));
-        return newData;
-      } else {
-        console.error("Error fetching data:", response.data.error);
-        return null;
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
+    if (response) {
+      const newData = response.data.videos;
+      console.log("getVideoTemplates", newData);
+      return newData;
+    } else {
+      console.error("Error fetching video templates:", response.data.error);
       return null;
     }
+  } catch (error) {
+    console.error("Error fetching video templates:", error);
+    return null;
   }
 }
 
-// export const generateVideo = async (source, prompt, templateId) => {
-//   if (!source) {
-//     return null;
-//   }
 
-//   console.log("Generating video, please hold", source);
-
-//   const endpoint =
-//     source === "text" ? "generateVideoFromText" : "generateVideoFromUrl";
-
-//   try {
-//     const response = await axios.post(
-//       `${process.env.REACT_APP_API_BASE_URL}/${endpoint}`,
-//       {
-//         prompt,
-//         templateId,
-//       },
-//       {
-//         headers: {
-//           "Content-Type": "application/json",
-//           "x-api-key": process.env.REACT_APP_X_API_KEY,
-//           Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
-//         },
-//       },
-//     );
-
-//     if (response.data.success) {
-//       console.log("VIDEO CREATED SUCCESSFULLY: ", response.data.data);
-//       return response.data.data;
-//       // const renderingVideo = renderVideo(response.data.data._id);
-//       // return renderingVideo.data.data.accepted;
-//     } else {
-//       console.error("Error creating Video:", response.data.error);
-//       return null;
-//     }
-//   } catch (error) {
-//     console.error("Error creating Video:", error);
-//     return null;
-//   }
-// };
+getVideoTemplates();
 
 export const generateVideo = async (source, prompt, templateId) => {
   if (!source) {
@@ -1142,8 +880,7 @@ export const generateVideo = async (source, prompt, templateId) => {
       {
         headers: {
           "Content-Type": "application/json",
-          // "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer AY9rruDSr9obNYh1ip7palwlli0LaN7H`,
+          Authorization: `Bearer ${process.env.ELAI_API_KEY}`,
         },
       },
     );
@@ -1177,7 +914,7 @@ export const generateVideoSlides = async (video_id) => {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer AY9rruDSr9obNYh1ip7palwlli0LaN7H`,
+          Authorization: `Bearer ${process.env.ELAI_API_KEY}`,
         },
       },
     );
@@ -1209,7 +946,7 @@ export const renderVideo = async (video_id) => {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer AY9rruDSr9obNYh1ip7palwlli0LaN7H`,
+          Authorization: `Bearer ${process.env.ELAI_API_KEY}`,
         },
       },
     );
@@ -1240,7 +977,7 @@ export const retrieveVideo = async (video_id) => {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer AY9rruDSr9obNYh1ip7palwlli0LaN7H`,
+          Authorization: `Bearer ${process.env.ELAI_API_KEY}`,
         },
       },
     );
@@ -1252,69 +989,3 @@ export const retrieveVideo = async (video_id) => {
     return null;
   }
 };
-
-// generateVideo("text", "\n\nTitle: \"The Email Marketing Guide for Beginners: Tips and Tricks\"\n\nKeywords: email marketing, beginners, guide, tips, tricks\n\nTags: email, marketing strategy, email list, email campaign, email software, email automation\n\nHashtags: #emailmarketing #beginnersguide #emailtips #emailtricks #emailstrategy #emailsoftware #emailautomation\n\nWelcome to our Youtube channel where we provide valuable tips and tricks for beginners in the world of email marketing! In today's video, we will be discussing everything you need to know to get started with your email marketing journey. From building an email list to creating successful email campaigns, we've got you covered.\n\nEmail marketing is a powerful tool that can help businesses reach their target audience and convert them into loyal customers. However, it can be overwhelming for beginners. That's why we have created this comprehensive guide to help you understand the basics and excel in your email marketing efforts.\n\nFirstly, let's talk about the importance of building an email list. Your email list is a valuable asset as it consists of people who have willingly given you their contact information, showing interest in your brand. We'll share some effective strategies to grow your email list and keep your subscribers engaged.\n\nNext, we'll dive into creating a successful email campaign. From subject lines to email design, we'll provide tips to ensure your emails stand out and drive conversions. We'll also discuss email automation and how it can save you time while still providing personalized communication with your audience.\n\nNo email marketing guide is complete without discussing the best email marketing software available. We'll provide an overview of popular email marketing platforms and help you choose the best one for your business.\n\nSo, whether you're a small business owner or a marketing newbie, this video has something for everyone. Don't forget to like and subscribe to our channel for more helpful tips on email marketing. Also, comment down below with any questions or topics you would like us to cover in our upcoming videos.\n\nThank you for watching and happy email marketing! #emailmarketingforbeginners #emailstrategy #emaillistgrowth", "642e88ff081e30cae04420a4")
-
-// export const saveYoutubePost = async (
-//   videoId,
-//   title,
-//   description,
-//   tags,
-//   thumbnails,
-//   likeCount,
-//   commentCount,
-//   viewCount,
-// ) => {
-//   console.log("data to save", {
-//     video_id: videoId,
-//     video_title: title,
-//     video_description: description,
-//     video_tags: tags,
-//     video_thumbnail: thumbnails,
-//     email: userFullDataDecrypted()?.email,
-//     likeCount,
-//     commentCount,
-//     viewCount,
-//   });
-//   try {
-//     const response = await axios.post(
-//       `${process.env.REACT_APP_API_BASE_URL}/saveYoutubePost`,
-//       {
-//         video_id: videoId,
-//         video_title: title,
-//         video_description: description,
-//         video_tags: tags,
-//         video_thumbnail: thumbnails,
-//         email: userFullDataDecrypted()?.email,
-//         likeCount,
-//         commentCount,
-//         viewCount,
-//       },
-//       {
-//         headers: {
-//           "Content-Type": "application/json",
-//           "x-api-key": process.env.REACT_APP_X_API_KEY,
-//           Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
-//         },
-//       },
-//     );
-
-//     console.log("response", response);
-
-//     if (response.data.success) {
-//       showToast("success", "Youtube Video saved successfully", 2000);
-//       // localStorage.setItem(`${videoId}-preserved`, "true");
-//     } else {
-//       showToast("error", "Youtube Video wasn't saved. Try again", 2000);
-//     }
-//   } catch (error) {
-//     console.error("Error saving YouTube Video:", error);
-//     showToast(
-//       "error",
-//       "An error occurred saving video. Please try again later.",
-//       2000,
-//     );
-//   }
-// };
-
-// getVideoTemplates();

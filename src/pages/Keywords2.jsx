@@ -46,6 +46,7 @@ import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
 import { MdCancel } from "react-icons/md";
 import Loader from "../components/Loader";
 import exportIcon from "../data/icons/export.png";
+import TDLogo from "../assets/images/TubeDominator 500x500.png"
 // import deleteChannelKeyword from "../data/api/calls";
 
 const Keyword2 = () => {
@@ -96,7 +97,7 @@ const Keyword2 = () => {
   function removeUndefinedOrNull(arr) {
     return arr.filter((item) => item !== undefined && item !== null);
   }
-  const decryptedFullData = userFullDataDecrypted();
+  // const decryptedFullData = userFullDataDecrypted();
   const [saveSuccess, setSaveSuccess] = useState(false);
   const toolbarOptions = [
     "Add",
@@ -195,19 +196,20 @@ const Keyword2 = () => {
 
   useEffect(() => {
     setLoadingUserChannelKeyword(true);
-    console.log("decryptedFullData", decryptedFullData);
+    const userEmail = localStorage.getItem("userRegEmail");
+    // console.log("decryptedFullData", decryptedFullData);
     const fetchUserKeywords = async () => {
       try {
         const response = await axios.get(
           `${process.env.REACT_APP_API_BASE_URL}/getUserKeyword`,
           {
             params: {
-              email: decryptedFullData.email,
+              email: userEmail,
             },
             headers: {
               "Content-Type": "application/json",
               "x-api-key": process.env.REACT_APP_X_API_KEY,
-              Authorization: `Bearer ${decryptedFullData.token}`,
+              // Authorization: `Bearer ${decryptedFullData.token}`,
             },
           },
         );
@@ -217,8 +219,10 @@ const Keyword2 = () => {
 
         console.log("response", response.data.success === "trueNut");
         if (response.data.success === "trueNut") {
-          showToast("error", "No saved Keywords", 2000);
+          // showToast("error", "No saved Keywords", 2000);
+          console.log("No saved Keywords");
           setLoadingUserChannelKeyword(false);
+          setUserChannelKeywords([]);
         } else if (response.data.success == true) {
           setUserChannelKeywords(data.data);
           setLoadingUserChannelKeyword(false);
@@ -232,7 +236,7 @@ const Keyword2 = () => {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        showToast("error", "No saved Keywords", 2000);
+        // showToast("error", "No saved Keywords", 2000);
       }
     };
 
@@ -286,7 +290,7 @@ const Keyword2 = () => {
       const headers = {
         "Content-Type": "application/json",
         "x-api-key": process.env.REACT_APP_X_API_KEY,
-        Authorization: `Bearer ${decryptedFullData.token}`,
+        // Authorization: `Bearer ${decryptedFullData.token}`,
       };
 
       const responseDelete = await axios.delete(
@@ -491,8 +495,10 @@ const Keyword2 = () => {
   };
 
   const submitUserKeyword = async () => {
+    const userEmail = localStorage.getItem("userRegEmail");
+
     setAddingKeyword(true);
-    console.log("decryptedFullData", decryptedFullData);
+    // console.log("decryptedFullData", decryptedFullData);
     if (userKeyword === "") {
       console.log("Keyword is empty. Please provide a keyword.");
       showToast("error", "Keyword is empty. Please provide a keyword.", 2000);
@@ -515,7 +521,7 @@ const Keyword2 = () => {
           headers: {
             "Content-Type": "application/json",
             "x-api-key": process.env.REACT_APP_X_API_KEY,
-            Authorization: `Bearer ${decryptedFullData.token}`,
+            // Authorization: `Bearer ${decryptedFullData.token}`,
           },
         },
       );
@@ -529,15 +535,14 @@ const Keyword2 = () => {
           `${process.env.REACT_APP_API_BASE_URL}/saveUserKeyword`,
           {
             keyword: userKeyword,
-            email: decryptedFullData.email,
-            user_id: decryptedFullData.user_id,
+            email: userEmail,
             search_volume: searchVolume,
           },
           {
             headers: {
               "Content-Type": "application/json",
               "x-api-key": process.env.REACT_APP_X_API_KEY,
-              Authorization: `Bearer ${decryptedFullData.token}`,
+              // Authorization: `Bearer ${decryptedFullData.token}`,
             },
           },
         );
@@ -604,7 +609,7 @@ const Keyword2 = () => {
   };
 
   return (
-    <div className="m-2 md:m-10 mt-24 p-2 md:p-10 min-h-screen">
+    <div className="m-2 md:m-10 mt-24 p-2 md:p-10">
       {isLoading ? (
         <div className="loading-container">
           <Spinner />
@@ -676,7 +681,7 @@ const Keyword2 = () => {
                   <span className="mr-2 text-xs flex justify-between items-center">
                     {" "}
                     <FaPlus color="#9999FF" />{" "}
-                    <span className="ml-2" style={{ color: "#9999FF" }}>
+                    <span className="ml-2 text-xs" style={{ color: "#9999FF" }}>
                       Add Keyword
                     </span>
                   </span>
@@ -702,7 +707,7 @@ const Keyword2 = () => {
                     name="keywords"
                     value={userKeyword}
                     onChange={handleChange}
-                    className="mt-1 p-2 border rounded-full w-full mr-2"
+                    className="mt-1 p-2 border rounded-lg w-full mr-2"
                     placeholder="keywords your channel focuses on"
                   />
                   <button
@@ -712,7 +717,7 @@ const Keyword2 = () => {
                       background:
                         "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
                     }}
-                    className="w-full text-white p-2 rounded mt-2 flex justify-center items-center"
+                    className="w-full text-white text-xs p-2 rounded-full mt-2 flex justify-center items-center"
                   >
                     Add Keyword{" "}
                     {addingKeyword && (
@@ -739,13 +744,16 @@ const Keyword2 = () => {
             </div>
             <div className="w-1/2 flex justify-end py-2"></div>
           </div>
-          {loadingUserChannelKeyword && (
+          {loadingUserChannelKeyword ? (
             <Loader
               message={"Loading your saved Keywords. Hold Tight"}
               marginBottom={20}
             />
-          )}
-          <br />
+          ) : (
+            <div>
+                        <br />
+          {
+            userChannelKeywords.length > 0 ? (
           <GridComponent
             dataSource={userChannelKeywords}
             allowExcelExport
@@ -806,6 +814,15 @@ const Keyword2 = () => {
               ]}
             />
           </GridComponent>
+            ) : (
+              <div className="flex items-center gap-3 justify-center text-xs mt-20 mb-20">
+                <img src={TDLogo} alt="Tubedominator logo" className="h-10"/>
+                <span>You haven't saved any keyword.</span>
+              </div>
+            )
+          }
+            </div>
+          ) }
         </div>
         {displayPreviewKeyword && (
           <PreviewKeyword

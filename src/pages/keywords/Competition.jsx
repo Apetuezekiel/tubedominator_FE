@@ -30,7 +30,7 @@ import showToast from "../../utils/toastUtils";
 import youtubeHeading from "../../assets/images/youtubeHeading.png";
 
 function Competition({ dataSet, setShowInsights, setShowCompetition }) {
-  const decryptedFullData = userFullDataDecrypted();
+  // const decryptedFullData = userFullDataDecrypted();
   const [keywordVideosInfo, setKeywordVideosInfo] = useState([]);
   const [competitionInsights, setCompetitionInsights] = useState([]);
   const [isSerpYoutubeLoaded, setIsSerpYoutubeLoaded] = useState(false);
@@ -126,7 +126,7 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
           headers: {
             "Content-Type": "application/json",
             "x-api-key": process.env.REACT_APP_X_API_KEY,
-            Authorization: `Bearer ${decryptedFullData.token}`,
+            // Authorization: `Bearer ${decryptedFullData.token}`,
           },
           params: {
             keyword: dataSet.keyword,
@@ -327,8 +327,7 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
                 </span>
               </div>
               <div className="text-lg font-bold pt-3 text-gray-800">
-                {competitionInsights.averageLikesComments != null &&
-                !isNaN(competitionInsights.averageLikesComments)
+                {competitionInsights.averageLikesComments != null
                   ? formatNumberToKMBPlus(
                       Math.ceil(competitionInsights.averageLikesComments),
                     )
@@ -336,8 +335,7 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
               </div>
               <div className="text-xs text-gray-800 flex items-center mt-3">
                 Least:{" "}
-                {competitionInsights.leastLikesComments != null &&
-                !isNaN(competitionInsights.leastLikesComments)
+                {competitionInsights.leastLikesComments != null
                   ? formatNumberToKMBPlus(
                       Math.ceil(competitionInsights.leastLikesComments),
                     )
@@ -345,8 +343,7 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
               </div>
               <div className="text-xs text-gray-800 flex items-center mt-1">
                 Most:{" "}
-                {competitionInsights.mostLikesComments != null &&
-                !isNaN(competitionInsights.mostLikesComments)
+                {competitionInsights.mostLikesComments != null
                   ? formatNumberToKMBPlus(
                       Math.ceil(competitionInsights.mostLikesComments),
                     )

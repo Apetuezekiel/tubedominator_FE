@@ -1,32 +1,24 @@
 import { GoogleLogout } from "react-google-login";
 import { useNavigate } from "react-router-dom";
-import {
-  useUserAccessLevel,
-  useUserData,
-  useUserLoggedin,
-} from "../../state/state";
-import { useStateContext } from "../../contexts/ContextProvider";
+import { useUserLoggedin } from "../../state/state";
+
+const clientId =
+  "372673946018-lu1u3llu6tqi6hmv8m2226ri9qev8bb8.apps.googleusercontent.com";
 
 const GoogleLogOut = () => {
-  const { setIsClicked, initialState } = useStateContext();
   const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
-  const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
-  const setUserData = useUserData((state) => state.setUserData);
 
   const navigate = useNavigate();
   const onLogoutSuccess = (res) => {
     console.log("Logout Success, res:", res);
-    setIsClicked(initialState);
     localStorage.clear();
-    setUserLoggedIn("");
-    setAccessLevel("");
-    setUserData(null);
+    setUserLoggedIn(false);
     navigate("/");
   };
   return (
     <div id="signoutButton">
       <GoogleLogout
-        clientId={process.env.REACT_APP_CLIENT_ID}
+        clientId={clientId}
         buttonText="Logout"
         onLogoutSuccess={onLogoutSuccess}
       ></GoogleLogout>

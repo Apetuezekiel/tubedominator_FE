@@ -19,26 +19,22 @@ function Home() {
             >
               #1 YouTube SEO Software
             </div>
-            <div className="text-2xl font-extrabold text-black mt-5 text-center line-height-6">
-              We Turn ANY URL Or Keyword <br /> Into Profitable YouTube Videos{" "}
-              <br /> And Ranks Them On Page #1 On COMPLETE Autopilot.
+            <div className="heroMainText text-black mt-5">
+              We Make YouTube <br /> Work for Business
             </div>
             <div className="mt-5 w-1/2 text-center">
-              TubeDominator Handles Everything From Ideas To Scripts To Videos
-              And Finally Generate Massive Traffic For You.
+              Tubedominator is more than just an agency. We empower brands with
+              easy-to-use software tools, actionable insights, and expert agency
+              services to grow their YouTube channel.
             </div>
             <div className="flex justify-center items-center mt-5 mr-5">
-              <Link to="/sign-in">
-                <button
-                  style={{
-                    background:
-                      "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
-                    color: "white",
-                  }}
-                  className="w-full text-lg text-white py-2 px-5 rounded-full"
-                >
-                  Start Your Journey Now
-                </button>
+              <Link to="/sign-up">
+              <button
+                style={{ backgroundColor: "#7438FF" }}
+                className="w-full text-lg text-white py-3 px-5 rounded-full"
+              >
+                Start Your Journey Now
+              </button>
               </Link>
             </div>
           </div>

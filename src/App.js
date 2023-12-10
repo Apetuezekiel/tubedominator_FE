@@ -61,13 +61,11 @@ import { fetchUser, userFullDataDecrypted } from "./data/api/calls";
 import GenerateIdeasPanel from "./components/GenerateIdeasPanel";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Settings from "./pages/Settings";
-import NotFound from "./pages/NotFound";
-import SignUpPremiumPage from "./pages/UserAuth/SignUpPremiumPage";
 import SignUpBundlePage from "./pages/UserAuth/SignUpBundlePage";
-import ConnectYoutubeNotice from "./pages/ConnectYoutubeNotice";
+import SignUpPremiumPage from "./pages/UserAuth/SignUpPremiumPage";
 
 const App = () => {
-  const decryptedFullData = userFullDataDecrypted();
+  // const decryptedFullData = userFullDataDecrypted();
 
   const {
     setCurrentColor,
@@ -110,8 +108,6 @@ const App = () => {
           <Route path="optimize" element={<Opitimize />} />
         </Route>
 
-        <Route path="optimize" element={<Opitimize />} />
-
         <Route path="/ai-generator" element={<ProtectedRoute />}>
           <Route index element={<AiPostGenerator />} />
           <Route path="ai-generator" element={<AiPostGenerator />} />
@@ -139,19 +135,19 @@ const App = () => {
         <Route path="/channel" element={<RegistrationForm />} />
         <Route path="/sidebar" element={<Sidebar2 />} />
         <Route path="/generate" element={<GenerateIdeasPanel />} />
+        <Route path="/settings" element={<Settings />} />
         {/* </Route> */}
 
         {/* Navigation */}
         <Route path="/nav" element={<Navbar />} />
+
+        {/* User-Specific Routes */}
         <Route path="/ideascategory" element={<IdeasCategoryView />} />
         <Route path="/saved-ideas-cat" element={<SavedIdeasCategories />} />
-        <Route path="/settings" element={<Settings />} />
-
         <Route path="/preview" element={<PreviewKeyword />} />
         <Route path="/tests" element={<Testss />} />
         <Route path="/register" element={<Register />} />
-
-        {/* <Route path="*" element={<NotFound />} /> */}
+        <Route path="/youtube" element={<ConnectYoutube />} />
       </Routes>
     );
   }
@@ -164,38 +160,54 @@ const App = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const fetchUserYoutubeInfo = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_BASE_URL}/getSavedUserYoutubeInfo`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": process.env.REACT_APP_X_API_KEY,
-              Authorization: `Bearer ${decryptedFullData.token}`,
-            },
-          },
-        );
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const fetchedUser = await fetchUser();
+  //       setFetchUserData(fetchedUser);
 
-        setUserData(response.data.data);
-        console.log(
-          "getSavedUserYoutubeInfo:",
-          response.data,
-          decryptedFullData.token,
-        );
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  //       console.log("fetched user data: ", fetchedUser);
+  //     } catch (error) {
 
-    console.log("is user logged in from App.js:", userLoggedIn);
+  //       console.error("Error fetching user data:", error);
+  //     }
+  //   };
 
-    // Only fetch data if the user is logged in
-    if (userLoggedIn) {
-      fetchUserYoutubeInfo();
-    }
-  }, [userLoggedIn]);
+  //   fetchData();
+  // }, []);
+
+  // useEffect(() => {
+  //   const fetchUserYoutubeInfo = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         `${process.env.REACT_APP_API_BASE_URL}/getSavedUserYoutubeInfo`,
+  //         {
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             "x-api-key": process.env.REACT_APP_X_API_KEY,
+  //             Authorization: `Bearer ${decryptedFullData.token}`,
+  //           },
+  //         },
+  //       );
+
+  //       setUserData(response.data.data);
+  //       console.log(
+  //         "getSavedUserYoutubeInfo:",
+  //         response.data,
+  //         decryptedFullData.token,
+  //       );
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+
+  //   console.log("is user logged in from App.js:", userLoggedIn);
+
+  //   // Only fetch data if the user is logged in
+  //   if (userLoggedIn) {
+  //     fetchUserYoutubeInfo();
+  //   }
+  // }, [userLoggedIn]);
 
   useEffect(() => {
     const fetchDataAndInitGAPI = async () => {
@@ -208,6 +220,8 @@ const App = () => {
           gapi.client.init({
             apiKey: fetchedUser.apiKey,
             clientId: fetchedUser.ClientId,
+            // apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
+            // clientId: process.env.REACT_APP_CLIENT_ID,
             scope:
               "https://www.googleapis.com/auth/youtube.readonly " +
               "https://www.googleapis.com/auth/youtube.force-ssl " +
@@ -243,38 +257,15 @@ const App = () => {
             <Navbar />
           </div>
           <Routes>
-
-            {/* <Route
-              path="/"
-              element={
-                userLoggedIn ? (
-                  accessLevel === "L2" ? (
-                    <Navigate to="/ideation" />
-                  ) : (
-                    <Navigate to="/settings" />
-                  )
-                ) : (
-                  <Navigate to="/home" />
-                )
-              }
-            /> */}
+            {/* Home */}
+            <Route path="/" element={<Home />} />
 
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/youtube" element={<ConnectYoutube />} />
-            <Route path="/thank-you" element={<ConnectYoutubeNotice />} />
             {/* Sign-In and Sign-Up */}
             <Route path="/sign-in/*" element={<SignInPage />} />
             <Route path="/sign-up/*" element={<SignUpPage />} />
-            <Route
-              path="/premium-account-create/*"
-              element={<SignUpPremiumPage />}
-            />
-            <Route
-              path="/bundle-account-create/*"
-              element={<SignUpBundlePage />}
-            />
-            {/* <Route path="*" element={<NotFound />} /> */}
+            <Route path="/premium-account-create/*" element={<SignUpPremiumPage />} />
+            <Route path="/bundle-account-create/*" element={<SignUpBundlePage />} />
           </Routes>
           <div
             className="flex w-full"

@@ -490,11 +490,7 @@ const RegistrationForm = () => {
           </div>
           <button
             type="submit"
-            style={{
-              background:
-                "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
-              color: "white",
-            }}
+            style={{ backgroundColor: "#7352FF" }}
             className="w-full text-white p-2 rounded flex items-center cursor-pointer justify-center"
           >
             Connect Channel

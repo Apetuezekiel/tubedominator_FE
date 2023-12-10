@@ -105,13 +105,12 @@ const SignUpPremiumPage = () => {
           setAccessLevel("L1");
           localStorage.setItem("userLoggedin", true);
           localStorage.setItem("userFirstName", formData.firstName);
+          localStorage.setItem("userFullName", `${formData.firstName} ${formData.lastName}`);
           localStorage.setItem("userRecordId", data.userRecordId);
           localStorage.setItem("gAppId", "2");
           localStorage.setItem("userRegEmail", formData.email);
-
           setUserLoggedIn(true);
-          // console.log("Got to the navigation");
-          navigate("/");
+          navigate("/ideation");
         } else {
           showToast("error", data.message, 3000);
           setIsLoading(false);
@@ -326,21 +325,37 @@ const SignUpPremiumPage = () => {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <img
-                    src={signInBtn}
-                    alt="Sign in Button"
-                    className="h-8 cursor-pointer"
-                    onClick={handleSubmit}
-                  />
-                  {/* <div className="border-b-1 text-center text-xs mb-3">
-                    <Link
-                      to="/sign-in"
-                      className="leading-none px-2 inline-block text-xs text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2"
-                    >
-                      Sign in Here
-                    </Link>
-                    <hr />
-                  </div> */}
+                  <div className="flex items-center justify-between">
+                    {isLoading ? (
+                      <img
+                        src={signInBtn}
+                        alt="Sign in Button"
+                        className="h-8 cursor-not-allowed"
+                        style={{ filter: "grayscale(1)" }}
+                      />
+                    ) : (
+                      <img
+                        src={signInBtn}
+                        alt="Sign in Button"
+                        className="h-8 cursor-pointer"
+                        style={{
+                          filter: `${
+                            formData.email === "" || formData.password === ""
+                              ? "grayscale(1)"
+                              : ""
+                          }`,
+                        }}
+                        onClick={handleSubmit}
+                      />
+                    )}
+                    {isLoading && (
+                      <BiLoaderCircle
+                        className="animate-spin text-center ml-3"
+                        color="#9999FF"
+                        size={20}
+                      />
+                    )}
+                  </div>
                 </div>
 
                 {/* <button

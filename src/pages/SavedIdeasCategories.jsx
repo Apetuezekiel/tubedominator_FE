@@ -82,7 +82,7 @@ const SavedIdeas = () => {
     useState(false);
   const [filteredData, setFilteredData] = useState(savedIdeasData);
   const userEncryptedData = localStorage.getItem("encryptedFullData");
-  const decryptedFullData = userFullDataDecrypted();
+  // const decryptedFullData = userFullDataDecrypted();
   const relatedKeywordData = useKeywordStore(
     (state) => state.relatedKeywordData,
   );
@@ -239,7 +239,7 @@ const SavedIdeas = () => {
                 </select>
               </div>
             </div> */}
-            <div className="w-full max-w-xs flex items-center p-2 pl-4 pr-4 border border-gray-300 bg-white rounded-full">
+            {/* <div className="w-full max-w-xs flex items-center p-2 pl-4 pr-4 border border-gray-300 bg-white rounded-full">
               <input
                 type="text"
                 placeholder="Enter a topic, brand, or product"
@@ -248,7 +248,7 @@ const SavedIdeas = () => {
                 onChange={handleSearchChange}
               />
               <HiSearch className="text-gray-500 text-xs" />
-            </div>
+            </div> */}
           </div>
         </div>
         <div>

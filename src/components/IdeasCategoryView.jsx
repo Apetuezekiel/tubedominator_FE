@@ -17,7 +17,7 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
   const [addedNewFolder, setAddedNewFolder] = useState(false);
   const [savingKeywordIdea, setSavingKeywordIdea] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const decryptedFullData = userFullDataDecrypted();
+  // const decryptedFullData = userFullDataDecrypted();
 
   //   const [fetchingSavedIdeas, setFetchingSavedIdeas] = useState(true);
 
@@ -81,7 +81,7 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
       keyword_diff: dataSet.difficulty || "",
       potential_views: dataSet.estimated_views || "",
       trend: dataSet.trend || "0",
-      email: decryptedFullData.email || "",
+      email: localStorage.getItem("userRegEmail") || "",
       category: selectedCategory || "Uncategorized Ideas",
       cpc: dataSet.cpc || "",
       cmp: dataSet.cmp || "",
@@ -130,7 +130,7 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
     const headers = {
       "Content-Type": "application/json",
       "x-api-key": process.env.REACT_APP_X_API_KEY,
-      Authorization: `Bearer ${decryptedFullData.token}`,
+      // Authorization: `Bearer ${decryptedFullData.token}`,
     };
 
     try {
@@ -162,7 +162,7 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
       className="fixed top-0 left-0 w-full h-full flex justify-center items-center z-50"
       style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
     >
-      <div className="w-fit border border-gray-200 rounded-lg p-4 bg-white relative">
+      <div className="w-fit min-w-1/2 border border-gray-200 rounded-lg p-4 bg-white relative">
         <button
           className="absolute top-0 right-0 m-3 text-gray-500 hover:text-gray-700 cursor-pointer"
           onClick={() => setShowSavedIdeaCategoryPanel(false)}
@@ -213,7 +213,7 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
           <div className="w-1/2">
             <button
               onClick={() => setShowInputTag(true)}
-              className="text-left flex items-center w-3/4 text-md py-2 px-5 rounded-full mr-3 border border-purple-600 text-purple-600"
+              className="text-left flex items-center w-fit mt-3 text-md py-2 px-5 rounded-full mr-3 border border-purple-600 text-purple-600"
             >
               New Folder <FaFolderPlus className="ml-3" color="#7438FF" />
             </button>
@@ -221,7 +221,7 @@ const IdeasCategoryView = ({ dataSet, setShowSavedIdeaCategoryPanel }) => {
               <div className="flex items-center">
                 <input
                   type="text"
-                  className="w-4/5 rounded-full text-xs border mt-3 mr-3 border-purple-600 focus:border-purple-800 h-10 pl-4 pr-20 focus:outline-none"
+                  className="w-4/5 rounded-full text-xs border mt-3 mr-3 border-purple-600 focus:border-purple-800 h-10 px-4 focus:outline-none"
                   placeholder="Name your new category folder"
                   value={newFolderName}
                   onChange={handleFolderName}

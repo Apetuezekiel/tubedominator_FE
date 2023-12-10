@@ -22,7 +22,7 @@ const IdeasCategoryDelete = ({
   const [deletingKeywordIdea, setDeletingKeywordIdea] = useState(false);
   const [savingKeywordIdea, setSavingKeywordIdea] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(dataSet.category);
-  const decryptedFullData = userFullDataDecrypted();
+  // const decryptedFullData = userFullDataDecrypted();
 
   //   const [fetchingSavedIdeas, setFetchingSavedIdeas] = useState(true);
 
@@ -78,6 +78,7 @@ const IdeasCategoryDelete = ({
   };
 
   const removeSavedIdea = async () => {
+    const userEmail = localStorage.getItem("userRegEmail");
     setDeletingKeywordIdea(true);
     const responseDelete = await axios.delete(
       `${process.env.REACT_APP_API_BASE_URL}/deleteSavedIdea/${dataSet.id}`,
@@ -85,10 +86,10 @@ const IdeasCategoryDelete = ({
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer ${decryptedFullData.token}`,
+          // Authorization: `Bearer ${decryptedFullData.token}`,
         },
         params: {
-          email: decryptedFullData.email,
+          email: userEmail,
         },
       },
     );
@@ -116,14 +117,14 @@ const IdeasCategoryDelete = ({
         keyword_diff: dataSet.keyword_diff,
         potential_views: dataSet.potential_views,
         trend: dataSet.trend,
-        email: decryptedFullData.email,
+        email: localStorage.getItem("userRegEmail"),
         category: selectedCategory,
       },
       {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer ${decryptedFullData.token}`,
+          // Authorization: `Bearer ${decryptedFullData.token}`,
         },
       },
     );

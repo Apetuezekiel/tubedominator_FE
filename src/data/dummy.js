@@ -1229,36 +1229,43 @@ export const menuLinks = [
       //   name: "Connect Your Youtube",
       //   link: "youtube",
       //   icon: <AiFillWarning color="#F89C0E" />,
+        // available: true
       // },
       {
         name: "ideation",
         link: "ideation",
         icon: <RiLightbulbFlashLine />,
+        available: true
       },
       {
         name: "Saved Ideas",
         link: "saved-ideas-cat",
         icon: <FaRegHeart />,
+        available: true
       },
       {
         name: "optimization",
         link: "optimization",
         icon: <IoRocketOutline />,
+        available: false
       },
       // {
       //   name: "Reporting",
       //   link: "reporting",
       //   icon: <BsGraphUp />,
+        // available: true
       // },
       {
         name: "Keywords Ranking",
         link: "keywords",
         icon: <BsBarChart />,
+        available: true
       },
       {
         name: "AI Generator",
         link: "ai-generator",
         icon: <BsYoutube />,
+        available: true
       },
     ],
   },
@@ -1272,11 +1279,13 @@ export const accountActions = [
         name: "Settings",
         link: "settings",
         icon: <IoSettings />,
+        available: true
       },
       // {
       //   name: "Log Out",
       //   link: "#",
       //   icon: <MdPowerSettingsNew />,
+        // available: true
       // },
     ],
   },
@@ -1646,11 +1655,11 @@ export const themeColors = [
 export const userProfileData = [
   {
     icon: <FaUserAlt />,
-    title: "Account Settings",
-    desc: "Manage your Account",
-    iconColor: "#9999FF",
-    iconBg: "#EAEAFF",
-    link: "/settings",
+    title: "My Profile",
+    desc: "Account Settings",
+    iconColor: "#03C9D7",
+    iconBg: "#E5FAFB",
+    link: "/settings"
   },
   // {
   //   icon: <BsShield />,

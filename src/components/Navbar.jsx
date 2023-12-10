@@ -113,7 +113,7 @@ const Navbar = () => {
   // const setUserAuthToken = useUserAuthToken((state) => state.setUserAuthToken);
   // const userFullData = getUserEncryptedData();
   const userEncryptedData = localStorage.getItem("encryptedGData");
-  const decryptedFullData = decryptAndRetrieveData(userEncryptedData);
+  // const decryptedFullData = decryptAndRetrieveData(userEncryptedData);
   const navigate = useNavigate();
   const [loadedUserData, setLoadeduserData] = useState(false);
 
@@ -121,7 +121,7 @@ const Navbar = () => {
   const [pageTitle, setPageTitle] = useState("");
   const [pageTag, setPageTag] = useState("");
   const [reloadRequired, setReloadRequired] = useState(false);
-  const [isUserGoogleCreds, setIsUserGoogleCreds] = useState(false);
+  const [isUserGoogleCreds, setIsUserGoogleCreds] = useState(null);
   const isGoogleCreds = useUserGoogleCreds(
     (state) => state.isGoogleCreds,
   );
@@ -164,6 +164,7 @@ const Navbar = () => {
     const fetchUserSetGoogleCreds = async () => {
       try {
         const userSetGoogleCreds = await checkClientAndApiKey();
+        console.log("userSetGoogleCreds userSetGoogleCreds", userSetGoogleCreds);
         setIsUserGoogleCreds(userSetGoogleCreds);
       } catch (error) {
         console.error("Error fetching user Google credentials:", error);
@@ -171,7 +172,7 @@ const Navbar = () => {
     };
   
     fetchUserSetGoogleCreds();
-  }, []);
+  }, [isGoogleCreds]);
   
 
   useEffect(() => {
@@ -275,26 +276,63 @@ const Navbar = () => {
       // style={{backgroundColor: 'black'}}
       className={`w-full flex justify-between navBar relative`}
     >
-      {userLoggedIn && accessLevel === "L2" && !userData ? (
-        <Loader
-          message={
-            "Hold on tight while your account loads Up. We might reload the page."
-          }
-        />
-      ) : userLoggedIn && userData ? (
-        <>
-          {/* <NavButton
-            title="Menu"
-            customFunc={handleActiveMenu}
-            color={currentColor}
-            icon={<AiOutlineMenu />}
-            
-          /> */}
-          <div className="ml-5 my-auto py-5">
+      {
+      // userLoggedIn && accessLevel === "L2" && !userData ? (
+      //   <Loader
+      //     message={
+      //       "Hold on tight while your account loads Up. We might reload the page."
+      //     }
+      //   />
+      // )
+      // : userLoggedIn && userData ? (
+      //   <>
+      //     <div className="ml-5 my-auto py-5">
+      //       <img src={TDLogo} alt="TubeDominator Logo" className="h-6"/>
+      //     </div>
+      //     <div className="flex my-auto">
+      //       <TooltipComponent content="Profile" position="BottomCenter">
+      //         <div
+      //           className="flex items-center gap-2 cursor-pointer hover:bg-light-gray rounded-full px-2 py-2 mr-10"
+      //           onClick={() => handleClick("userProfile")}
+      //           style={{ backgroundColor: "#EAEAFF" }}
+      //         >
+      //           <img
+      //             className="rounded-full w-5 h-5"
+      //             src={userData.channel_image_link}
+      //             alt="user-profile"
+      //           />
+      //           <p className="">
+      //             <span className="text-gray-400 font-bold ml-1 text-14">
+      //               {userData.firstName}
+      //             </span>
+      //           </p>
+      //           <MdKeyboardArrowDown className="text-gray-400 text-14" />
+      //         </div>
+      //       </TooltipComponent>
+      //       {isClicked.userProfile && <UserProfile />}
+      //     </div>
+      //   </>
+      // )
+      userLoggedIn ? (
+        <div className="w-full flex justify-between p-2 md:ml-6 md:mr-6 relative homeHeader">
+                    <div className="ml-5 my-auto py-5">
             {/* <div className="pageTitle text-3xl font-semibold">{pageTitle}</div>
             <div className="tag text-md mt-2 text-xs">{pageTag}</div> */}
-            <img src={TDLogo} alt="TubeDominator Logo" className="h-6" />
+            <img src={TDLogo} alt="TubeDominator Logo" className="h-6"/>
           </div>
+          <div className="navbar-nav ms-auto py-0 flex justify-between items-center text-lg">
+            {/* Welcome,{" "}
+            <span className="text-2xl ml-2 font-semibold">
+              {localStorage.getItem("userFirstName")}
+            </span> */}
+            {
+              isUserGoogleCreds === false && (
+                <span className="text-md ml-4 font-semibold flex items-center">
+                  <IoIosWarning color="#D25C87" /><a style={{color: "blue"}} href={`${process.env.REACT_APP_BASE_URL}/settings`}>You need to connect your Api Key and Client ID. Click here</a>
+              </span>
+              )
+            }
+          </div>  
           <div className="flex my-auto">
             <TooltipComponent content="Profile" position="BottomCenter">
               <div
@@ -304,41 +342,18 @@ const Navbar = () => {
               >
                 <img
                   className="rounded-full w-5 h-5"
-                  src={userData.channel_image_link}
+                  src={userAvatar}
                   alt="user-profile"
                 />
                 <p className="">
                   <span className="text-gray-400 font-bold ml-1 text-14">
-                    {userData.firstName}
+                    {localStorage.getItem('userFirstName')}
                   </span>
                 </p>
                 <MdKeyboardArrowDown className="text-gray-400 text-14" />
               </div>
             </TooltipComponent>
             {isClicked.userProfile && <UserProfile />}
-          </div>
-        </>
-      ) : userLoggedIn && accessLevel === "L1" ? (
-        <div className="w-full flex justify-between p-2 md:ml-6 md:mr-6 relative homeHeader">
-          <div className="navbar-nav ms-auto py-0 flex justify-between items-center text-lg">
-            Welcome,{" "}
-            <span className="text-2xl ml-2 font-semibold">
-              {localStorage.getItem("userFirstName")}
-            </span>
-            {
-              isUserGoogleCreds === false && (
-                <span className="text-md ml-4 font-semibold flex items-center">
-                  <IoIosWarning color="#D25C87" /><a style={{color: "blue"}} href={`${process.env.REACT_APP_BASE_URL}/settings`}>You need to connect your Api Key and Client ID. Click here</a>
-              </span>
-              )
-            }
-          </div>
-          <div className="flex">
-            <img
-              className="rounded-full w-10 h-10"
-              src={userAvatar}
-              alt="user-profile"
-            />
           </div>
         </div>
       ) : (
@@ -386,11 +401,7 @@ const Navbar = () => {
               <Link
                 className="text-xs mr-4 text-black py-2 px-8 rounded-full"
                 to="/sign-in"
-                style={{
-                  background:
-                    "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
-                  color: "white",
-                }}
+                style={{ backgroundColor: "#9999ff" }}
               >
                 Log In
               </Link>

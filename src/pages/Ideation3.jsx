@@ -112,7 +112,7 @@ const Ideation = () => {
   const allUserDeets = useAllUserDeets((state) => state.allUserDeets);
   const setAllUserDeets = useAllUserDeets((state) => state.setAllUserDeets);
   const encryptedGData = localStorage.getItem("encryptedGData");
-  const decryptedFullData = userFullDataDecrypted();
+  // const decryptedFullData = userFullDataDecrypted();
   const [keywordSuggestionRemark, setKeywordSuggestionRemark] = useState("");
   const [showCompetition, setShowCompetition] = useState(false);
   const [showSearchPanel, setShowSearchPanel] = useState(false);
@@ -157,14 +157,14 @@ const Ideation = () => {
     }
   }, []);
 
-    // useEffect(() => {
-    //   const userLevel = localStorage.getItem("accessLevel");
-    //   if (userLevel === "L1") {
-    //     alert(
-    //       "Connect your Youtube Account now to enjoy the cool features of Tubedominator",
-    //     );
-    //   }
-    // }, []);
+  // useEffect(() => {
+  //   const userLevel = localStorage.getItem("accessLevel");
+  //   if (userLevel === "L1") {
+  //     alert(
+  //       "Connect your Youtube Account now to enjoy the cool features of Tubedominator",
+  //     );
+  //   }
+  // }, []);
 
   // useEffect(() => {
   //   const handleGetIdeas = async () => {
@@ -301,13 +301,13 @@ const Ideation = () => {
             keyword_diff: foundObject.difficulty,
             trends: foundObject.trends,
             potential_views: foundObject.estimated_views,
-            email: decryptedFullData.email,
+            email: localStorage.getItem("userRegEmail"),
           },
           {
             headers: {
               "Content-Type": "application/json",
               "x-api-key": process.env.REACT_APP_X_API_KEY,
-              Authorization: `Bearer ${decryptedFullData.token}`,
+              // Authorization: `Bearer ${decryptedFullData.token}`,
             },
           },
         );
@@ -324,12 +324,12 @@ const Ideation = () => {
       } else {
         try {
           const response = await axios.get(
-            `${process.env.REACT_APP_API_BASE_URL}/getAllSavedIdeas?email=${decryptedFullData.email}`,
+            `${process.env.REACT_APP_API_BASE_URL}/getAllSavedIdeas?email=${localStorage.getItem("userRegEmail")}`,
             {
               headers: {
                 "Content-Type": "application/json",
                 "x-api-key": process.env.REACT_APP_X_API_KEY,
-                Authorization: `Bearer ${decryptedFullData.token}`,
+                // Authorization: `Bearer ${decryptedFullData.token}`,
               },
             },
           );
@@ -341,7 +341,7 @@ const Ideation = () => {
           );
 
           console.log("to delete response.data 2", findFoundObjectInSaved);
-          console.log("decryptedFullData.email", decryptedFullData.email);
+          // console.log("decryptedFullData.email", decryptedFullData.email);
 
           const responseDelete = await axios.delete(
             `${process.env.REACT_APP_API_BASE_URL}/deleteSavedIdea/${findFoundObjectInSaved.id}`,
@@ -349,10 +349,10 @@ const Ideation = () => {
               headers: {
                 "Content-Type": "application/json",
                 "x-api-key": process.env.REACT_APP_X_API_KEY,
-                Authorization: `Bearer ${decryptedFullData.token}`,
+                // Authorization: `Bearer ${decryptedFullData.token}`,
               },
               params: {
-                email: decryptedFullData.email,
+                email: localStorage.getItem("userRegEmail"),
               },
             },
           );
@@ -672,7 +672,7 @@ const Ideation = () => {
 
     try {
       setIsLoading(true);
-      console.log("handleGetIdeas", decryptedFullData.token);
+      // console.log("handleGetIdeas", decryptedFullData.token);
 
       const response = await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}/fetchKeywordStat`,
@@ -681,7 +681,7 @@ const Ideation = () => {
           headers: {
             "Content-Type": "application/json",
             "x-api-key": process.env.REACT_APP_X_API_KEY,
-            Authorization: `Bearer ${decryptedFullData.token}`,
+            // Authorization: `Bearer ${decryptedFullData.token}`,
           },
         },
       );

@@ -71,26 +71,26 @@ const SignInPage = () => {
 
       const data = response.data;
       if (data.success) {
-        showToast("success", data.message, 3000);
+        // showToast("success", data.message, 3000);
         setIsLoading(false);
-        console.log("Data0", data);
-        const gId = data.user_id ? data.user_id.split("_")[1] : null;
+        // console.log("Data0", data);
+        // const gId = data.user_id ? data.user_id.split("_")[1] : null;
 
-        gId && (await getUserEncryptedDataFromDb(gId));
+        // gId && (await getUserEncryptedDataFromDb(gId));
 
-        const channelRegistered = data.user_id
-          ? await isChannelRegistered(data.user_id)
-          : null;
-        channelRegistered
-          ? localStorage.setItem("accessLevel", "L2")
-          : localStorage.setItem("accessLevel", data.accessLevel);
+        // const channelRegistered = data.user_id
+        //   ? await isChannelRegistered(data.user_id)
+        //   : null;
+        // channelRegistered
+        //   ? localStorage.setItem("accessLevel", "L2")
+        //   : localStorage.setItem("accessLevel", data.accessLevel);
         localStorage.setItem("userLoggedin", true);
         localStorage.setItem("userRecordId", data.userRecordId);
         localStorage.setItem("userFirstName", data.firstName);
         localStorage.setItem("userLastName", data.lastName);
         localStorage.setItem("userRegEmail", formData.email);
 
-        setAccessLevel(localStorage.getItem("accessLevel"));
+        setAccessLevel("L1");
         setUserLoggedIn(true);
         navigate("/ideation");
       } else {
@@ -164,9 +164,8 @@ const SignInPage = () => {
                       onClick={handleSubmit}
                       style={{
                         filter: `${
-                          formData.email === "" || formData.password === ""
-                            ? "grayscale(1)"
-                            : ""
+                          (formData.email === "" || formData.password === "") ?
+                          "grayscale(1)" : ""
                         }`,
                       }}
                     />

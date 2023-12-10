@@ -15,10 +15,11 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogout } from "react-google-login";
 import { useRef } from "react";
-import GoogleLogOut from "../pages/UserAuth/GoogleLogOut";
+import userAvatar from "../assets/images/man-avatar-profile-picture-vector-illustration_268834-538.avif"
 
 const UserProfile = () => {
-  const clientId = process.env.REACT_APP_CLIENT_ID;
+  const clientId =
+    "372673946018-lu1u3llu6tqi6hmv8m2226ri9qev8bb8.apps.googleusercontent.com";
   const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
   const accessLevel = useUserAccessLevel((state) => state.accessLevel);
   const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
@@ -32,11 +33,7 @@ const UserProfile = () => {
 
   const onLogoutSuccess = (res) => {
     console.log("Logout Success, res:", res);
-    setIsClicked(initialState);
     localStorage.clear();
-    setUserLoggedIn("");
-    setAccessLevel("");
-    setUserData(null);
     navigate("/");
   };
 
@@ -52,11 +49,6 @@ const UserProfile = () => {
 
   const handleLogOutClick = () => {
     dismissProfileBtn.current.click();
-  };
-
-  const goToSettings = () => {
-    setIsClicked(initialState);
-    navigate("/settings");
   };
 
   return (
@@ -76,13 +68,13 @@ const UserProfile = () => {
       <div className="flex gap-5 items-center mt-6 border-color border-b-1 pb-6">
         <img
           className="rounded-full h-24 w-24"
-          src={userData.channel_image_link}
+          src={userAvatar}
           alt="user-profile"
         />
         <div>
           <p className="font-semibold text-xl dark:text-gray-200">
             {" "}
-            {userData.fullName}{" "}
+            {localStorage.getItem('userFirstName')}{" "}
           </p>
           <p className="text-gray-500 text-sm dark:text-gray-400">
             {" "}
@@ -90,16 +82,16 @@ const UserProfile = () => {
           </p>
           <p className="text-gray-500 text-sm font-semibold dark:text-gray-400">
             {" "}
-            {userData.business_email}{" "}
+            {localStorage.getItem('userRegEmail')}{" "}
           </p>
         </div>
       </div>
       <div>
-        {/* {userProfileData.map((item, index) => (
-          <div
+        {userProfileData.map((item, index) => (
+          <Link
             key={index}
             className="flex gap-5 border-b-1 border-color p-4 hover:bg-light-gray cursor-pointer  dark:hover:bg-[#42464D]"
-            onClick={goToSettings}
+            to={item.link}
           >
             <button
               type="button"
@@ -116,20 +108,27 @@ const UserProfile = () => {
                 {item.desc}{" "}
               </p>
             </div>
-          </div>
-        ))} */}
+          </Link>
+        ))}
       </div>
-      <div className="mt-5 flex flex-col justify-center items-center relative">
-        <div className="top-1 opacity-0 ml-8 absolute left-1/2 transform -translate-x-1/2 w-1/2">
-          <GoogleLogOut />
+      <div className="mt-5">
+        <div id="signoutButton">
+          {/* <GoogleLogout
+            clientId={clientId}
+            buttonText="Logout"
+            onLogoutSuccess={onLogoutSuccess}
+          ></GoogleLogout> */}
         </div>
+        {/* <Button
+            color="white"
+            bgColor={currentColor}
+            text="Logout"
+            borderRadius="10px"
+            width="full"
+          /> */}
         <button
-          className="w-1/2 rounded-md py-3 text-white"
-          style={{
-            background:
-              "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
-            color: "white",
-          }}
+          className="w-full rounded-md py-3 text-white"
+          style={{ backgroundColor: "#7352FF" }}
           onClick={() => {
             setIsClicked(initialState);
             handleLogOut();

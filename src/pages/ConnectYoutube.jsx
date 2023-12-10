@@ -7,7 +7,7 @@ import GoogleLoginComp from "./UserAuth/GoogleLogin";
 import { NavLink } from "react-router-dom";
 import accountIllus from "../assets/images/brand loyalty-rafiki.png";
 import homeBg from "../assets/images/homeBg.png";
-import youtubeIllus from "../assets/images/HomeImage2.png";
+import youtubeIllus from "../assets/images/HomeImage.png";
 
 const ConnectYoutube = () => {
   const [formData, setFormData] = useState({

@@ -35,7 +35,6 @@ import {
 } from "@syncfusion/ej2-react-grids";
 import showToast from "../utils/toastUtils";
 import countriesWithLanguages from "../data/countries";
-import Loader from "./Loader";
 
 const staticData = [
   { keyword: "Keyword 1", source: "Source 1", monthlysearch: 1000 },
@@ -132,7 +131,7 @@ function SearchTerm({ videoId }) {
     setSearchQuery(savedSearchTerm);
     setProcessedUserSearchTerms(savedSearchTermData);
     if (!savedSearchTermData) {
-      // console.log("got to local storage bay here");
+      console.log("got to local storage bay here");
 
       return null;
     } else {
@@ -456,14 +455,9 @@ function SearchTerm({ videoId }) {
           <span className="mr-2">
             <button
               onClick={() => selectUserSearchTerm(props.keyword)}
-              className="btn px-2 text-xs rounded-full py-1"
-              style={{
-                background:
-                  "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
-                color: "white",
-              }}
+              className="btn"
             >
-              select
+              Select
             </button>
           </span>
         </span>
@@ -494,7 +488,7 @@ function SearchTerm({ videoId }) {
   };
 
   return (
-    <div className="flex h-screen flex-col px-10 py-5 w-full bg-white">
+    <div className="flex h-screen flex-col px-10 py-5 w-full">
       {/* <div className="flex pl-5 pb-5 pt-5">
         <div className="w-1/2 items-center flex">
           <img
@@ -549,16 +543,13 @@ function SearchTerm({ videoId }) {
           <div className="text-sm text-center">
             Choosing a search term gets you better recommendations for your
             metadata. <br />
-            {/* You can either search or choose a suggested term. */}
+            You can either search or choose a suggested term.
           </div>
         </div>
         <div className="flex w-4/6 flex-col items-center justify-center h-full mb-5">
           <div className="p-4 w-full">
             <div className="mb-4">
-              <div
-                className="border rounded shadow mt-5"
-                style={{ backgroundColor: "#F1F1FA" }}
-              >
+              <div className="border rounded shadow mt-5">
                 <button
                   className="w-full text-sm text-left p-3 border-b flex items-center justify-between focus:outline-none"
                   onClick={toggleAccordion1}
@@ -572,7 +563,7 @@ function SearchTerm({ videoId }) {
                   )}
                 </button>
                 {isOpen1 && (
-                  <div className="p-3 text-sm">
+                  <div v className="p-3 text-sm">
                     <div>
                       <div className="flex w-full items-end">
                         <div className="flex flex-col w-3/6">
@@ -620,15 +611,18 @@ function SearchTerm({ videoId }) {
                     </div>
                     <div>
                       {isLoading ? (
-                        <Loader
-                          message={"Gathering Insights for your search Term"}
-                          marginTop={10}
-                        />
+                        <div className="flex flex-col justify-center items-center w-full mt-20">
+                          <BiLoaderCircle
+                            className="animate-spin text-center"
+                            color="#7352FF"
+                            size={30}
+                          />
+                          <div>Gathering Insights for your Keyword.</div>
+                        </div>
                       ) : (
                         <div className=""></div>
                       )}
                     </div>
-                    <br />
                     <GridComponent
                       // id="gridcomp"
                       dataSource={processedUserSearchTerms}

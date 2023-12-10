@@ -48,7 +48,7 @@ function Insights({
   display,
 }) {
   console.log("dataSet", dataSet);
-  const decryptedFullData = userFullDataDecrypted();
+  // const decryptedFullData = userFullDataDecrypted();
   const [keywordVideosInfo, setKeywordVideosInfo] = useState([]);
   const [isSerpGoogleLoaded, setSerpGoogleLoaded] = useState("");
   const [overallInsightMetrics, setOverallInsightsMetrics] = useState("");
@@ -140,7 +140,7 @@ function Insights({
             headers: {
               "Content-Type": "application/json",
               "x-api-key": process.env.REACT_APP_X_API_KEY,
-              Authorization: `Bearer ${decryptedFullData.token}`,
+              // Authorization: `Bearer ${decryptedFullData.token}`,
             },
             params: {
               keyword: dataSet.keyword,
@@ -159,10 +159,10 @@ function Insights({
 
           setKeywordVideosInfo(keywordVideosInfo.slice(0, 3));
 
-          localStorage.setItem(
-            `${decryptedFullData.gid}-${dataSet.index}-keywordVideosInfo`,
-            JSON.stringify(keywordVideosInfo),
-          );
+          // localStorage.setItem(
+          //   `${decryptedFullData.gid}-${dataSet.index}-keywordVideosInfo`,
+          //   JSON.stringify(keywordVideosInfo),
+          // );
 
           setSerpGoogleLoaded("data");
         } else {
@@ -222,7 +222,7 @@ function Insights({
               headers: {
                 "Content-Type": "application/json",
                 "x-api-key": process.env.REACT_APP_X_API_KEY,
-                Authorization: `Bearer ${decryptedFullData.token}`,
+                // Authorization: `Bearer ${decryptedFullData.token}`,
               },
               params: {
                 keyword: dataSet.keyword,
@@ -309,7 +309,7 @@ function Insights({
   const difficultyColor = difficultyColors[dataSet.difficulty];
 
   return (
-    <section className={`w-full z-50 ${display} min-h-screen`}>
+    <section className={`w-full z-50 ${display}`}>
       <div className="m-2 md:m-10 mt-10 p-2 md:p-10 rounded-3xl">
         {isSerpYoutubeLoaded ? (
           <div>

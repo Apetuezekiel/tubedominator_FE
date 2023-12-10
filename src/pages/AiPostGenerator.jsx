@@ -18,7 +18,7 @@ import TDLogo from "../assets/images/TubeDominator 500x500.png";
 import Tags from "../components/Tags";
 
 function AiPostGenerator({ display }) {
-  const decryptedFullData = userFullDataDecrypted();
+  // const decryptedFullData = userFullDataDecrypted();
   const [generatedYoutubePost, setGeneratedYoutubePost] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(null);
@@ -183,7 +183,7 @@ function AiPostGenerator({ display }) {
 
     try {
       setIsLoading(true);
-      console.log("handleGetIdeas", decryptedFullData.token);
+      // console.log("handleGetIdeas", decryptedFullData.token);
 
       const response = await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}/generateYoutubePost`,
@@ -192,7 +192,7 @@ function AiPostGenerator({ display }) {
           headers: {
             "Content-Type": "application/json",
             "x-api-key": process.env.REACT_APP_X_API_KEY,
-            Authorization: `Bearer ${decryptedFullData.token}`,
+            // Authorization: `Bearer ${decryptedFullData.token}`,
           },
         },
       );
@@ -843,6 +843,7 @@ function AiPostGenerator({ display }) {
                               width: "98%",
                             }}
                             className="p-5 text-xs"
+                            readOnly
                           ></textarea>
                         ) : (
                           <input
