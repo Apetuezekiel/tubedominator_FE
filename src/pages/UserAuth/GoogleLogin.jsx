@@ -13,6 +13,7 @@ import GoogleApiInitializer from "../../utils/GoogleApiInitializer";
 import axios from "axios";
 import {
   encryptAndStoreData,
+  fetchUser,
   getUserEncryptedDataFromDb,
   userFullDataDecrypted,
 } from "../../data/api/calls";
@@ -32,10 +33,25 @@ const GoogleLoginComp = forwardRef((props, ref) => {
 
   const navigate = useNavigate();
   const [initialized, setInitialized] = useState(false);
+  const [fetchUserData, setFetchUserData] = useState(false);
   const accessLevel = useUserAccessLevel((state) => state.accessLevel);
   const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
   // const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
   // const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const fetchedUser = await fetchUser();
+        setFetchUserData(fetchedUser);
+        console.log("fetched user data: ", fetchedUser);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const isChannelRegistered = async (user_id, GUserData) => {
     try {
@@ -175,13 +191,27 @@ const GoogleLoginComp = forwardRef((props, ref) => {
 
   return (
     <div>
-      {initialized && (
+      {/* {initialized && (
         <GoogleApiInitializer
           apiKey={process.env.REACT_APP_GOOGLE_API_KEY}
           clientId={process.env.REACT_APP_CLIENT_ID}
           initializeOnLoad={true}
         />
+      )} */}
+      {initialized && fetchUserData.apiKey && fetchUserData.clientId && (
+        <GoogleApiInitializer
+          apiKey={fetchUserData.apiKey}
+          clientId={fetchUserData.clientId}
+          initializeOnLoad={true}
+        />
       )}
+
+      {(!fetchUserData.apiKey || !fetchUserData.clientId) &&
+        (() => {
+          showToast("error", "You haven't set your clientId and apiKey");
+          console.error("Error: apiKey or clientId is not available");
+        })()}
+
       <button onClick={() => handleLoginClick()}>
         <GoogleLogin
           clientId={process.env.REACT_APP_CLIENT_ID}

@@ -23,6 +23,7 @@ const SignUpPage = () => {
     password: "",
     firstName: "",
     lastName: "",
+    gAppId: "2",
     confirmPassword: "",
     agreeToTerms: false,
   });
@@ -104,6 +105,9 @@ const SignUpPage = () => {
           localStorage.setItem("userLoggedin", true);
           localStorage.setItem("userFirstName", formData.firstName);
           localStorage.setItem("userRecordId", data.userRecordId);
+          localStorage.setItem("gAppId", "2");
+          localStorage.setItem("userRegEmail", formData.email);
+
           setUserLoggedIn(true);
           // console.log("Got to the navigation");
           navigate("/");

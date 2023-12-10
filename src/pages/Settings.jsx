@@ -6,6 +6,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { BiLoaderCircle } from "react-icons/bi";
 import { IoCloudUploadSharp } from "react-icons/io5";
+import { useEffect } from "react";
+import { fetchUser } from "../data/api/calls";
+import Loader from "../components/Loader";
+import userAvatar from "../assets/images/man-avatar-profile-picture-vector-illustration_268834-538.avif";
 
 function Settings() {
   const navigate = useNavigate();
@@ -14,17 +18,51 @@ function Settings() {
     email: "",
     password: "",
     firstName: "",
+    apiKey: "",
+    ClientID: "",
     lastName: "",
     confirmPassword: "",
     agreeToTerms: false,
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [loadingUserData, setLoadingUserData] = useState(false);
+  const [fetchedUserData, setFetchUserData] = useState(false);
 
   const [userProfile, setUserProfile] = useState({
     firstName: "John",
     lastName: "Doe",
+    apiKey: "Youtube API Key",
+    ClientID: "Youtube API Client ID",
     email: "john.doe@example.com",
   });
+
+  useEffect(() => {
+    setLoadingUserData(true);
+    const fetchData = async () => {
+      try {
+        const fetchedUser = await fetchUser();
+        setFetchUserData(fetchedUser);
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          email: fetchedUser.email,
+          firstName: fetchedUser.firstName,
+          apiKey: fetchedUser.apiKey,
+          ClientID: fetchedUser.ClientId,
+          lastName: fetchedUser.lastName,
+          // Update other fields as needed
+        }));
+        setLoadingUserData(false);
+
+        console.log("fetched user data: ", fetchedUser);
+      } catch (error) {
+        setLoadingUserData(false);
+
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -51,14 +89,17 @@ function Settings() {
       errors.lastName = "Last Name is required";
     }
 
+    if (!formData.apiKey) {
+      errors.apiKey = "Please provide your google api key ";
+    }
+    if (!formData.ClientID) {
+      errors.ClientID = "Please provide your google Client ID ";
+    }
+
     if (!formData.confirmPassword) {
       errors.confirmPassword = "Confirm Password is required";
     } else if (formData.confirmPassword !== formData.password) {
       errors.confirmPassword = "Passwords do not match";
-    }
-
-    if (!formData.agreeToTerms) {
-      errors.agreeToTerms = "You must agree to the terms";
     }
 
     setValidationErrors(errors);
@@ -71,13 +112,13 @@ function Settings() {
     return emailRegex.test(email);
   };
 
-  const handleSubmit = async () => {
+  const handleSave = async () => {
     if (validateForm()) {
       setIsLoading(true);
 
       try {
         const response = await axios.post(
-          `${process.env.REACT_APP_API_BASE_URL}/sign-up`,
+          `${process.env.REACT_APP_API_BASE_URL}/saveUser`,
           formData,
           {
             headers: {
@@ -88,15 +129,18 @@ function Settings() {
         );
 
         const data = response.data;
-        console.log("Sign up response", data);
+        console.log("update user data response", data);
         if (data.success) {
+          showToast("error", `Account updated succesfully`, 3000);
+          localStorage.setItem("ClientID", formData.ClientID);
+          localStorage.setItem("apiKey", formData.apiKey);
         } else {
           showToast("error", data.message, 3000);
           setIsLoading(false);
         }
       } catch (error) {
-        console.error("Error Registering User:", error);
-        showToast("error", `Couldn't Sign you up`, 3000);
+        console.error("Error updating User details:", error);
+        showToast("error", `Couldn't update your account details`, 3000);
         setIsLoading(false);
       }
     }
@@ -131,43 +175,47 @@ function Settings() {
         </div>
       </div>
 
-      <header
-        className="flex items-center py-5 px-10 rounded-xl mt-8"
-        style={{
-          background:
-            "linear-gradient(90.07deg, #9999FF 0.05%, rgba(153, 153, 255, 0) 98.56%)",
-        }}
-      >
-        <div className="p-3 rounded-lg">
-          <img src={profileImage} alt="" className="h-24" />
-        </div>
-        <div className="text-xl px-4 mr-4">
-          <div className="font-semibold">Mikel wanger</div>
-          <div className="text-xs">Mikelwanger02@email.com</div>
-          <div className="flex items-center gap-2 cursor-pointer p-1 rounded-lg mt-2">
-            <Link
-              className="text-xs mr-4 py-2 px-5 rounded-md text-black flex items-center"
-              to="/sign-up"
-              style={{
-                backgroundColor: "transparent",
-                border: "1px black solid",
-              }}
-            >
-              <IoCloudUploadSharp className="mr-2" />
-              Upload Image
-            </Link>
-            <Link
-              className="text-xs mr-4 text-black py-2 px-5 rounded-md"
-              to="/sign-in"
-              style={{
-                background:
-                  "linear-gradient(270deg, #FD2E2E 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
-                color: "white",
-              }}
-            >
-              Delete
-            </Link>
-            {/* <p>
+      {loadingUserData ? (
+        <Loader message={"Loading your account info. Hold on"} />
+      ) : (
+        <div>
+          <header
+            className="flex items-center py-5 px-10 rounded-xl mt-8"
+            style={{
+              background:
+                "linear-gradient(90.07deg, #9999FF 0.05%, rgba(153, 153, 255, 0) 98.56%)",
+            }}
+          >
+            <div className="p-3 rounded-lg">
+              <img src={userAvatar} alt="" className="h-24 rounded-full" />
+            </div>
+            <div className="text-xl px-4 mr-4">
+              <div className="font-semibold">{fetchedUserData.fullName}</div>
+              <div className="text-xs">{fetchedUserData.email}</div>
+              <div className="flex items-center gap-2 cursor-pointer p-1 rounded-lg mt-2">
+                <Link
+                  className="text-xs mr-4 py-2 px-5 rounded-md text-black flex items-center"
+                  to="/sign-up"
+                  style={{
+                    backgroundColor: "transparent",
+                    border: "1px black solid",
+                  }}
+                >
+                  <IoCloudUploadSharp className="mr-2" />
+                  Upload Image
+                </Link>
+                <Link
+                  className="text-xs mr-4 text-black py-2 px-5 rounded-md"
+                  to="/sign-in"
+                  style={{
+                    background:
+                      "linear-gradient(270deg, #FD2E2E 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                    color: "white",
+                  }}
+                >
+                  Delete
+                </Link>
+                {/* <p>
                 <button
                   type="submit"
                   style={{ backgroundColor: "#7438FF" }}
@@ -176,145 +224,194 @@ function Settings() {
                   Talk to an Expert
                 </button>
               </p> */}
+              </div>
+            </div>
+          </header>
+
+          <div className="flex items-center gap-3 mt-10">
+            <div className="flex flex-col">
+              <div className="text-xs mb-1 ml-1 text-gray-400">First Name</div>
+              <input
+                className={`w-full px-8 mb-5 py-4 rounded-full font-medium text-xs bg-white border ${
+                  validationErrors.firstName
+                    ? "border-red-500"
+                    : "border-gray-200"
+                } placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white`}
+                type="text"
+                placeholder="John"
+                value={formData.firstName}
+                onChange={(e) =>
+                  setFormData({ ...formData, firstName: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <div className="text-xs mb-1 ml-1 text-gray-400">Last Name</div>
+              <input
+                className={`w-full px-8 py-4 mb-5 rounded-full font-medium bg-white border text-xs ${
+                  validationErrors.lastName
+                    ? "border-red-500"
+                    : "border-gray-200"
+                } placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white`}
+                type="text"
+                placeholder="Doe"
+                value={formData.lastName}
+                onChange={(e) =>
+                  setFormData({ ...formData, lastName: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <div className="text-xs mb-1 ml-1 text-gray-400">Email</div>
+              <input
+                className={`w-full px-8 py-4 mb-5 rounded-full font-medium bg-white border border-gray-200 placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white  ${
+                  validationErrors.email ? "border-red-500" : "border-gray-200"
+                }`}
+                type="email"
+                placeholder="youremail@email.com"
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="flex flex-col">
+              <div className="text-xs mb-1 ml-1 text-gray-400">Password</div>
+              <div className="relative">
+                <input
+                  className={`w-full px-8 mb-5 py-4 rounded-full font-medium bg-white border border-gray-200 placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white ${
+                    validationErrors.password
+                      ? "border-red-500"
+                      : "border-gray-200"
+                  }`}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="********"
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                />
+                <span
+                  className="absolute top-4 right-3 cursor-pointer"
+                  onClick={toggleShowPassword}
+                >
+                  {showPassword ? (
+                    <FaEyeSlash color="#9999FF" />
+                  ) : (
+                    <FaEye color="#9999FF" />
+                  )}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col">
+              <div className="text-xs mb-1 ml-1 text-gray-400">
+                Confirm Password
+              </div>
+              <div className="relative">
+                <input
+                  className={`w-full px-8 mb-5 py-4 rounded-full font-medium bg-white border border-gray-200 placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white ${
+                    validationErrors.confirmPassword
+                      ? "border-red-500"
+                      : "border-gray-200"
+                  }`}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="********"
+                  value={formData.confirmPassword}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      confirmPassword: e.target.value,
+                    })
+                  }
+                />
+                <span
+                  className="absolute top-4 right-3 cursor-pointer"
+                  onClick={toggleShowPassword}
+                >
+                  {showPassword ? (
+                    <FaEyeSlash color="#9999FF" />
+                  ) : (
+                    <FaEye color="#9999FF" />
+                  )}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <span
+                className="h-7 w-7 rounded-full flex items-center justify-center text-sm cursor-pointer"
+                style={{
+                  background:
+                    "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                  color: "white",
+                }}
+              >
+                X
+              </span>
+              <button
+                className={`text-white rounded-full px-4 py-2 ml-2 text-xs flex items-center cursor-pointer`}
+                onClick={handleSave}
+                style={{
+                  background:
+                    "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                  color: "white",
+                }}
+              >
+                Save{" "}
+                {isLoading && (
+                  <BiLoaderCircle className="ml-2 animate-spin" color="white" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 mt-10">
+            <div className="flex flex-col">
+              <div className="text-xs mb-1 ml-1 text-gray-400">
+                Google Client ID
+              </div>
+              <input
+                className={`w-full px-8 mb-5 py-4 rounded-full font-medium text-xs bg-white border ${
+                  validationErrors.ClientID
+                    ? "border-red-500"
+                    : "border-gray-200"
+                } placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white`}
+                type="text"
+                placeholder="Your Client ID"
+                value={formData.ClientID}
+                onChange={(e) =>
+                  setFormData({ ...formData, ClientID: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <div className="text-xs mb-1 ml-1 text-gray-400">
+                Google API key
+              </div>
+              <input
+                className={`w-full px-8 py-4 mb-5 rounded-full font-medium bg-white border text-xs ${
+                  validationErrors.apiKey ? "border-red-500" : "border-gray-200"
+                } placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white`}
+                type="text"
+                placeholder="Your API Key"
+                value={formData.apiKey}
+                onChange={(e) =>
+                  setFormData({ ...formData, apiKey: e.target.value })
+                }
+              />
+              <div className="text-xs mb-1 ml-1 text-gray-400">
+                how to setup google api key for youtube ?
+              </div>
+            </div>
           </div>
         </div>
-      </header>
-
-      <div className="flex items-center gap-3 mt-10">
-        <div className="flex flex-col">
-          <div className="text-xs mb-1 ml-1 text-gray-400">First Name</div>
-          <input
-            className={`w-full px-8 mb-5 py-4 rounded-full font-medium text-xs bg-white border ${
-              validationErrors.firstName ? "border-red-500" : "border-gray-200"
-            } placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white`}
-            type="text"
-            placeholder="John"
-            value={formData.firstName}
-            onChange={(e) =>
-              setFormData({ ...formData, firstName: e.target.value })
-            }
-          />
-        </div>
-
-        <div className="flex flex-col">
-          <div className="text-xs mb-1 ml-1 text-gray-400">Last Name</div>
-          <input
-            className={`w-full px-8 py-4 mb-5 rounded-full font-medium bg-white border text-xs ${
-              validationErrors.lastName ? "border-red-500" : "border-gray-200"
-            } placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white`}
-            type="text"
-            placeholder="Doe"
-            value={formData.lastName}
-            onChange={(e) =>
-              setFormData({ ...formData, lastName: e.target.value })
-            }
-          />
-        </div>
-
-        <div className="flex flex-col">
-          <div className="text-xs mb-1 ml-1 text-gray-400">Email</div>
-          <input
-            className={`w-full px-8 py-4 mb-5 rounded-full font-medium bg-white border border-gray-200 placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white  ${
-              validationErrors.email ? "border-red-500" : "border-gray-200"
-            }`}
-            type="email"
-            placeholder="youremail@email.com"
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
-          />
-        </div>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="flex flex-col">
-          <div className="text-xs mb-1 ml-1 text-gray-400">Password</div>
-          <div className="relative">
-            <input
-              className={`w-full px-8 mb-5 py-4 rounded-full font-medium bg-white border border-gray-200 placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white ${
-                validationErrors.password ? "border-red-500" : "border-gray-200"
-              }`}
-              type={showPassword ? "text" : "password"}
-              placeholder="********"
-              value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-            />
-            <span
-              className="absolute top-4 right-3 cursor-pointer"
-              onClick={toggleShowPassword}
-            >
-              {showPassword ? (
-                <FaEyeSlash color="#9999FF" />
-              ) : (
-                <FaEye color="#9999FF" />
-              )}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex flex-col">
-          <div className="text-xs mb-1 ml-1 text-gray-400">
-            Confirm Password
-          </div>
-          <div className="relative">
-            <input
-              className={`w-full px-8 mb-5 py-4 rounded-full font-medium bg-white border border-gray-200 placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white ${
-                validationErrors.confirmPassword
-                  ? "border-red-500"
-                  : "border-gray-200"
-              }`}
-              type={showPassword ? "text" : "password"}
-              placeholder="********"
-              value={formData.confirmPassword}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  confirmPassword: e.target.value,
-                })
-              }
-            />
-            <span
-              className="absolute top-4 right-3 cursor-pointer"
-              onClick={toggleShowPassword}
-            >
-              {showPassword ? (
-                <FaEyeSlash color="#9999FF" />
-              ) : (
-                <FaEye color="#9999FF" />
-              )}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center">
-          <span
-            className="h-7 w-7 rounded-full flex items-center justify-center text-sm cursor-pointer"
-            style={{
-              background:
-                "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
-              color: "white",
-            }}
-          >
-            X
-          </span>
-          <button
-            className={`text-white rounded-full px-4 py-2 ml-2 text-xs flex items-center cursor-pointer`}
-            // onClick={handleGetIdeas}
-            style={{
-              background:
-                "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
-              color: "white",
-            }}
-          >
-            Save{" "}
-            {isLoading && (
-              <BiLoaderCircle className="ml-2 animate-spin" color="white" />
-            )}
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

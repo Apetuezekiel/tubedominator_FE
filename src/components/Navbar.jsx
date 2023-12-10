@@ -38,6 +38,8 @@ import { pagesInfo } from "../data/pagesInfo";
 import userAvatar from "../assets/images/man-avatar-profile-picture-vector-illustration_268834-538.avif";
 import Loader from "./Loader";
 import { GoPlus } from "react-icons/go";
+import { checkClientAndApiKey } from "../data/api/calls";
+import { IoIosWarning } from "react-icons/io";
 
 const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
   <TooltipComponent content={title} position="BottomCenter">
@@ -118,6 +120,7 @@ const Navbar = () => {
   const [pageTitle, setPageTitle] = useState("");
   const [pageTag, setPageTag] = useState("");
   const [reloadRequired, setReloadRequired] = useState(false);
+  const [isUserGoogleCreds, setIsUserGoogleCreds] = useState(false);
 
   const location = useLocation();
 
@@ -149,6 +152,20 @@ const Navbar = () => {
   // };
 
   // fetchUserYoutubeInfo();
+
+  useEffect(() => {
+    const fetchUserSetGoogleCreds = async () => {
+      try {
+        const userSetGoogleCreds = await checkClientAndApiKey();
+        setIsUserGoogleCreds(userSetGoogleCreds);
+      } catch (error) {
+        console.error("Error fetching user Google credentials:", error);
+      }
+    };
+  
+    fetchUserSetGoogleCreds();
+  }, []);
+  
 
   useEffect(() => {
     const handleResize = () => setScreenSize(window.innerWidth);
@@ -301,6 +318,13 @@ const Navbar = () => {
             <span className="text-2xl ml-2 font-semibold">
               {localStorage.getItem("userFirstName")}
             </span>
+            {
+              isUserGoogleCreds === false && (
+                <span className="text-md ml-4 font-semibold flex items-center">
+                  <IoIosWarning color="#D25C87" />You need to connect your Api Key and Client ID
+              </span>
+              )
+            }
           </div>
           <div className="flex">
             <img

@@ -215,6 +215,58 @@ export async function getSavedIdeas() {
   }
 }
 
+export async function checkClientAndApiKey() {
+  const userRegEmail = localStorage.getItem("userRegEmail");
+  try {
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_BASE_URL}/checkClientAndApiKey?email=${
+        userRegEmail || decryptedFullData.email
+      }`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+        },
+      },
+    );
+
+    const data = response.data.success;
+    console.log("checkClientAndApiKey", data);
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return [];
+  }
+}
+
+export async function fetchUser() {
+  const userRegEmail = localStorage.getItem("userRegEmail");
+  console.log("userRegEmail, userRegEmail", userRegEmail);
+
+  try {
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_BASE_URL}/fetchUser?email=${
+        userRegEmail || decryptedFullData.email
+      }`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+        },
+      },
+    );
+
+    const data = response.data;
+    console.log("response.data", response);
+
+    return data.user;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return [];
+  }
+}
+
 export async function getUserEncryptedDataFromDb(gId) {
   console.log("Fetching use details from DB");
   try {

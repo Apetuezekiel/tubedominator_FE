@@ -236,7 +236,7 @@ const App = () => {
                   accessLevel === "L2" ? (
                     <Navigate to="/ideation" />
                   ) : (
-                    <Navigate to="/thank-you" />
+                    <Navigate to="/settings" />
                   )
                 ) : (
                   <Navigate to="/home" />

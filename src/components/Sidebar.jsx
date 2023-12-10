@@ -106,8 +106,8 @@ const Sidebar = () => {
                           : "#E5E4E2 1px solid",
                         color: isActive ? "#9999FF" : "#000000",
                         borderRadius: "6px",
-                        pointerEvents: isDisabled ? "none" : "auto",
-                        opacity: isDisabled ? 0.5 : 1,
+                        // pointerEvents: isDisabled ? "none" : "auto",
+                        // opacity: isDisabled ? 0.5 : 1,
                       })}
                       className={({ isActive }) =>
                         isActive ? activeLink : normalLink
@@ -116,11 +116,11 @@ const Sidebar = () => {
                       <div className="">{link.icon}</div>
                       {/* <div className="capitalize pr-4">{link.name}</div> */}
                     </NavLink>
-                    {isDisabled && ( // Show a message on hover if accessLevel is not 'L2'
+                    {/* {isDisabled && (
                       <div className="tooltip bg-white">
                         Connect to Youtube to access feature
                       </div>
-                    )}
+                    )} */}
                   </div>
                 ))}
               </div>
@@ -151,8 +151,8 @@ const Sidebar = () => {
                           : "#E5E4E2 1px solid",
                         color: isActive ? "#9999FF" : "#000000",
                         borderRadius: "6px",
-                        pointerEvents: isDisabled ? "none" : "auto",
-                        opacity: isDisabled ? 0.5 : 1,
+                        // pointerEvents: isDisabled ? "none" : "auto",
+                        // opacity: isDisabled ? 0.5 : 1,
                       })}
                       className={({ isActive }) =>
                         isActive ? activeLink : normalLink

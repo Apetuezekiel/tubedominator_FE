@@ -24,6 +24,7 @@ const SignUpPremiumPage = () => {
     firstName: "",
     lastName: "",
     confirmPassword: "",
+    gAppId: "2",
     agreeToTerms: false,
     accountType: "premium",
   });
@@ -105,6 +106,9 @@ const SignUpPremiumPage = () => {
           localStorage.setItem("userLoggedin", true);
           localStorage.setItem("userFirstName", formData.firstName);
           localStorage.setItem("userRecordId", data.userRecordId);
+          localStorage.setItem("gAppId", "2");
+          localStorage.setItem("userRegEmail", formData.email);
+
           setUserLoggedIn(true);
           // console.log("Got to the navigation");
           navigate("/");

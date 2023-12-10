@@ -1268,16 +1268,16 @@ export const accountActions = [
   {
     title: "",
     links: [
-      // {
-      //   name: "Settings",
-      //   link: "settings",
-      //   icon: <IoSettings />,
-      // },
       {
-        name: "Log Out",
-        link: "#",
-        icon: <MdPowerSettingsNew />,
+        name: "Settings",
+        link: "settings",
+        icon: <IoSettings />,
       },
+      // {
+      //   name: "Log Out",
+      //   link: "#",
+      //   icon: <MdPowerSettingsNew />,
+      // },
     ],
   },
 ];

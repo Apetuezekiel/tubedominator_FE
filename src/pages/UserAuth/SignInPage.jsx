@@ -88,6 +88,8 @@ const SignInPage = () => {
         localStorage.setItem("userRecordId", data.userRecordId);
         localStorage.setItem("userFirstName", data.firstName);
         localStorage.setItem("userLastName", data.lastName);
+        localStorage.setItem("userRegEmail", formData.email);
+
         setAccessLevel(localStorage.getItem("accessLevel"));
         setUserLoggedIn(true);
         navigate("/ideation");

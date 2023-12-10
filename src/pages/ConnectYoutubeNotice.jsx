@@ -66,21 +66,24 @@ const ConnectYoutube = () => {
             className="leading-none px-2 inline-block text-2xl whitespace-normal w-1/2 text-black font-extrabold tracking-wide"
             style={{ lineHeight: "30px" }}
           >
-            Hey there, Thank you once again for your patronage. <br /><br /> Kindly note that
-            we're here to provide an adequate support until you start getting
-            outstanding results with the platform.
+            Hey there, Thank you once again for your patronage. <br />
+            <br /> Kindly note that we're here to provide an adequate support
+            until you start getting outstanding results with the platform.
             <br />
             <br />
-            For now, to get started
-            kindly provide us with the gmail account that is tied to your
-            YouTube channel so we can approve it on the platform to enable you
-            enjoy all the awesome features of TubeDominator.
-            <br /><br />
-            NOTE: Send the
-            gmail address here:
-            <div style={{color: "#0000EE"}}><a href="mailto:support@supremewebcustomercare.freshdesk.com">support@supremewebcustomercare.freshdesk.com</a></div>
-            and
-            we will get it approved immediately. Thank you and let's make
+            For now, to get started kindly provide us with the gmail account
+            that is tied to your YouTube channel so we can approve it on the
+            platform to enable you enjoy all the awesome features of
+            TubeDominator.
+            <br />
+            <br />
+            NOTE: Send the gmail address here:
+            <div style={{ color: "#0000EE" }}>
+              <a href="mailto:support@supremewebcustomercare.freshdesk.com">
+                support@supremewebcustomercare.freshdesk.com
+              </a>
+            </div>
+            and we will get it approved immediately. Thank you and let's make
             YouTube work for your business.
           </div>
         </div>
