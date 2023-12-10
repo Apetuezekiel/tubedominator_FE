@@ -321,7 +321,7 @@ const Navbar = () => {
             {
               isUserGoogleCreds === false && (
                 <span className="text-md ml-4 font-semibold flex items-center">
-                  <IoIosWarning color="#D25C87" />You need to connect your Api Key and Client ID
+                  <IoIosWarning color="#D25C87" /><a style={{color: "blue"}} href={`${process.env.REACT_APP_BASE_URL}/settings`}>You need to connect your Api Key and Client ID. Click here</a>
               </span>
               )
             }

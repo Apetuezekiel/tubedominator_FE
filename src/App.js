@@ -57,7 +57,7 @@ import ConnectYoutube from "./pages/ConnectYoutube";
 import AiPostGenerator from "./pages/AiPostGenerator";
 import Testss from "./pages/Testss";
 import axios from "axios";
-import { userFullDataDecrypted } from "./data/api/calls";
+import { fetchUser, userFullDataDecrypted } from "./data/api/calls";
 import GenerateIdeasPanel from "./components/GenerateIdeasPanel";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Settings from "./pages/Settings";
@@ -198,19 +198,33 @@ const App = () => {
   }, [userLoggedIn]);
 
   useEffect(() => {
-    gapi.load("client:auth2", () => {
-      gapi.client.init({
-        apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
-        clientId: process.env.REACT_APP_CLIENT_ID,
-        scope:
-          "https://www.googleapis.com/auth/youtube.readonly " +
-          "https://www.googleapis.com/auth/youtube.force-ssl " +
-          "https://www.googleapis.com/auth/youtube " +
-          "https://www.googleapis.com/auth/youtube.upload " +
-          "https://www.googleapis.com/auth/cse",
-      });
-    });
-  }, []);
+    const fetchDataAndInitGAPI = async () => {
+      try {
+        const fetchedUser = await fetchUser();
+        console.log("fetched user data: ", fetchedUser);
+  
+        // Initialize gapi.client inside the try block
+        gapi.load("client:auth2", () => {
+          gapi.client.init({
+            apiKey: fetchedUser.apiKey,
+            clientId: fetchedUser.ClientId,
+            scope:
+              "https://www.googleapis.com/auth/youtube.readonly " +
+              "https://www.googleapis.com/auth/youtube.force-ssl " +
+              "https://www.googleapis.com/auth/youtube " +
+              "https://www.googleapis.com/auth/youtube.upload " +
+              "https://www.googleapis.com/auth/cse",
+          });
+        });
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+  
+    fetchDataAndInitGAPI();
+  
+  }, []); 
+  
 
   return (
     <div className={currentMode === "Dark" ? "dark" : ""}>
