@@ -157,14 +157,14 @@ const Ideation = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const userLevel = localStorage.getItem("accessLevel");
-    if (userLevel === "L1") {
-      alert(
-        "Connect your Youtube Account now to enjoy the cool features of Tubedominator",
-      );
-    }
-  }, []);
+    // useEffect(() => {
+    //   const userLevel = localStorage.getItem("accessLevel");
+    //   if (userLevel === "L1") {
+    //     alert(
+    //       "Connect your Youtube Account now to enjoy the cool features of Tubedominator",
+    //     );
+    //   }
+    // }, []);
 
   // useEffect(() => {
   //   const handleGetIdeas = async () => {

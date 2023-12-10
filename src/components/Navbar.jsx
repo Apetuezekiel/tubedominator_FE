@@ -22,6 +22,7 @@ import {
   useUserAuthToken,
   useUserLoggedin,
   useUserAccessLevel,
+  useUserGoogleCreds,
 } from "../state/state";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 // import {
@@ -121,6 +122,12 @@ const Navbar = () => {
   const [pageTag, setPageTag] = useState("");
   const [reloadRequired, setReloadRequired] = useState(false);
   const [isUserGoogleCreds, setIsUserGoogleCreds] = useState(false);
+  const isGoogleCreds = useUserGoogleCreds(
+    (state) => state.isGoogleCreds,
+  );
+  const setIsGoogleCreds = useUserGoogleCreds(
+    (state) => state.setIsGoogleCreds,
+  );
 
   const location = useLocation();
 

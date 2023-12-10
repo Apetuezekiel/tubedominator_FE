@@ -7,9 +7,10 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { BiLoaderCircle } from "react-icons/bi";
 import { IoCloudUploadSharp } from "react-icons/io5";
 import { useEffect } from "react";
-import { fetchUser } from "../data/api/calls";
+import { checkClientAndApiKey, fetchUser } from "../data/api/calls";
 import Loader from "../components/Loader";
 import userAvatar from "../assets/images/man-avatar-profile-picture-vector-illustration_268834-538.avif";
+import { useUserGoogleCreds } from "../state/state";
 
 function Settings() {
   const navigate = useNavigate();
@@ -19,20 +20,25 @@ function Settings() {
     password: "",
     firstName: "",
     apiKey: "",
-    ClientID: "",
+    ClientId: "",
     lastName: "",
     confirmPassword: "",
-    agreeToTerms: false,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loadingUserData, setLoadingUserData] = useState(false);
   const [fetchedUserData, setFetchUserData] = useState(false);
+  const isGoogleCreds = useUserGoogleCreds(
+    (state) => state.isGoogleCreds,
+  );
+  const setIsGoogleCreds = useUserGoogleCreds(
+    (state) => state.setIsGoogleCreds,
+  );
 
   const [userProfile, setUserProfile] = useState({
     firstName: "John",
     lastName: "Doe",
     apiKey: "Youtube API Key",
-    ClientID: "Youtube API Client ID",
+    ClientId: "Youtube API Client ID",
     email: "john.doe@example.com",
   });
 
@@ -47,7 +53,7 @@ function Settings() {
           email: fetchedUser.email,
           firstName: fetchedUser.firstName,
           apiKey: fetchedUser.apiKey,
-          ClientID: fetchedUser.ClientId,
+          ClientId: fetchedUser.ClientId,
           lastName: fetchedUser.lastName,
           // Update other fields as needed
         }));
@@ -74,10 +80,8 @@ function Settings() {
     } else if (!isValidEmail(formData.email)) {
       errors.email = "Invalid email format";
     }
-
-    if (!formData.password) {
-      errors.password = "Password is required";
-    } else if (formData.password.length < 8) {
+    
+    if (formData.password && formData.password.length < 8) {
       errors.password = "Password must be at least 8 characters";
     }
 
@@ -92,13 +96,11 @@ function Settings() {
     if (!formData.apiKey) {
       errors.apiKey = "Please provide your google api key ";
     }
-    if (!formData.ClientID) {
-      errors.ClientID = "Please provide your google Client ID ";
+    if (!formData.ClientId) {
+      errors.ClientId = "Please provide your google Client ID ";
     }
 
-    if (!formData.confirmPassword) {
-      errors.confirmPassword = "Confirm Password is required";
-    } else if (formData.confirmPassword !== formData.password) {
+   if (formData.confirmPassword || formData.password && formData.confirmPassword !== formData.password) {
       errors.confirmPassword = "Passwords do not match";
     }
 
@@ -110,6 +112,18 @@ function Settings() {
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+  };
+
+  const resetFormData = () => {
+    setFormData({
+      email: "",
+      password: "",
+      firstName: "",
+      apiKey: "",
+      ClientId: "",
+      lastName: "",
+      confirmPassword: "",
+    });
   };
 
   const handleSave = async () => {
@@ -131,9 +145,12 @@ function Settings() {
         const data = response.data;
         console.log("update user data response", data);
         if (data.success) {
-          showToast("error", `Account updated succesfully`, 3000);
-          localStorage.setItem("ClientID", formData.ClientID);
+          showToast("success", `Account updated succesfully`, 3000);
+          localStorage.setItem("ClientId", formData.ClientId);
           localStorage.setItem("apiKey", formData.apiKey);
+          setIsLoading(false);
+          const clientAndApiKey = await checkClientAndApiKey();
+          setIsGoogleCreds(clientAndApiKey)
         } else {
           showToast("error", data.message, 3000);
           setIsLoading(false);
@@ -270,6 +287,7 @@ function Settings() {
                   validationErrors.email ? "border-red-500" : "border-gray-200"
                 }`}
                 type="email"
+                value={formData.email}
                 placeholder="youremail@email.com"
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
@@ -350,6 +368,7 @@ function Settings() {
                     "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
                   color: "white",
                 }}
+                onClick={resetFormData}
               >
                 X
               </span>
@@ -364,7 +383,7 @@ function Settings() {
               >
                 Save{" "}
                 {isLoading && (
-                  <BiLoaderCircle className="ml-2 animate-spin" color="white" />
+                  <BiLoaderCircle className="ml-2 animate-spin" color="#9999FF" />
                 )}
               </button>
             </div>
@@ -377,15 +396,15 @@ function Settings() {
               </div>
               <input
                 className={`w-full px-8 mb-5 py-4 rounded-full font-medium text-xs bg-white border ${
-                  validationErrors.ClientID
+                  validationErrors.ClientId
                     ? "border-red-500"
                     : "border-gray-200"
                 } placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white`}
                 type="text"
                 placeholder="Your Client ID"
-                value={formData.ClientID}
+                value={formData.ClientId}
                 onChange={(e) =>
-                  setFormData({ ...formData, ClientID: e.target.value })
+                  setFormData({ ...formData, ClientId: e.target.value })
                 }
               />
             </div>

@@ -99,26 +99,24 @@ const GoogleLoginComp = forwardRef((props, ref) => {
           const pageName = path.substring(path.lastIndexOf("/") + 1);
           const currentURL = window.location.href;
           console.log("I got here and will redirect", currentURL);
-          if (pageName === `channel`) {
-            localStorage.setItem("accessLevel", "L2");
-            setAccessLevel(localStorage.getItem("accessLevel"));
-            navigate("/ideation");
-          } else if (
-            currentURL === process.env.REACT_APP_BASE_URL ||
-            currentURL === `${process.env.REACT_APP_BASE_URL}/`
-          ) {
-            localStorage.setItem("accessLevel", "L2");
-            setAccessLevel(localStorage.getItem("accessLevel"));
-            navigate("/ideation");
-          } else {
-            return null;
-          }
+          // if (pageName === `channel`) {
+          //   localStorage.setItem("accessLevel", "L2");
+          //   setAccessLevel(localStorage.getItem("accessLevel"));
+          //   navigate("/ideation");
+          // } else if (
+          //   currentURL === process.env.REACT_APP_BASE_URL ||
+          //   currentURL === `${process.env.REACT_APP_BASE_URL}/`
+          // ) {
+          //   localStorage.setItem("accessLevel", "L2");
+          //   setAccessLevel(localStorage.getItem("accessLevel"));
+          //   navigate("/ideation");
+          // } else {
+          //   return null;
+          // }
         }, 3000);
       } else {
         encryptAndStoreData(GUserData);
-        // setTimeout(async () => {
         navigate("/channel");
-        // }, 1000);
       }
     } catch (error) {
       showToast(
@@ -194,27 +192,27 @@ const GoogleLoginComp = forwardRef((props, ref) => {
       {/* {initialized && (
         <GoogleApiInitializer
           apiKey={process.env.REACT_APP_GOOGLE_API_KEY}
-          clientId={process.env.REACT_APP_CLIENT_ID}
+          ClientId={process.env.REACT_APP_CLIENT_ID}
           initializeOnLoad={true}
         />
       )} */}
-      {initialized && fetchUserData.apiKey && fetchUserData.clientId && (
+      {initialized && fetchUserData.apiKey && fetchUserData.ClientId && (
         <GoogleApiInitializer
           apiKey={fetchUserData.apiKey}
-          clientId={fetchUserData.clientId}
+          ClientId={fetchUserData.ClientId}
           initializeOnLoad={true}
         />
       )}
 
-      {(!fetchUserData.apiKey || !fetchUserData.clientId) &&
+      {(!fetchUserData.apiKey || !fetchUserData.ClientId) &&
         (() => {
-          showToast("error", "You haven't set your clientId and apiKey");
-          console.error("Error: apiKey or clientId is not available");
+          showToast("error", "You haven't set your ClientId and apiKey");
+          console.error("Error: apiKey or ClientId is not available");
         })()}
 
       <button onClick={() => handleLoginClick()}>
         <GoogleLogin
-          clientId={process.env.REACT_APP_CLIENT_ID}
+          ClientId={process.env.REACT_APP_CLIENT_ID}
           buttonText="Login with Google"
           onSuccess={onLoginSuccess}
           onFailure={onLoginFailure}

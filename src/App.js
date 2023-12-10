@@ -85,7 +85,7 @@ const App = () => {
   const userData = useUserData((state) => state.userData);
   const setUserData = useUserData((state) => state.setUserData);
   function ProtectedRoute() {
-    return userLoggedIn && accessLevel === "L2" ? (
+    return userLoggedIn ? (
       <Outlet />
     ) : (
       <Navigate to="/" />
@@ -243,7 +243,8 @@ const App = () => {
             <Navbar />
           </div>
           <Routes>
-            <Route
+
+            {/* <Route
               path="/"
               element={
                 userLoggedIn ? (
@@ -256,7 +257,7 @@ const App = () => {
                   <Navigate to="/home" />
                 )
               }
-            />
+            /> */}
 
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/home" element={<Home />} />

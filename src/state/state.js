@@ -66,6 +66,11 @@ export const useUserAccessLevel = create((set) => ({
   setAccessLevel: (data) => set({ accessLevel: data }),
 }));
 
+export const useUserGoogleCreds = create((set) => ({
+  isGoogleCreds: null,
+  setIsGoogleCreds: (data) => set({ isGoogleCreds: data }),
+}));
+
 export const useSerpYoutubeVideosInfo = create((set) => ({
   serpYoutubeVideosInfo: {
     keyword: "",
