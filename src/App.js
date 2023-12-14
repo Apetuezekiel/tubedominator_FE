@@ -23,14 +23,12 @@ import Ideation from "./pages/Ideation3";
 import Optimization from "./pages/Optimization";
 import Reporting from "./pages/Reporting";
 import SavedIdeas from "./pages/SavedIdeas";
-import Keywords from "./pages/Keywords2";
+import Keywords from "./pages/Keywords";
 import Rankings from "./pages/Rankings";
 import "./App.css";
-import Sort from "./data/Sortting";
 import RegistrationForm from "./pages/UserAuth/registration/index2";
 
 import {
-  useSavedIdeasData,
   useUserAccessLevel,
   useUserData,
   useUserLoggedin,
@@ -39,30 +37,27 @@ import SignInPage from "./pages/UserAuth/SignInPage";
 import SignUpPage from "./pages/UserAuth/SignUpPage";
 import Opitimize from "./components/Opitimize";
 import SearchTerm from "./components/SearchTerm";
-import Tests from "./components/Tests";
 import IdeasCategoryView from "./components/IdeasCategoryView";
 import SavedIdeasCategories from "./pages/SavedIdeasCategories";
-import Register from "./pages/UserAuth/registration/Register";
-import SignUpPage2 from "./pages/UserAuth/registration/SignUpPage";
 import PreviewKeyword from "./components/PreviewKeyword";
-import Sidebar2 from "./components/Sidebar2";
-
 import { useStateContext } from "./contexts/ContextProvider";
 import Home from "./pages/Home";
 import { gapi } from "gapi-script";
-import Auth from "./components/Auth";
 import Insights from "./pages/keywords/Insights";
 import Competition from "./pages/keywords/Competition";
 import ConnectYoutube from "./pages/ConnectYoutube";
 import AiPostGenerator from "./pages/AiPostGenerator";
-import Testss from "./pages/Testss";
-import axios from "axios";
 import { fetchUser, userFullDataDecrypted } from "./data/api/calls";
 import GenerateIdeasPanel from "./components/GenerateIdeasPanel";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Settings from "./pages/Settings";
 import SignUpBundlePage from "./pages/UserAuth/SignUpBundlePage";
 import SignUpPremiumPage from "./pages/UserAuth/SignUpPremiumPage";
+import DFYSEOAgency from "./pages/bundle/DFYSEOAgency";
+import AffilliateMarketingCoaching from "./pages/bundle/AffilliateMarketingCoaching";
+import DFYCampaigns from "./pages/bundle/25DFYCampaigns";
+import UnlimitedTraffic from "./pages/bundle/UnlimitedTraffic";
+import Training from "./pages/Training";
 
 const App = () => {
   // const decryptedFullData = userFullDataDecrypted();
@@ -83,19 +78,15 @@ const App = () => {
   const userData = useUserData((state) => state.userData);
   const setUserData = useUserData((state) => state.setUserData);
   function ProtectedRoute() {
-    return userLoggedIn ? (
-      <Outlet />
-    ) : (
-      <Navigate to="/" />
-    );
+    return userLoggedIn ? <Outlet /> : <Navigate to="/" />;
+  }
+  function ProtectedRouteLoggedIn() {
+    return !userLoggedIn ? <Outlet /> : <Navigate to="/ideation" />;
   }
 
   function AppRoutes() {
     return (
       <Routes>
-        {/* Authentication */}
-        <Route path="/auth" element={<Auth />} />
-
         {/* Pages */}
         <Route path="/ideation" element={<ProtectedRoute />}>
           <Route index element={<Ideation />} />
@@ -105,8 +96,9 @@ const App = () => {
 
         <Route path="/optimization" element={<ProtectedRoute />}>
           <Route index element={<Optimization />} />
-          <Route path="optimize" element={<Opitimize />} />
         </Route>
+
+        <Route path="optimize" element={<Opitimize />} />
 
         <Route path="/ai-generator" element={<ProtectedRoute />}>
           <Route index element={<AiPostGenerator />} />
@@ -133,7 +125,6 @@ const App = () => {
 
         {/* <Route path="/channel" element={<ProtectedRoute />}> */}
         <Route path="/channel" element={<RegistrationForm />} />
-        <Route path="/sidebar" element={<Sidebar2 />} />
         <Route path="/generate" element={<GenerateIdeasPanel />} />
         <Route path="/settings" element={<Settings />} />
         {/* </Route> */}
@@ -145,9 +136,15 @@ const App = () => {
         <Route path="/ideascategory" element={<IdeasCategoryView />} />
         <Route path="/saved-ideas-cat" element={<SavedIdeasCategories />} />
         <Route path="/preview" element={<PreviewKeyword />} />
-        <Route path="/tests" element={<Testss />} />
-        <Route path="/register" element={<Register />} />
         <Route path="/youtube" element={<ConnectYoutube />} />
+        <Route path="/dfy-seo-agency" element={<DFYSEOAgency />} />
+        <Route
+          path="/afilliate-marketing-coaching"
+          element={<AffilliateMarketingCoaching />}
+        />
+        <Route path="/dfy-campaigns" element={<DFYCampaigns />} />
+        <Route path="/unlimited-traffic" element={<UnlimitedTraffic />} />
+        <Route path="/training" element={<Training />} />
       </Routes>
     );
   }
@@ -214,11 +211,11 @@ const App = () => {
       try {
         const fetchedUser = await fetchUser();
         console.log("fetched user data: ", fetchedUser);
-  
+
         // Initialize gapi.client inside the try block
         gapi.load("client:auth2", () => {
           gapi.client.init({
-            apiKey: fetchedUser.apiKey,
+            // apiKey: fetchedUser.apiKey,
             clientId: fetchedUser.ClientId,
             // apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
             // clientId: process.env.REACT_APP_CLIENT_ID,
@@ -234,11 +231,58 @@ const App = () => {
         console.error("Error fetching user data:", error);
       }
     };
-  
+
     fetchDataAndInitGAPI();
-  
-  }, []); 
-  
+  }, []);
+
+  // useEffect(() =>{
+  //   const userRegEmail = localStorage.getItem("userRegEmail");
+  //   const isChannelRegistered = async (user_id, GUserData) => {
+  //     try {
+  //       const response = await axios.get(
+  //         `${process.env.REACT_APP_API_BASE_URL}/ischannelRegistered?email=${userRegEmail}`,
+  //         {
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             "x-api-key": process.env.REACT_APP_X_API_KEY,
+  //           },
+  //         },
+  //       );
+
+  //       console.log("is channel registered", response.data.success);
+  //       if (response.data.success) {
+  //       } else {
+  //       }
+  //     } catch (error) {
+  //       console.error("Error checking user channel connection status", error);
+  //       throw error;
+  //     }
+  //   };
+  // })
+  // const navigate = useNavigate();
+  const excludedRoutes = [
+    "/",
+    "/privacy-policy",
+    "/sign-up",
+    "/sign-in",
+    "/premium-account-create",
+    "/premium-account-create",
+  ];
+  const redirectRoutes = [
+    "/sign-in",
+    "/sign-up",
+    "/premium-account-create",
+    "/bundle-account-create",
+  ];
+
+  // Wrap your routes with a higher-order component to conditionally redirect
+  // const ProtectedRoute = ({ path, element }) => {
+  //   if (userLoggedIn && redirectRoutes.includes(path)) {
+  //     return <Navigate to="/ideation" />;
+  //   } else {
+  //     return <Route path={path} element={element} />;
+  //   }
+  // };
 
   return (
     <div className={currentMode === "Dark" ? "dark" : ""}>
@@ -250,6 +294,7 @@ const App = () => {
         closeOnClick
         // pauseOnFocusLoss
         // pauseOnHover
+        toastStyle={{ zIndex: 10000 }}
       ></ToastContainer>
       <BrowserRouter>
         <div className="relative w-full">
@@ -257,26 +302,62 @@ const App = () => {
             <Navbar />
           </div>
           <Routes>
-            {/* Home */}
-            <Route path="/" element={<Home />} />
+          <Route
+        path="/"
+        element={userLoggedIn ? <Navigate to="/ideation" /> : <Home />}
+      />
+
 
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             {/* Sign-In and Sign-Up */}
-            <Route path="/sign-in/*" element={<SignInPage />} />
-            <Route path="/sign-up/*" element={<SignUpPage />} />
-            <Route path="/premium-account-create/*" element={<SignUpPremiumPage />} />
-            <Route path="/bundle-account-create/*" element={<SignUpBundlePage />} />
+            <Route path="/sign-up" element={<ProtectedRouteLoggedIn />}>
+              <Route path="/sign-up" element={<SignUpPage />} />
+            </Route>
+            <Route path="/sign-in" element={<ProtectedRouteLoggedIn />}>
+              <Route path="/sign-in" element={<SignInPage />} />
+            </Route>
+            <Route
+              path="/premium-account-create"
+              element={<ProtectedRouteLoggedIn />}
+            >
+              <Route
+                path="/premium-account-create"
+                element={<SignUpPremiumPage />}
+              />
+            </Route>
+            <Route
+              path="/bundle-account-create"
+              element={<ProtectedRouteLoggedIn />}
+            >
+              <Route
+                path="/bundle-account-create"
+                element={<SignUpBundlePage />}
+              />
+            </Route>
+            {/* <Route path="/sign-in" element={<SignInPage />} />
+            <Route path="/sign-up" element={<SignUpPage />} />
+            <Route
+              path="/premium-account-create"
+              element={<SignUpPremiumPage />}
+            />
+            <Route
+              path="/bundle-account-create"
+              element={<SignUpBundlePage />}
+            /> */}
           </Routes>
           <div
             className="flex w-full"
             style={{ backgroundColor: `${userLoggedIn && "#F1F1FA"}` }}
           >
             <div className="" style={{ width: "5vw" }}>
-              {userLoggedIn && (
-                <div className="flex justify-center mt-20 h-72">
-                  <Sidebar />
-                </div>
-              )}
+              {
+                // !excludedRoutes.includes(navigate.pathname) &&
+                userLoggedIn && (
+                  <div className="flex justify-center mt-20">
+                    <Sidebar />
+                  </div>
+                )
+              }
             </div>
             <div className="" style={{ width: "95vw" }}>
               {/* {themeSettings && <ThemeSettings />} */}

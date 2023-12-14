@@ -4,13 +4,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { IoSearchCircle } from "react-icons/io5";
 import { MdCancel } from "react-icons/md";
-import Spinner from "../../../components/Spinner";
 import showToast from "../../../utils/toastUtils";
 import { useNavigate } from "react-router-dom";
 import {
   useAllUserDeets,
   useUserAccessLevel,
   useUserAuthToken,
+  useUserChannelConnected,
   useUserData,
   useUserLoggedin,
   // useUserLoggedin,
@@ -19,6 +19,7 @@ import { useStateContext } from "../../../contexts/ContextProvider";
 import CryptoJS from "crypto-js";
 import {
   fetchUserYoutubeInfo,
+  saveUser,
   userFullDataDecrypted,
 } from "../../../data/api/calls";
 import countriesWithLanguages from "../../../data/countries";
@@ -62,14 +63,19 @@ const RegistrationForm = () => {
   const allUserDeets = useAllUserDeets((state) => state.allUserDeets);
   const setAllUserDeets = useAllUserDeets((state) => state.setAllUserDeets);
   const secretKey = "+)()^77---<@#$>";
-  const decryptedFullData = userFullDataDecrypted();
-  console.log("decryptedFullDataaaaaa", decryptedFullData);
+  // const decryptedFullData = userFullDataDecrypted();
+  // console.log("decryptedFullDataaaaaa", decryptedFullData);
   const initialCountry = {
     countryCode: "GLB",
     languageCode: "en",
   };
   const [selectedCountry, setSelectedCountry] = useState(initialCountry);
-
+  const userChannelConnected = useUserChannelConnected(
+    (state) => state.userChannelConnected,
+  );
+  const setUserChannelConnected = useUserChannelConnected(
+    (state) => state.setUserChannelConnected,
+  );
   const userRecordId = localStorage.getItem("userRecordId");
   console.log(userRecordId, userRecordId, userRecordId);
 
@@ -88,16 +94,20 @@ const RegistrationForm = () => {
   }, []);
 
   useEffect(() => {
+    const userRegEmail = localStorage.getItem("userRegEmail");
     const fetchChannel = () => {
       setIsLoading(true);
       axios
-        .get(`${process.env.REACT_APP_API_BASE_URL}/getMyChannels`, {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": process.env.REACT_APP_X_API_KEY,
-            gToken: decryptedFullData.gToken,
+        .get(
+          `${process.env.REACT_APP_API_BASE_URL}/getMyChannels?email=${userRegEmail}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.REACT_APP_X_API_KEY,
+              // gToken: decryptedFullData.gToken,
+            },
           },
-        })
+        )
         .then((response) => {
           setIsLoading(false);
           // showToast('success', 'Channel Found!', '1000')
@@ -105,7 +115,7 @@ const RegistrationForm = () => {
           const channelData = response.data.map((channel) => ({
             title: channel.channelTitle,
             image: channel.thumbnailUrl,
-            id: channel.channelId,
+            id: channel.channelId.channelId,
             description: channel.description,
           }));
           setChannels(channelData);
@@ -123,7 +133,7 @@ const RegistrationForm = () => {
   }, [callForUserChannels]);
 
   const selectChannel = (channel) => {
-    console.log(channel);
+    console.log("channel", channel);
     setClearSelectedChannel(true);
     setShowChannel(false);
     setSelectedFormData(channel.title);
@@ -158,7 +168,7 @@ const RegistrationForm = () => {
 
   const saveUserToken = async (token, updatedFormData) => {
     const updatedGUserData = {
-      ...decryptedFullData,
+      // ...decryptedFullData,
       token,
       channelId: selectedChannel.id,
       channelImage: selectedChannel.image,
@@ -210,13 +220,13 @@ const RegistrationForm = () => {
     setConnectingChannel(true);
     e.preventDefault();
     // Extract relevant user data
-    const userFirstName = decryptedFullData.firstName;
-    const userLastName = decryptedFullData.lastName;
-    const userFullName = decryptedFullData.fullName;
-    const businessEmail = decryptedFullData.email;
+    const userFirstName = localStorage.getItem("userFirstName");
+    const userLastName = localStorage.getItem("userLastName");
+    const userFullName = localStorage.getItem("userFullName");
+    const businessEmail = localStorage.getItem("userRegEmail");
     const channel_image_link = selectedChannel.image;
     const description = selectedChannel.description;
-    const user_id = `TUBE_${decryptedFullData.gId}`;
+    const user_id = `TUBE_${localStorage.getItem("userRegEmail")}`;
 
     // Update form data with selected channel and user details
     const updatedFormData = {
@@ -250,17 +260,20 @@ const RegistrationForm = () => {
 
       console.log(response, response);
       if (response.data.success) {
-        localStorage.setItem("accessLevel", "L2");
+        localStorage.setItem("accessLevel", "L2");  
         setAccessLevel("L2");
         console.log("Channel details stored successfully", response.data.token);
         const token = response.data.token;
+        localStorage.setItem("channelConnected", 1);
+        setUserChannelConnected(1);
+        await saveUser({channelConnected: 1, email: localStorage.getItem("userRegEmail")});
         setTimeout(() => {
           saveUserToken(token, updatedFormData);
         }, 2000);
       }
     } catch (error) {
       console.error("-----------------------", error.response.data.message);
-      showToast("error", "Error saving channel. Try again", 5000);
+      showToast("error", error.response.data.message, 5000);
       setConnectingChannel(false);
     }
   };
@@ -317,7 +330,7 @@ const RegistrationForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 ">
+    <div className="min-h-screen flex items-center justify-center">
       <div className="bg-white shadow-lg rounded p-8 w-96 m-10">
         <h2 className="text-2xl font-semibold mb-8 text-center">
           Let's get some of your Channel Details
@@ -490,7 +503,11 @@ const RegistrationForm = () => {
           </div>
           <button
             type="submit"
-            style={{ backgroundColor: "#7352FF" }}
+            style={{
+              background:
+                "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+              color: "white",
+            }}
             className="w-full text-white p-2 rounded flex items-center cursor-pointer justify-center"
           >
             Connect Channel

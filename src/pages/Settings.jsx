@@ -9,7 +9,7 @@ import { IoCloudUploadSharp } from "react-icons/io5";
 import { checkClientAndApiKey, fetchUser } from "../data/api/calls";
 import Loader from "../components/Loader";
 import userAvatar from "../assets/images/man-avatar-profile-picture-vector-illustration_268834-538.avif";
-import { useUserGoogleCreds } from "../state/state";
+import { useUserGoogleCreds, useUserProfilePic } from "../state/state";
 import { FiCamera } from "react-icons/fi";
 
 function Settings() {
@@ -21,29 +21,34 @@ function Settings() {
     firstName: "",
     lastName: "",
     confirmPassword: "",
-    thumbnail: ""
   });
   const [formDataGoogleCreds, setFormDataGoogleCreds] = useState({
     apiKey: "",
-    ClientId: "",
+    channelName: "",
+  });
+  const [formDataUserImage, setFormDataUserImage] = useState({
+    profilePic: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loadingUserData, setLoadingUserData] = useState(false);
   const [loadingUserDataFailed, setLoadingUserDataFailed] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [fetchedUserData, setFetchUserData] = useState(false);
-  const isGoogleCreds = useUserGoogleCreds(
-    (state) => state.isGoogleCreds,
-  );
+  const [savingImage, setSavingImage] = useState(false);
+  const isGoogleCreds = useUserGoogleCreds((state) => state.isGoogleCreds);
   const setIsGoogleCreds = useUserGoogleCreds(
     (state) => state.setIsGoogleCreds,
+  );
+  const userProfilePic = useUserProfilePic((state) => state.userProfilePic);
+  const setUserProfilePic = useUserProfilePic(
+    (state) => state.setUserProfilePic,
   );
 
   const [userProfile, setUserProfile] = useState({
     firstName: "John",
     lastName: "Doe",
     apiKey: "Youtube API Key",
-    ClientId: "Youtube API Client ID",
+    channelName: "Youtube API Client ID",
     email: "john.doe@example.com",
   });
 
@@ -58,14 +63,19 @@ function Settings() {
           email: fetchedUser.email,
           firstName: fetchedUser.firstName,
           apiKey: fetchedUser.apiKey,
-          ClientId: fetchedUser.ClientId,
+          channelName: fetchedUser.channelName,
           lastName: fetchedUser.lastName,
         }));
         setFormDataGoogleCreds((prevFormData) => ({
           ...prevFormData,
           apiKey: fetchedUser.apiKey,
-          ClientId: fetchedUser.ClientId,
+          channelName: fetchedUser.channelName,
         }));
+        console.log("fetchedUser", fetchedUser);
+        setFormDataUserImage((prevFormData) => ({
+          ...prevFormData,
+          profilePic: fetchedUser.profilePic,
+        }));  
         setLoadingUserData(false);
 
         console.log("fetched user data: ", fetchedUser);
@@ -93,31 +103,34 @@ function Settings() {
       } else if (!isValidEmail(formData.email)) {
         errors.email = "Invalid email format";
       }
-      
+
       if (formData.password && formData.password.length < 8) {
         errors.password = "Password must be at least 8 characters";
       }
-  
+
       if (!formData.firstName) {
         errors.firstName = "First Name is required";
       }
-  
+
       if (!formData.lastName) {
         errors.lastName = "Last Name is required";
       }
-  
-      if (formData.confirmPassword || formData.password && formData.confirmPassword !== formData.password) {
-         errors.confirmPassword = "Passwords do not match";
-       }
+
+      if (
+        formData.confirmPassword ||
+        (formData.password && formData.confirmPassword !== formData.password)
+      ) {
+        errors.confirmPassword = "Passwords do not match";
+      }
     }
 
-    if (type === "googleCreds"){
+    if (type === "googleCreds") {
       if (!formDataGoogleCreds.apiKey) {
         errors.apiKey = "Please provide your google api key ";
       }
-  
-      if (!formDataGoogleCreds.ClientId) {
-        errors.ClientId = "Please provide your google Client ID ";
+
+      if (!formDataGoogleCreds.channelName) {
+        errors.channelName = "Please provide your google Client ID ";
       }
     }
 
@@ -132,7 +145,7 @@ function Settings() {
   };
 
   const resetFormData = (type) => {
-    if (type === "accData"){
+    if (type === "accData") {
       setFormData({
         email: "",
         password: "",
@@ -141,11 +154,11 @@ function Settings() {
         confirmPassword: "",
       });
     }
-    if (type === "googleCreds"){
+    if (type === "googleCreds") {
       console.log("Got here. I should delete");
       setFormDataGoogleCreds({
         apiKey: "",
-        ClientId: "",
+        channelName: "",
       });
     }
   };
@@ -153,11 +166,11 @@ function Settings() {
   const handleSave = async (type) => {
     if (validateForm(type)) {
       setIsLoading((prevLoading) => ({ ...prevLoading, [type]: true }));
-  
+
       try {
         let postData;
         let url = `${process.env.REACT_APP_API_BASE_URL}/saveUser`;
-  
+
         if (type === "accData") {
           postData = formData;
         } else if (type === "googleCreds") {
@@ -166,37 +179,44 @@ function Settings() {
             email: localStorage.getItem("userRegEmail"),
           };
         }
-  
-        const response = await axios.post(
-          url,
-          postData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": process.env.REACT_APP_X_API_KEY,
-            },
+
+        const response = await axios.post(url, postData, {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
           },
-        );
-  
+        });
+
         const data = response.data;
         console.log("updated user data response", data);
         if (data.success) {
           showToast("success", `Account updated successfully`, 3000);
-  
+
           if (type === "googleCreds") {
-            localStorage.setItem("ClientId", formDataGoogleCreds.ClientId);
+            localStorage.setItem(
+              "channelName",
+              formDataGoogleCreds.channelName,
+            );
             localStorage.setItem("apiKey", formDataGoogleCreds.apiKey);
             const clientAndApiKey = await checkClientAndApiKey();
             setIsGoogleCreds(clientAndApiKey);
+            setFormData((prevFormData) => ({
+              ...prevFormData,
+              apiKey: formDataGoogleCreds.apiKey,
+              channelName: formDataGoogleCreds.channelName,
+            }));
           }
 
           if (type === "accData") {
             localStorage.setItem("firstName", formData.firstName);
             localStorage.setItem("lastName", formData.lastName);
-            localStorage.setItem("userFullName", `${formData.firstName} ${formData.lastName}`);
+            localStorage.setItem(
+              "userFullName",
+              `${formData.firstName} ${formData.lastName}`,
+            );
             localStorage.setItem("userRegEmail", formData.email);
           }
-  
+
           setIsLoading((prevLoading) => ({ ...prevLoading, [type]: false }));
         } else {
           showToast("error", "Couldn't update your account details", 3000);
@@ -210,7 +230,7 @@ function Settings() {
       }
     }
   };
-  
+
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -239,11 +259,51 @@ function Settings() {
     const reader = new FileReader();
     reader.onload = (e) => {
       const base64String = e.target.result;
-      setFormData({ ...formData, thumbnail: base64String });
+      setFormDataUserImage({ ...formDataUserImage, profilePic: base64String });
     };
 
     if (file) {
       reader.readAsDataURL(file);
+    }
+  };
+
+  const saveUserImage = async (type) => {
+    setSavingImage(true);
+
+    try {
+      let postData = {
+        profilePic: formDataUserImage.profilePic,
+        email: localStorage.getItem("userRegEmail"),
+      };
+
+      console.log("postData", postData);
+      let url = `${process.env.REACT_APP_API_BASE_URL}/saveUser`;
+
+      const response = await axios.post(url, postData, {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+        },
+      });
+
+      const data = response.data;
+      console.log("updated user profile picture response", response);
+      if (data.success) {
+        showToast("success", `Profile picture updated successfully`, 3000);
+
+        localStorage.setItem("profilePic", formDataUserImage.profilePic);
+        setUserProfilePic(selectedImage);
+        // localStorage.setItem("profilePic", JSON.stringify())
+        console.log("selectedImage", selectedImage);
+        setSavingImage(false);
+      } else {
+        showToast("error", "Couldn't update your profile picture", 3000);
+        setSavingImage(false);
+      }
+    } catch (error) {
+      console.error("Error updating User profile image:", error);
+      showToast("error", `Couldn't update your profile image`, 3000);
+      setSavingImage(false);
     }
   };
 
@@ -268,7 +328,17 @@ function Settings() {
             }}
           >
             <div className="p-3 rounded-lg">
-              <img src={selectedImage && URL.createObjectURL(selectedImage) || userAvatar} alt="" className="h-24 w-24 rounded-full" />
+              <img
+                src={
+                  userProfilePic
+                    ? URL.createObjectURL(userProfilePic)
+                    : selectedImage
+                    ? URL.createObjectURL(selectedImage)
+                    : userAvatar
+                }
+                alt=""
+                className="h-24 w-24 rounded-full"
+              />
             </div>
             <div className="text-xl px-4 mr-4">
               <div className="font-semibold">{fetchedUserData.fullName}</div>
@@ -290,7 +360,26 @@ function Settings() {
                     onChange={handleFileChange}
                   />
                 </label>
-                <Link
+                <div className="flex items-center">
+                  <button
+                    className="text-xs mr-4 text-black py-2 px-5 rounded-md"
+                    style={{
+                      background:
+                        "linear-gradient(270deg, #FD2E2E 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                      color: "white",
+                    }}
+                    onClick={saveUserImage}
+                  >
+                    Save Image
+                  </button>
+                  {savingImage && (
+                    <BiLoaderCircle
+                      className="ml-2 animate-spin"
+                      color="white"
+                    />
+                  )}
+                </div>
+                {/* <Link
                   className="text-xs mr-4 text-black py-2 px-5 rounded-md"
                   to="/sign-in"
                   style={{
@@ -300,7 +389,7 @@ function Settings() {
                   }}
                 >
                   Delete
-                </Link>
+                </Link> */}
               </div>
             </div>
           </header>
@@ -443,32 +532,16 @@ function Settings() {
               >
                 Save{" "}
                 {isLoading.accData && (
-                  <BiLoaderCircle className="ml-2 animate-spin" color="#9999FF" />
+                  <BiLoaderCircle
+                    className="ml-2 animate-spin"
+                    color="#9999FF"
+                  />
                 )}
               </button>
             </div>
           </div>
 
           <div className="flex items-center gap-3 mt-10">
-            <div className="flex flex-col">
-              <div className="text-xs mb-1 ml-1 text-gray-400">
-                Google Client ID
-              </div>
-              <input
-                className={`w-full px-8 mb-5 py-4 rounded-full font-medium text-xs bg-white border ${
-                  validationErrors.ClientId
-                    ? "border-red-500"
-                    : "border-gray-200"
-                } placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white`}
-                type="text"
-                placeholder="Your Client ID"
-                value={formDataGoogleCreds.ClientId}
-                onChange={(e) =>
-                  setFormDataGoogleCreds({ ...formDataGoogleCreds, ClientId: e.target.value })
-                }
-              />
-            </div>
-
             <div className="flex flex-col">
               <div className="text-xs mb-1 ml-1 text-gray-400">
                 Google API key
@@ -481,7 +554,32 @@ function Settings() {
                 placeholder="Your API Key"
                 value={formDataGoogleCreds.apiKey}
                 onChange={(e) =>
-                  setFormDataGoogleCreds({ ...formDataGoogleCreds, apiKey: e.target.value })
+                  setFormDataGoogleCreds({
+                    ...formDataGoogleCreds,
+                    apiKey: e.target.value,
+                  })
+                }
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <div className="text-xs mb-1 ml-1 text-gray-400">
+                Channel Name
+              </div>
+              <input
+                className={`w-full px-8 mb-5 py-4 rounded-full font-medium text-xs bg-white border ${
+                  validationErrors.channelName
+                    ? "border-red-500"
+                    : "border-gray-200"
+                } placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white`}
+                type="text"
+                placeholder="Your channel name"
+                value={formDataGoogleCreds.channelName}
+                onChange={(e) =>
+                  setFormDataGoogleCreds({
+                    ...formDataGoogleCreds,
+                    channelName: e.target.value,
+                  })
                 }
               />
             </div>
@@ -509,18 +607,37 @@ function Settings() {
               >
                 Save{" "}
                 {isLoading.googleCreds && (
-                  <BiLoaderCircle className="ml-2 animate-spin" color="#9999FF" />
+                  <BiLoaderCircle
+                    className="ml-2 animate-spin"
+                    color="#9999FF"
+                  />
                 )}
               </button>
+
+              {formData?.apiKey && formData?.channelName && (
+                <Link to={"/channel"}>
+                  <button
+                    // onClick={() => router}
+                    className="rounded-full px-4 py-2 ml-2 text-xs flex items-center cursor-pointer"
+                    style={{
+                      background:
+                        "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                      color: "white",
+                    }}
+                  >
+                    Connect Youtube
+                  </button>
+                </Link>
+              )}
             </div>
           </div>
-              <div className="text-xs mb-1 ml-1 text-gray-400">
-                how to setup google api key for youtube ?
-              </div>
+          <div className="text-xs mb-1 ml-1 text-gray-400">
+            how to setup google api key for youtube ?
+          </div>
         </div>
       )}
     </div>
   );
-};
+}
 
 export default Settings;

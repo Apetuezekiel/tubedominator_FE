@@ -73,7 +73,7 @@ const SignInPage = () => {
       if (data.success) {
         // showToast("success", data.message, 3000);
         setIsLoading(false);
-        // console.log("Data0", data);
+        console.log("Data0", data);
         // const gId = data.user_id ? data.user_id.split("_")[1] : null;
 
         // gId && (await getUserEncryptedDataFromDb(gId));
@@ -89,6 +89,8 @@ const SignInPage = () => {
         localStorage.setItem("userFirstName", data.firstName);
         localStorage.setItem("userLastName", data.lastName);
         localStorage.setItem("userRegEmail", formData.email);
+        localStorage.setItem("userPackage", data.package);
+        console.log("data.package", data.package, localStorage.getItem("userPackage"));
 
         setAccessLevel("L1");
         setUserLoggedIn(true);
@@ -164,8 +166,9 @@ const SignInPage = () => {
                       onClick={handleSubmit}
                       style={{
                         filter: `${
-                          (formData.email === "" || formData.password === "") ?
-                          "grayscale(1)" : ""
+                          formData.email === "" || formData.password === ""
+                            ? "grayscale(1)"
+                            : ""
                         }`,
                       }}
                     />

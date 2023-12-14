@@ -39,7 +39,6 @@ import {
   FaVideo,
   FaDownload,
 } from "react-icons/fa";
-import Spinner from "../components/Spinner";
 import { Link, NavLink } from "react-router-dom";
 import { BiSearch, BiWorld, BiStar, BiLoaderCircle } from "react-icons/bi";
 import { IoWarningOutline } from "react-icons/io5";
@@ -595,7 +594,7 @@ const Keyword2 = () => {
     <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
       {isLoading ? (
         <div className="loading-container">
-          <Spinner />
+          <Loader />
         </div>
       ) : (
         <div className=""></div>

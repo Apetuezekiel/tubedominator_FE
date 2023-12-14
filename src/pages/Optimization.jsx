@@ -28,8 +28,11 @@ import {
 } from "../state/state";
 import { useKeywordStore } from "../state/state";
 import CryptoJS from "crypto-js";
-import Spinner from "../components/Spinner";
-import { getAllYoutubePosts, userFullDataDecrypted } from "../data/api/calls";
+import {
+  checkDraftExistence,
+  getAllYoutubePosts,
+  userFullDataDecrypted,
+} from "../data/api/calls";
 import showToast from "../utils/toastUtils";
 import { BiChevronDown, BiEdit, BiTrendingUp } from "react-icons/bi";
 import { AiOutlineSearch } from "react-icons/ai";
@@ -64,7 +67,7 @@ const Ideation = () => {
   const clerkUser = JSON.parse(localStorage.getItem("clerkUser"));
   const userAuthToken = useUserAuthToken((state) => state.userAuthToken);
   const setUserAuthToken = useUserAuthToken((state) => state.setUserAuthToken);
-  const decryptedFullData = userFullDataDecrypted();
+  // const decryptedFullData = userFullDataDecrypted();
   const [isUserDataLoaded, setIsuserDataLoaded] = useState(false);
   const [selectedVideoId, setSelectedVideoId] = useState("");
   const [selectedVideoLikeCount, setSelectedVideoLikeCount] = useState("");
@@ -72,7 +75,7 @@ const Ideation = () => {
     useState("");
   const [selectedVideoViewCount, setSelectedVideoViewCount] = useState("");
   const [userPlaylistData, setUserPlaylistData] = useState([]);
-  console.log("decryptedFullData OptimizationPage", decryptedFullData);
+  // console.log("decryptedFullData OptimizationPage", decryptedFullData);
   const navigate = useNavigate();
   const [isOptimizeVideo, setIsOptimizeVideo] = useState(false);
 
@@ -147,71 +150,132 @@ const Ideation = () => {
   ];
 
   useEffect(() => {
-    console.log("allUserDeetsallUserDeetsallUserDeets", decryptedFullData);
+    // console.log("allUserDeetsallUserDeetsallUserDeets", decryptedFullData);
     let isMounted = true;
 
-    const fetchMyYoutubeInfo = async () => {
+    // const fetchDataFromLocalStorage = async () => {
+    //   const storedYoutubePosts = localStorage.getItem("Youtube_Posts");
+
+    //   if (storedYoutubePosts) {
+    //     const gottenYoutubePosts = await getAllYoutubePosts();
+    //     const updatedData = JSON.parse(storedYoutubePosts).map(
+    //       (item1, index1) => {
+    //         const item2 = gottenYoutubePosts.find(
+    //           (item2) => item1.videoId === item2.video_id,
+    //         );
+
+    //         // Check if item2 is null and set default values
+    //         const defaultValues = {
+    //           optimizationPercentage: "N/A",
+    //           optimizationImpact: "N/A",
+    //         };
+
+    //         if (item2) {
+    //           const analyzedVideoPerformance = analyzeVideoPerformance(
+    //             item2.likeCount,
+    //             item1.likeCount,
+    //             item2.commentCount,
+    //             item1.commentCount,
+    //             item2.viewCount,
+    //             item1.viewCount,
+    //           );
+
+    //           return {
+    //             ...item1,
+    //             optimizationPercentage:
+    //               analyzedVideoPerformance.optimizationPercentage,
+    //             optimizationImpact: analyzedVideoPerformance.optimizationImpact,
+    //           };
+    //         } else {
+    //           // If item2 is null, set default values
+    //           return {
+    //             ...item1,
+    //             ...defaultValues,
+    //           };
+    //         }
+    //       },
+    //     );
+
+    //     setUserYoutubeData(updatedData);
+    //     setIsuserDataLoaded(true);
+    //   } else {
+    //     fetchDataFromAPI();
+    //   }
+    // };
+
+    const fetchDataFromAPI = async () => {
+      const userRegEmail = localStorage.getItem("userRegEmail");
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_API_BASE_URL}/fetchMyYoutubeInfo`,
+          `${process.env.REACT_APP_API_BASE_URL}/fetchMyYoutubeInfo?email=${userRegEmail}`,
           {
-            params: {
-              channel_id: decryptedFullData.channelId,
-            },
+            // params: {
+            //   channel_id: decryptedFullData.channelId,
+            // },
             headers: {
               "Content-Type": "application/json",
               "x-api-key": process.env.REACT_APP_X_API_KEY,
-              Authorization: `Bearer ${decryptedFullData.token}`,
-              gToken: decryptedFullData.gToken,
+              // Authorization: `Bearer ${decryptedFullData.token}`,
+              // gToken: decryptedFullData.gToken,
             },
           },
         );
 
-        console.log("response I am inte", response);
+        console.log("fetchMyYoutubeInfo", response);
+
         if (response.data.success) {
+          localStorage.setItem(
+            "Youtube_Posts",
+            JSON.stringify(response.data.data),
+          );
+
           const gottenYoutubePosts = await getAllYoutubePosts();
+
           const updatedData = response.data.data.map((item1, index1) => {
-            // Initialize item2 here to make it accessible in the entire map function
-            const item2 = gottenYoutubePosts.find(
-              (item2) => item1.videoId === item2.video_id,
-            );
-
-            if (item2) {
-              const analyzedVideoPerformance = analyzeVideoPerformance(
-                item2.likeCount,
-                item1.likeCount,
-                item2.commentCount,
-                item1.commentCount,
-                item2.viewCount,
-                item1.viewCount,
+            // Check if gottenYoutubePosts is an array and not empty
+            if (
+              Array.isArray(gottenYoutubePosts) &&
+              gottenYoutubePosts.length > 0
+            ) {
+              // Find the corresponding item in gottenYoutubePosts
+              const item2 = gottenYoutubePosts.find(
+                (item2) => item1.videoId === item2.video_id,
               );
 
-              console.log(
-                "analyzedVideoPerformanceeeeeeeeee",
-                analyzedVideoPerformance,
-                item2.likeCount,
-                item1.likeCount,
-                item2.commentCount,
-                item1.commentCount,
-                item2.viewCount,
-                item1.viewCount,
-              );
+              // Check if item2 is null
+              if (item2) {
+                // If item2 is not null, analyze video performance
+                const analyzedVideoPerformance = analyzeVideoPerformance(
+                  item2.likeCount,
+                  item1.likeCount,
+                  item2.commentCount,
+                  item1.commentCount,
+                  item2.viewCount,
+                  item1.viewCount,
+                );
 
-              return {
-                ...item1,
-                optimizationPercentage:
-                  analyzedVideoPerformance.optimizationPercentage,
-                optimizationImpact: analyzedVideoPerformance.optimizationImpact,
-              };
+                return {
+                  ...item1,
+                  optimizationPercentage:
+                    analyzedVideoPerformance.optimizationPercentage,
+                  optimizationImpact:
+                    analyzedVideoPerformance.optimizationImpact,
+                };
+                ``;
+              }
             }
 
-            // If a match is not found, return the original item1
-            return item1;
+            // Set default values if item2 is null or gottenYoutubePosts is not an array or empty
+            const defaultValues = {
+              optimizationPercentage: "N/A",
+              optimizationImpact: "N/A",
+            };
+            return {
+              ...item1,
+              ...defaultValues,
+            };
           });
 
-          console.log("updatedData", updatedData);
-
-          // Assuming setUserYoutubeData is a function to set the updated data
           setUserYoutubeData(updatedData);
           setIsuserDataLoaded(true);
         } else {
@@ -223,43 +287,37 @@ const Ideation = () => {
     };
 
     const fetchMyPlaylists = async () => {
+      const userRegEmail = localStorage.getItem("userRegEmail");
       try {
-        axios
-          .get(`${process.env.REACT_APP_API_BASE_URL}/fetchMyPlaylists`, {
-            params: {
-              channel_id: decryptedFullData.channelId,
-            },
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_BASE_URL}/fetchMyPlaylists?email=${userRegEmail}`,
+          {
             headers: {
               "Content-Type": "application/json",
               "x-api-key": process.env.REACT_APP_X_API_KEY,
-              Authorization: `Bearer ${decryptedFullData.token}`,
-              gToken: decryptedFullData.gToken,
+              // Authorization: `Bearer ${decryptedFullData.token}`,
+              // gToken: decryptedFullData.gToken,
             },
-          })
-          .then((response) => {
-            if (isMounted) {
-              setUserPlaylistData(response.data);
-              console.log(
-                "User Youtube Playlists Optimization page",
-                response.data,
-              );
-            }
-          })
-          .catch((error) => {
-            console.error("Error fetching data:", error);
-            showToast("error", error.message, 2000);
-          });
+          },
+        );
+
+        if (isMounted) {
+          setUserPlaylistData(response.data);
+          console.log(
+            "User Youtube Playlists Optimization page",
+            response.data,
+          );
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
         showToast("error", error.message, 2000);
       }
     };
 
-    fetchMyPlaylists();
-    fetchMyYoutubeInfo();
+    fetchDataFromAPI();
+    // fetchMyPlaylists();
 
     return () => {
-      // Cleanup function to be called when the component is unmounted
       isMounted = false;
     };
   }, []);
@@ -390,6 +448,17 @@ const Ideation = () => {
     setSelectedVideoLikeCount(props.likeCount);
     setSelectedVideoCommentCount(props.commentCount);
     setSelectedVideoViewCount(props.viewCount);
+    // handleOptimizeVideo();
+    navigate("/optimize", {
+      state: {
+        customData: {
+          videoId: props.videoId,
+          likeCount: props.likeCount,
+          commentCount: props.commentCount,
+          viewCount: props.viewCount,
+        },
+      },
+    });
   };
 
   const ThumbnailTitleTemplate = (props) => {
@@ -398,13 +467,13 @@ const Ideation = () => {
       <div>
         <div className="flex justify-start items-center">
           <img
-            src={props.thumbnails.url}
+            src={props?.thumbnails?.url ?? ""}
             alt="Thumbnail"
             style={{ width: "100px", height: "80px" }}
           />
           <div className="ml-3">
             <div className="whitespace-normal mt-4 mb-3 flex">
-              {props.title}
+              {props.title ?? "N/A"}
             </div>
             <div className="text-gray-500 italic">Public</div>
           </div>
@@ -429,7 +498,7 @@ const Ideation = () => {
             </span>
           </Link> */}
           <Link
-            to={`https://www.youtube.com/watch?v=${props.videoId}`}
+            to={`https://www.youtube.com/watch?v=${props.videoId || "#"}`}
             className="flex justify-center items-center cursor-pointer"
           >
             <span className="text-gray-500 hover:text-black">View on YT</span>
@@ -473,8 +542,21 @@ const Ideation = () => {
   };
 
   const gridOrderOptimizationLevel = (props) => {
-    const roundedPercentage = Math.round(props.optimizationPercentage);
-    const percentageWidth = `${roundedPercentage}%`;
+    let roundedPercentage;
+    let percentageWidth;
+    let backgroundColor;
+
+    // Check if props.optimizationPercentage is not a number
+    if (isNaN(props.optimizationPercentage)) {
+      roundedPercentage = "N/A";
+      percentageWidth = "20%";
+      backgroundColor = "#ECECFF"; // Use a lighter shade when percentage is N/A
+    } else {
+      // Convert to a number and round
+      roundedPercentage = Math.round(Number(props.optimizationPercentage));
+      percentageWidth = `${roundedPercentage}%`;
+      backgroundColor = "#C8C8FF";
+    }
 
     return (
       <div className="h-10 w-full rounded-md flex flex-row items-center justify-between">
@@ -484,7 +566,7 @@ const Ideation = () => {
         >
           <div
             className="h-full rounded-tl-md rounded-bl-md flex items-center justify-center"
-            style={{ width: percentageWidth, background: "#C8C8FF" }}
+            style={{ width: percentageWidth, background: backgroundColor }}
           >
             <span
               className="text-xs text-gray-700"
@@ -589,9 +671,27 @@ const Ideation = () => {
       });
   }, []);
 
+  const handleOptimizeVideo = () => {
+    // Navigate to /optimize and pass the extracted properties as 'customData'
+    if (isOptimizeVideo && selectedVideoId) {
+      navigate("/optimize", {
+        state: {
+          customData: {
+            videoId: selectedVideoId,
+            likeCount: selectedVideoLikeCount,
+            commentCount: selectedVideoCommentCount,
+            viewCount: selectedVideoViewCount,
+          },
+        },
+      });
+    } else {
+      console.log("ERROR: No selected Video ID");
+    }
+  };
+
   return (
     <div>
-      {isOptimizeVideo ? (
+      {/* {isOptimizeVideo ? (
         selectedVideoId && (
           <Opitimize
             videoId={selectedVideoId}
@@ -600,30 +700,30 @@ const Ideation = () => {
             viewCount={selectedVideoViewCount}
           />
         )
-      ) : (
-        <div className="m-2 md:m-10 mt-24 p-2 md:p-10 rounded-md overflow-hidden">
-          <div className="flex justify-between">
-            <div className="w-full flex py-2">
-              <div className="flex w-full justify-between items-center">
-                <div className="">
-                  <div className="pageTitle text-3xl font-semibold">
-                    Optimization
-                  </div>
-                  <div className="tag text-md mt-2 text-xs font-thin">
-                    Implement our optimization recommendations to increase your
-                    organic reach
-                  </div>
+      ) : ( */}
+      <div className="m-2 md:m-10 mt-24 p-2 md:p-10 rounded-md overflow-hidden min-h-screen">
+        <div className="flex justify-between">
+          <div className="w-full flex py-2">
+            <div className="flex w-full justify-between items-center">
+              <div className="">
+                <div className="pageTitle text-3xl font-semibold">
+                  Optimization
                 </div>
-                <div className="flex justify-center items-center">
-                  <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
-                    <select
-                      id="mySelect"
-                      // value={this.state.selectedOption}
-                      // onChange={this.handleChange}
-                      className="text-xs outline-none"
-                    >
-                      <option value=""> Visibility (All)</option>
-                      {/* <option className="text-xs" value="Public Videos">
+                <div className="tag text-md mt-2 text-xs font-thin">
+                  Implement our optimization recommendations to increase your
+                  organic reach
+                </div>
+              </div>
+              <div className="flex justify-center items-center">
+                <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
+                  <select
+                    id="mySelect"
+                    // value={this.state.selectedOption}
+                    // onChange={this.handleChange}
+                    className="text-xs outline-none"
+                  >
+                    <option value=""> Visibility (All)</option>
+                    {/* <option className="text-xs" value="Public Videos">
                       Public Videos
                     </option>
                     <option className="text-xs" value="Private Videos">
@@ -632,28 +732,28 @@ const Ideation = () => {
                     <option className="text-xs" value="Unlisted Videos">
                       Unlisted Videos
                     </option> */}
-                    </select>
-                  </div>
-                  <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
-                    <select
-                      id="mySelect"
-                      // value={this.state.selectedOption}
-                      // onChange={this.handleChange}
-                      className="text-xs outline-none"
-                    >
-                      <option value="">Playlists (All)</option>
-                      {userPlaylistData.map((playlist, index) => (
-                        <option
-                          className="text-xs"
-                          key={index}
-                          value={playlist.title}
-                        >
-                          {playlist.title}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  {/* <div className="w-52 text-sm h-80">
+                  </select>
+                </div>
+                {/* <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
+                  <select
+                    id="mySelect"
+                    // value={this.state.selectedOption}
+                    // onChange={this.handleChange}
+                    className="text-xs outline-none"
+                  >
+                    <option value="">Playlists (All)</option>
+                    {userPlaylistData.map((playlist, index) => (
+                      <option
+                        className="text-xs"
+                        key={index}
+                        value={playlist.title}
+                      >
+                        {playlist.title}
+                      </option>
+                    ))}
+                  </select>
+                </div> */}
+                {/* <div className="w-52 text-sm h-80">
               <div
                 onClick={() => setOpen(!open)}
                 className={`bg-white w-full p-2 flex items-center justify-between rounded-full border border-gray-300 ${
@@ -716,27 +816,27 @@ const Ideation = () => {
                 ))}
               </ul>
             </div> */}
-                  <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
-                    <select
-                      id="mySelect"
-                      // value={this.state.selectedOption}
-                      // onChange={this.handleChange}
-                      className="text-xs outline-none"
-                    >
-                      <option value=""> Time (All)</option>
-                      <option className="text-xs" value="Last Week">
-                        Last Week
-                      </option>
-                      <option className="text-xs" value="Last Month">
-                        Last Month
-                      </option>
-                      <option className="text-xs" value="Last Week">
-                        Last Year
-                      </option>
-                    </select>
-                  </div>
+                {/* <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
+                  <select
+                    id="mySelect"
+                    // value={this.state.selectedOption}
+                    // onChange={this.handleChange}
+                    className="text-xs outline-none"
+                  >
+                    <option value=""> Time (All)</option>
+                    <option className="text-xs" value="Last Week">
+                      Last Week
+                    </option>
+                    <option className="text-xs" value="Last Month">
+                      Last Month
+                    </option>
+                    <option className="text-xs" value="Last Week">
+                      Last Year
+                    </option>
+                  </select>
+                </div> */}
 
-                  {/* <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
+                {/* <div className="bg-white rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4">
                   <span className="mr-2 text-xs">Updated on YT</span>
                   <HiOutlineChevronDown />
                 </div>
@@ -744,11 +844,11 @@ const Ideation = () => {
                   <span className="mr-2 text-xs">Drafts</span>
                   <HiOutlineChevronDown />
                 </div> */}
-                </div>
               </div>
             </div>
-            {/* IMPORTANT COMMENT */}
-            {/* <div className="w-1/4 flex justify-end py-2">
+          </div>
+          {/* IMPORTANT COMMENT */}
+          {/* <div className="w-1/4 flex justify-end py-2">
               <div className="flex items-center w-2/4 border border-gray-300 bg-white rounded-full px-4 py-2">
                 <input
                   type="text"
@@ -758,12 +858,10 @@ const Ideation = () => {
                 <HiSearch className="text-gray-500 text-xs" />
               </div>
             </div> */}
-          </div>
-          {!isUserDataLoaded ? (
-            <Loader message={"Loading your channel Videos. Hold tight"} />
-          ) : (
-            ""
-          )}
+        </div>
+        {!isUserDataLoaded ? (
+          <Loader message={"Loading your channel Videos. Hold tight"} />
+        ) : (
           <div>
             {/* Header component */}
             <div className="text-xs font-thin mt-5 mb-5">
@@ -829,8 +927,9 @@ const Ideation = () => {
               </GridComponent>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
+      {/* // )} */}
     </div>
   );
 };

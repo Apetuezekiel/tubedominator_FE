@@ -104,7 +104,10 @@ const SignUpPage = () => {
           setAccessLevel("L1");
           localStorage.setItem("userLoggedin", true);
           localStorage.setItem("userFirstName", formData.firstName);
-          localStorage.setItem("userFullName", `${formData.firstName} ${formData.lastName}`);
+          localStorage.setItem(
+            "userFullName",
+            `${formData.firstName} ${formData.lastName}`,
+          );
           localStorage.setItem("userRecordId", data.userRecordId);
           localStorage.setItem("gAppId", "2");
           localStorage.setItem("userRegEmail", formData.email);

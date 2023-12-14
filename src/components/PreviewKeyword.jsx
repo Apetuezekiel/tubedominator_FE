@@ -2,14 +2,8 @@
 
 import { React, useEffect, useState } from "react";
 import { MdCancel, MdOutlineCancel } from "react-icons/md";
-import { BiLinkExternal, BiLoaderCircle } from "react-icons/bi";
-import { Button } from ".";
-import { userProfileData } from "../data/dummy";
 import { useStateContext } from "../contexts/ContextProvider";
-import avatar from "../data/avatar.jpg";
 import { useDisplayPreviewKeyword, useUserData } from "../state/state";
-import { SignOutButton } from "@clerk/clerk-react";
-import { useUser } from "@clerk/clerk-react";
 import {
   GridComponent,
   ColumnsDirective,
@@ -25,13 +19,10 @@ import {
   Inject,
   Toolbar,
 } from "@syncfusion/ej2-react-grids";
-import Header from "./Header";
 import { useKeywordVideosInfo } from "../state/state";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { userFullDataDecrypted } from "../data/api/calls";
-import Spinner from "./Spinner";
-import showToast from "../utils/toastUtils";
 import { FaYoutube } from "react-icons/fa";
 import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
 import Loader from "./Loader";

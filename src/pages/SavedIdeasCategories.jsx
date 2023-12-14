@@ -22,7 +22,6 @@ import {
   HiOutlineTrendingDown,
   HiOutlineTrendingUp,
 } from "react-icons/hi";
-import Spinner from "../components/Spinner";
 
 import { HiOutlineChevronDown, HiSearch } from "react-icons/hi";
 import { AiOutlineStar, AiFillStar } from "react-icons/ai";

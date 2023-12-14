@@ -1,6 +1,5 @@
 /* eslint-disable */
 import { useState } from "react";
-import heroImage from "../data/avatar3.png";
 import { FaChevronDown, FaChevronUp, FaYoutube } from "react-icons/fa";
 import { TiDeleteOutline } from "react-icons/ti";
 import { thingsToFix, itemsFixed } from "../data/optimizeData";
@@ -11,7 +10,6 @@ import {
   useUserSearchTerm,
   useUserYoutubeInfo,
 } from "../state/state";
-import Spinner from "./Spinner";
 import { userFullDataDecrypted } from "../data/api/calls";
 import axios from "axios";
 import { FiCamera, FiEdit3 } from "react-icons/fi";

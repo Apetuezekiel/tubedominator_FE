@@ -48,8 +48,8 @@ const ConnectYoutube = () => {
   return (
     // <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
     <div
-      className="w-full h-screen bg-gray-100 text-gray-900 flex justify-center"
-      style={{ backgroundImage: `url(${homeBg})`, backgroundSize: "cover" }}
+      className="min-h-screen flex items-center justify-center"
+      // style={{ backgroundImage: `url(${homeBg})`, backgroundSize: "cover" }}
     >
       <div className="w-full flex-1 mt-8">
         <div className="flex flex-col items-center">

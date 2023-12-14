@@ -25,7 +25,6 @@ import {
   useUserLoggedin,
   useAllUserDeets,
 } from "../state/state";
-import Spinner from "../components/Spinner";
 import { useStateContext } from "../contexts/ContextProvider";
 import { useUser } from "@clerk/clerk-react";
 import showToast from "../utils/toastUtils";
@@ -324,7 +323,9 @@ const Ideation = () => {
       } else {
         try {
           const response = await axios.get(
-            `${process.env.REACT_APP_API_BASE_URL}/getAllSavedIdeas?email=${localStorage.getItem("userRegEmail")}`,
+            `${
+              process.env.REACT_APP_API_BASE_URL
+            }/getAllSavedIdeas?email=${localStorage.getItem("userRegEmail")}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -707,6 +708,12 @@ const Ideation = () => {
     }
   };
 
+  const handleGetIdeasOnEnter = (event) => {
+    if (event.key === "Enter") {
+      handleGetIdeas();
+    }
+  };
+
   const isQuestion = (str) => {
     const questionKeywords = [
       "what",
@@ -835,6 +842,7 @@ const Ideation = () => {
               setShowSearchPanel={setShowSearchPanel}
               setSearchQueryComplete={setSearchQueryComplete}
               handleGetIdeas={handleGetIdeas}
+              handleGetIdeasOnEnter={handleGetIdeasOnEnter}
             />
           )}
         </div>

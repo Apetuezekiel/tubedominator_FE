@@ -22,7 +22,6 @@ import {
   HiOutlineTrendingDown,
   HiOutlineTrendingUp,
 } from "react-icons/hi";
-import Spinner from "../components/Spinner";
 
 import { HiOutlineChevronDown, HiSearch } from "react-icons/hi";
 import { AiOutlineStar, AiFillStar } from "react-icons/ai";
@@ -433,12 +432,12 @@ const SavedIdeas = () => {
         }}
       >
         <span className="text-md capitalize">{props.video_ideas}</span>
-        <span
+        {/* <span
           className="text-xs text cursor-pointer"
           style={{ color: "#7352FF" }}
         >
           More Insights
-        </span>
+        </span> */}
       </div>
     );
   };

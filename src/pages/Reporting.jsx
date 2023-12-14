@@ -2,14 +2,8 @@
 
 import React from "react";
 import { useState, useEffect } from "react";
-
-import { BsCurrencyDollar } from "react-icons/bs";
-import { GoPrimitiveDot } from "react-icons/go";
-import { IoIosMore } from "react-icons/io";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
-import { pieChartData } from "../data/dummy";
-import { ChartsHeader, LineChart, Pie as PieChart } from "../components";
 import {
   GridComponent,
   ColumnsDirective,
@@ -24,21 +18,9 @@ import {
   Edit,
   Inject,
 } from "@syncfusion/ej2-react-grids";
-import {
-  earningData,
-  medicalproBranding,
-  recentTransactions,
-  weeklyStats,
-  dropdownData,
-  SparklineAreaData,
-  ecomPieChartData,
-} from "../data/dummy";
 import { useStateContext } from "../contexts/ContextProvider";
-import product9 from "../data/product9.jpg";
 import {
   FaYoutube,
-  FaGoogle,
-  FaPlus,
   FaCalendarAlt,
   FaAngleDown,
 } from "react-icons/fa";
@@ -46,51 +28,8 @@ import tubicsLogo from "../data/tubicon.svg";
 import { userFullDataDecrypted } from "../data/api/calls";
 import axios from "axios";
 import { useUserYoutubeInfo } from "../state/state";
-import Spinner from "../components/Spinner";
 import donought from "../data/donought3.png";
 import Loader from "../components/Loader";
-
-const DropDown = ({ currentMode }) => (
-  <div className="w-28 border-1 border-color px-2 py-1 rounded-md">
-    <DropDownListComponent
-      id="time"
-      fields={{ text: "Time", value: "Id" }}
-      style={{ border: "none", color: currentMode === "Dark" && "white" }}
-      value="1"
-      dataSource={dropdownData}
-      popupHeight="220px"
-      popupWidth="120px"
-    />
-  </div>
-);
-
-// const saveUserToken = async () => {
-//   const decryptedFullData = userFullDataDecrypted();
-//   console.log("decryptedFullData", decryptedFullData);
-//   await axios
-//   .post(
-//     "${process.env.REACT_APP_API_BASE_URL}/saveUserToken",
-//     {
-//       encryptedFullData: JSON.stringify(decryptedFullData)
-//     },
-//     {
-//       headers: {
-//         "Content-Type": "application/json",
-//         "x-api-key": process.env.REACT_APP_X_API_KEY,
-//         Authorization: `Bearer ${decryptedFullData.token}`,
-//       },
-//     },
-//   )
-//   .then(async (response) => {
-//     showToast("success", "Error saving token. Try again", 2000);
-//     console.log(response);
-//   })
-//   .catch((error) => {
-//     console.error("Error storing token:", error);
-//     console.error("-----------------------", error.response.data.message);
-//     showToast("error", "Error saving token. Try again", 2000);
-//   });
-// }
 
 const Reporting = () => {
   const [mostWatchedUserVideos, setMostWatchedUserVideos] = useState(0);

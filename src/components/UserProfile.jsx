@@ -2,20 +2,17 @@
 
 import React from "react";
 import { MdOutlineCancel } from "react-icons/md";
-
 import { Button } from ".";
 import { userProfileData } from "../data/dummy";
 import { useStateContext } from "../contexts/ContextProvider";
-import avatar from "../data/avatar.jpg";
 import {
   useUserAccessLevel,
   useUserData,
   useUserLoggedin,
 } from "../state/state";
 import { Link, useNavigate } from "react-router-dom";
-import { GoogleLogout } from "react-google-login";
 import { useRef } from "react";
-import userAvatar from "../assets/images/man-avatar-profile-picture-vector-illustration_268834-538.avif"
+import userAvatar from "../assets/images/man-avatar-profile-picture-vector-illustration_268834-538.avif";
 
 const UserProfile = () => {
   const clientId =
@@ -74,7 +71,7 @@ const UserProfile = () => {
         <div>
           <p className="font-semibold text-xl dark:text-gray-200">
             {" "}
-            {localStorage.getItem('userFirstName')}{" "}
+            {localStorage.getItem("userFirstName")}{" "}
           </p>
           <p className="text-gray-500 text-sm dark:text-gray-400">
             {" "}
@@ -82,7 +79,7 @@ const UserProfile = () => {
           </p>
           <p className="text-gray-500 text-sm font-semibold dark:text-gray-400">
             {" "}
-            {localStorage.getItem('userRegEmail')}{" "}
+            {localStorage.getItem("userRegEmail")}{" "}
           </p>
         </div>
       </div>

@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import {
   GridComponent,
@@ -32,7 +32,6 @@ import {
   FaVideo,
   FaDownload,
 } from "react-icons/fa";
-import Spinner from "../components/Spinner";
 import { BiSearch, BiWorld, BiStar, BiLoaderCircle } from "react-icons/bi";
 import { useUser } from "@clerk/clerk-react";
 import { Link, NavLink } from "react-router-dom";
@@ -46,7 +45,7 @@ import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
 import { MdCancel } from "react-icons/md";
 import Loader from "../components/Loader";
 import exportIcon from "../data/icons/export.png";
-import TDLogo from "../assets/images/TubeDominator 500x500.png"
+import TDLogo from "../assets/images/TubeDominator 500x500.png";
 // import deleteChannelKeyword from "../data/api/calls";
 
 const Keyword2 = () => {
@@ -577,6 +576,12 @@ const Keyword2 = () => {
     setUserKeyword(""); // Clear the userKeyword after successful submission
   };
 
+  const handleSubmitUserKeywordOnEnter = (event) => {
+    if (event.key === "Enter") {
+      submitUserKeyword();
+    }
+  };
+
   const addUserKeyword = () => {
     setIsAddKeyword(true);
   };
@@ -608,11 +613,18 @@ const Keyword2 = () => {
     );
   };
 
+  const gridRef = useRef(null);
+  const exportToPdf = () => {
+    if (gridRef.current) {
+      gridRef.current.pdfExport();
+    }
+  };
+
   return (
     <div className="m-2 md:m-10 mt-24 p-2 md:p-10">
       {isLoading ? (
         <div className="loading-container">
-          <Spinner />
+          <Loader />
         </div>
       ) : (
         <div className=""></div>
@@ -691,7 +703,8 @@ const Keyword2 = () => {
                     background:
                       "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
                   }}
-                  className="rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4"
+                  className="rounded-full border border-gray-300 px-4 py-2 flex items-center mr-4 cursor-pointer"
+                  onClick={exportToPdf}
                 >
                   <span className="mr-2 text-xs flex justify-between items-center">
                     <img src={exportIcon} alt="" className="h-4" />
@@ -707,6 +720,7 @@ const Keyword2 = () => {
                     name="keywords"
                     value={userKeyword}
                     onChange={handleChange}
+                    onKeyDown={handleSubmitUserKeywordOnEnter}
                     className="mt-1 p-2 border rounded-lg w-full mr-2"
                     placeholder="keywords your channel focuses on"
                   />
@@ -751,36 +765,36 @@ const Keyword2 = () => {
             />
           ) : (
             <div>
-                        <br />
-          {
-            userChannelKeywords.length > 0 ? (
-          <GridComponent
-            dataSource={userChannelKeywords}
-            allowExcelExport
-            allowPdfExport
-            allowPaging
-            allowSorting
-          >
-            <ColumnsDirective>
-              <ColumnDirective
-                field=""
-                headerText="#"
-                template={actionTemplate}
-                width={100}
-                headerTemplate={actionTitleTemplate}
-              />
-              <ColumnDirective
-                field="keyword"
-                headerText="Keywords"
-                // template={keywordTemplate}
-              />
-              <ColumnDirective
-                field=""
-                headerText="Youtube Results"
-                headerTemplate={VideoIconTitleTemplate}
-                template={previewYoutubeKwSearch}
-              />
-              {/* <ColumnDirective
+              <br />
+              {userChannelKeywords.length > 0 ? (
+                <GridComponent
+                  ref={gridRef}
+                  dataSource={userChannelKeywords}
+                  allowExcelExport
+                  allowPdfExport
+                  allowPaging
+                  allowSorting
+                >
+                  <ColumnsDirective>
+                    <ColumnDirective
+                      field=""
+                      headerText="#"
+                      template={actionTemplate}
+                      width={100}
+                      headerTemplate={actionTitleTemplate}
+                    />
+                    <ColumnDirective
+                      field="keyword"
+                      headerText="Keywords"
+                      // template={keywordTemplate}
+                    />
+                    <ColumnDirective
+                      field=""
+                      headerText="Youtube Results"
+                      headerTemplate={VideoIconTitleTemplate}
+                      template={previewYoutubeKwSearch}
+                    />
+                    {/* <ColumnDirective
                 field=""
                 headerText="Rank"
                 headerTemplate={VolumeTitleTemplate}
@@ -791,38 +805,37 @@ const Keyword2 = () => {
                 headerText="Video Result"
                 headerTemplate={VideoIconTitleTemplate}
               /> */}
-              <ColumnDirective
-                field="search_volume"
-                headerText="Volume"
-                template={formatViews}
-              />
-              <ColumnDirective
-                field="created_at_formatted"
-                headerText="Date added"
-              />
-            </ColumnsDirective>
-            <Inject
-              services={[
-                Resize,
-                Sort,
-                ContextMenu,
-                Filter,
-                Page,
-                ExcelExport,
-                Edit,
-                PdfExport,
-              ]}
-            />
-          </GridComponent>
-            ) : (
-              <div className="flex items-center gap-3 justify-center text-xs mt-20 mb-20">
-                <img src={TDLogo} alt="Tubedominator logo" className="h-10"/>
-                <span>You haven't saved any keyword.</span>
-              </div>
-            )
-          }
+                    <ColumnDirective
+                      field="search_volume"
+                      headerText="Volume"
+                      template={formatViews}
+                    />
+                    <ColumnDirective
+                      field="created_at_formatted"
+                      headerText="Date added"
+                    />
+                  </ColumnsDirective>
+                  <Inject
+                    services={[
+                      Resize,
+                      Sort,
+                      ContextMenu,
+                      Filter,
+                      Page,
+                      ExcelExport,
+                      Edit,
+                      PdfExport,
+                    ]}
+                  />
+                </GridComponent>
+              ) : (
+                <div className="flex items-center gap-3 justify-center text-xs mt-20 mb-20">
+                  <img src={TDLogo} alt="Tubedominator logo" className="h-10" />
+                  <span>You haven't saved any keyword.</span>
+                </div>
+              )}
             </div>
-          ) }
+          )}
         </div>
         {displayPreviewKeyword && (
           <PreviewKeyword

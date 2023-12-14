@@ -71,6 +71,16 @@ export const useUserGoogleCreds = create((set) => ({
   setIsGoogleCreds: (data) => set({ isGoogleCreds: data }),
 }));
 
+export const useUserChannelConnected = create((set) => ({
+  userChannelConnected: localStorage.getItem("channelConnected"),
+  setUserChannelConnected: (data) => set({ userChannelConnected: data }),
+}));
+
+export const useUserProfilePic = create((set) => ({
+  userProfilePic: "",
+  setUserProfilePic: (data) => set({ userProfilePic: data }),
+}));
+
 export const useSerpYoutubeVideosInfo = create((set) => ({
   serpYoutubeVideosInfo: {
     keyword: "",

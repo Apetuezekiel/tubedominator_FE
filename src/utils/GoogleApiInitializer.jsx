@@ -2,6 +2,7 @@
 import React, { useEffect } from "react";
 
 function GoogleApiInitializer({ apiKey, clientId, initializeOnLoad }) {
+  console.log(clientId, apiKey);
   useEffect(() => {
     if (initializeOnLoad) {
       gapi.load("client:auth2", () => {

@@ -9,7 +9,8 @@ const GenerateIdeasPanel = ({
   onSearchChange,
   setShowSearchPanel,
   setSearchQueryComplete,
-  handleGetIdeas
+  handleGetIdeas,
+  handleGetIdeasOnEnter,
 }) => {
   const initialCountry = {
     countryCode: "GLB",
@@ -79,6 +80,7 @@ const GenerateIdeasPanel = ({
                     className="flex-grow bg-transparent outline-none pr-2 text-xs py-3 px-3"
                     value={searchQuery}
                     onChange={handleSearchChange}
+                    onKeyDown={handleGetIdeasOnEnter}
                   />
                   <BiSearch className="text-gray-500 text-xs mr-3" />
                 </div>

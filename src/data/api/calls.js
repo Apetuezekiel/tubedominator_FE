@@ -41,7 +41,7 @@ export async function generateThumbnail(prompt) {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
+          // Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
         },
       },
     );
@@ -63,10 +63,10 @@ export async function generateThumbnail(prompt) {
   }
 }
 
-export async function getCategorySavedIdeas(category) { 
+export async function getCategorySavedIdeas(category) {
   try {
     // const decryptedFullData = userFullDataDecrypted();
-  const userEmail = localStorage.getItem("userRegEmail")
+    const userEmail = localStorage.getItem("userRegEmail");
     const response = await axios.get(
       `${process.env.REACT_APP_API_BASE_URL}/getCategorySavedIdeas?email=${userEmail}&category=${category}`,
       {
@@ -121,14 +121,11 @@ export async function getSavedIdeas() {
   }
 }
 
-
 export async function checkClientAndApiKey() {
   const userRegEmail = localStorage.getItem("userRegEmail");
   try {
     const response = await axios.get(
-      `${process.env.REACT_APP_API_BASE_URL}/checkClientAndApiKey?email=${
-        userRegEmail
-      }`,
+      `${process.env.REACT_APP_API_BASE_URL}/checkClientAndApiKey?email=${userRegEmail}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -153,9 +150,7 @@ export async function fetchUser() {
 
   try {
     const response = await axios.get(
-      `${process.env.REACT_APP_API_BASE_URL}/fetchUser?email=${
-        userRegEmail
-      }`,
+      `${process.env.REACT_APP_API_BASE_URL}/fetchUser?email=${userRegEmail}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -197,6 +192,8 @@ export async function getUserEncryptedDataFromDb(gId) {
     throw error;
   }
 }
+
+// console.log("getUserEncryptedDataFromDb(107055926455841084977)", getUserEncryptedDataFromDb("107055926455841084977"));
 
 export async function getUserEncryptedData() {
   // const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
@@ -695,6 +692,14 @@ export const daysToTime = (days) => {
   }
 };
 
+// export const handleGetIdeasOnEnter = (event, action) => {
+//   if (event.key === "Enter") {
+//     action();
+//   }
+// };
+
+/////////////////////////////////////
+
 export const saveYoutubePost = async (
   videoId,
   title,
@@ -711,7 +716,7 @@ export const saveYoutubePost = async (
     video_description: description,
     video_tags: tags,
     video_thumbnail: thumbnails,
-    email: userFullDataDecrypted()?.email,
+    email: localStorage.getItem("userRegEmail"),
     likeCount,
     commentCount,
     viewCount,
@@ -725,7 +730,7 @@ export const saveYoutubePost = async (
         video_description: description,
         video_tags: tags,
         video_thumbnail: thumbnails,
-        email: userFullDataDecrypted()?.email,
+        email: localStorage.getItem("userRegEmail"),
         likeCount,
         commentCount,
         viewCount,
@@ -734,7 +739,7 @@ export const saveYoutubePost = async (
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
+          // Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
         },
       },
     );
@@ -763,13 +768,13 @@ export const getYoutubePost = async (videoId) => {
       `${process.env.REACT_APP_API_BASE_URL}/getYoutubePosts`,
       {
         params: {
-          email: userFullDataDecrypted()?.email,
+          email: localStorage.getItem("userRegEmail"),
           video_id: videoId,
         },
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
+          // Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
         },
       },
     );
@@ -802,12 +807,12 @@ export const getAllYoutubePosts = async () => {
       `${process.env.REACT_APP_API_BASE_URL}/getAllYoutubePosts`,
       {
         params: {
-          email: userFullDataDecrypted()?.email,
+          email: localStorage.getItem("userRegEmail"),
         },
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
+          // Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
         },
       },
     );
@@ -817,10 +822,98 @@ export const getAllYoutubePosts = async () => {
     if (response.data.success) {
       return response.data.data;
     } else {
-      showToast("error", "Youtube videos werent retrieved. Try again", 2000);
+      return []
+      // showToast("error", "Youtube videos werent retrieved. Try again", 2000);
     }
   } catch (error) {
     console.error("Error fetching YouTube Video:", error);
+    return [];
+    // showToast(
+    //   "error",
+    //   "An error occurred fetching video. Please try again later.",
+    //   2000,
+    // );
+  }
+};
+
+// DRAFT POSTS
+export const checkDraftExistence = async (videoId) => {
+  try {
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_BASE_URL}/checkDraftExistence`,
+      {
+        params: {
+          video_id: videoId,
+        },
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+          // Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
+        },
+      },
+    );
+
+    return response.data.exists;
+  } catch (error) {
+    console.error("Error confirming if draft post exists", error);
+  }
+};
+
+export const deleteDraftPost = async (videoId) => {
+  try {
+    const responseDelete = await axios.delete(
+      `${process.env.REACT_APP_API_BASE_URL}/deleteDraftPost`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+          Authorization: `Bearer ${decryptedFullData.token}`,
+        },
+        params: {
+          video_id: videoId,
+        },
+      },
+    );
+    console.log("Draft removed successfully");
+    if (responseDelete.data.success) {
+      showToast("success", "Draft post removed from Search Terms", 2000);
+    } else {
+      showToast("error", "Draft post wasn't removed. Try again", 2000);
+    }
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+export const getDraftPost = async (videoId) => {
+  try {
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_BASE_URL}/getDraftPost`,
+      {
+        params: {
+          email: localStorage.getItem("userRegEmail"),
+          video_id: videoId,
+        },
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+          // Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
+        },
+      },
+    );
+
+    console.log("response", response);
+
+    if (response.data.success) {
+      console.log("gottenDraftPost", response.data.data);
+      return response.data.data;
+    } else {
+      showToast("error", "Draft post wasn't retrieved. Try again", 2000);
+      return [];
+    }
+  } catch (error) {
+    console.error("Error fetching Original YouTube post:", error);
     showToast(
       "error",
       "An error occurred fetching video. Please try again later.",
@@ -829,6 +922,8 @@ export const getAllYoutubePosts = async () => {
   }
 };
 
+
+// VIDEO GENERATION
 export async function getVideoTemplates() {
   console.log("Loading video Templates");
 
@@ -838,7 +933,7 @@ export async function getVideoTemplates() {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.ELAI_API_KEY}`,
+          Authorization: `Bearer AY9rruDSr9obNYh1ip7palwlli0LaN7H`,
         },
       },
     );
@@ -856,9 +951,6 @@ export async function getVideoTemplates() {
     return null;
   }
 }
-
-
-getVideoTemplates();
 
 export const generateVideo = async (source, prompt, templateId) => {
   if (!source) {
@@ -880,7 +972,7 @@ export const generateVideo = async (source, prompt, templateId) => {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.ELAI_API_KEY}`,
+          Authorization: `Bearer AY9rruDSr9obNYh1ip7palwlli0LaN7H`,
         },
       },
     );
@@ -914,7 +1006,7 @@ export const generateVideoSlides = async (video_id) => {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer ${process.env.ELAI_API_KEY}`,
+          Authorization: `Bearer AY9rruDSr9obNYh1ip7palwlli0LaN7H`,
         },
       },
     );
@@ -946,7 +1038,7 @@ export const renderVideo = async (video_id) => {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer ${process.env.ELAI_API_KEY}`,
+          Authorization: `Bearer AY9rruDSr9obNYh1ip7palwlli0LaN7H`,
         },
       },
     );
@@ -977,7 +1069,7 @@ export const retrieveVideo = async (video_id) => {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer ${process.env.ELAI_API_KEY}`,
+          Authorization: `Bearer AY9rruDSr9obNYh1ip7palwlli0LaN7H`,
         },
       },
     );
@@ -989,3 +1081,24 @@ export const retrieveVideo = async (video_id) => {
     return null;
   }
 };
+
+// USER
+export const saveUser = async (postData) => {
+  console.log("postData", postData);
+  try {
+    const response = await axios.post(
+      `${process.env.REACT_APP_API_BASE_URL}/saveUser`,postData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+          // Authorization: `Bearer ${userFullDataDecrypted()?.token}`,
+        },
+      },
+    );
+    return response.data.success;
+  } catch (error) {
+    console.error("Error saving user details:", error);
+  }
+};
+

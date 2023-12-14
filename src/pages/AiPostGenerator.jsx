@@ -113,6 +113,7 @@ function AiPostGenerator({ display }) {
         // setLoadedLocalStorage(true); // Commented out as it is not clear from your code whether this state is needed
         setGeneratedYoutubePost(savedData);
         setSearchQuery(savedData.searchQuery);
+        setInputValue(savedData.videoScript);
         console.log("savedData.data.searchQuery", savedData.searchQuery);
         setLoadedYoutubePost(true);
       } else {
@@ -216,8 +217,8 @@ function AiPostGenerator({ display }) {
     } catch (error) {
       console.error("Error fetching data:", error);
       showToast(
-        "error",
-        `Couldn't fetch results for your search "${searchQuery}"`,
+        "warning",
+        `Oops. You might want to try that again`,
         5000,
       );
       setIsLoading(false);
@@ -396,8 +397,11 @@ function AiPostGenerator({ display }) {
   const retrieveReadyVideo = async (attemptCount = 0) => {
     setRetrievingVideo(true);
     if (attemptCount >= 5) {
+      showToast("error", "Looks like your video creation failed, If it persists reach support", 5000)
       console.error("Max attempts reached. Unable to retrieve ready video.");
       setVideoRetrievalFailed(true);
+      setRetrievingVideo(false);
+      setVideoRendered(false);
       return null;
     }
 
@@ -450,6 +454,14 @@ function AiPostGenerator({ display }) {
     anchor.click();
   };
 
+  const handleGetIdeasOnEnter = (event) => {
+    if (event.key === "Enter") {
+      handleGetIdeas();
+    }
+  };
+
+
+
   return (
     <section className={`w-full z-50 ${display} min-h-screen`}>
       <div className="m-2 md:m-10 mt-10 p-2 md:p-10 rounded-3xl">
@@ -472,6 +484,7 @@ function AiPostGenerator({ display }) {
                     className="flex-grow bg-transparent outline-none pr-2 text-xs"
                     value={searchQuery}
                     onChange={handleSearchChange}
+                    onKeyDown={handleGetIdeasOnEnter}
                   />
                   <BiSearch className="text-gray-500 text-xs" />
                 </div>
@@ -740,10 +753,16 @@ function AiPostGenerator({ display }) {
                       <Loader message={"We are now rendering your Video"} />
                     ) : retrievingVideo ? (
                       <Loader
-                        message={
-                          "We are building the final part of your Video. Hang in there. This will take a few minutes"
-                        }
-                      />
+                      messages={[
+                        'We are building the final part of your Video. Hang in there. This will take between 5 to 15 minutes.',
+                        'Still gearing this up for you',
+                        'Your video will soon be ready. Grab a pop corn',
+                        'More time, better video. Hold on tight',
+                        'Took a while, but we are close.',
+                      ]}
+                      size={20}
+                      iconColor="#7352FF"
+                    />
                     ) : videoCreated ? (
                       <div className="w-full flex flex-col justify-center items-center mt-5">
                         <button

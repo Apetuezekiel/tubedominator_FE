@@ -23,6 +23,7 @@ import {
   useUserLoggedin,
   useUserAccessLevel,
   useUserGoogleCreds,
+  useUserProfilePic,
 } from "../state/state";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 // import {
@@ -84,6 +85,11 @@ const Navbar = () => {
   const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
   const accessLevel = useUserAccessLevel((state) => state.accessLevel);
   const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
+  const userProfilePic = useUserProfilePic((state) => state.userProfilePic);
+  const setUserProfilePic = useUserProfilePic(
+    (state) => state.setUserProfilePic,
+  );
+
   //
   //  if (accessLevel === "" || null){
   //   setAccessLevel(localStorage.getItem("accessLevel"))
@@ -122,9 +128,7 @@ const Navbar = () => {
   const [pageTag, setPageTag] = useState("");
   const [reloadRequired, setReloadRequired] = useState(false);
   const [isUserGoogleCreds, setIsUserGoogleCreds] = useState(null);
-  const isGoogleCreds = useUserGoogleCreds(
-    (state) => state.isGoogleCreds,
-  );
+  const isGoogleCreds = useUserGoogleCreds((state) => state.isGoogleCreds);
   const setIsGoogleCreds = useUserGoogleCreds(
     (state) => state.setIsGoogleCreds,
   );
@@ -164,16 +168,18 @@ const Navbar = () => {
     const fetchUserSetGoogleCreds = async () => {
       try {
         const userSetGoogleCreds = await checkClientAndApiKey();
-        console.log("userSetGoogleCreds userSetGoogleCreds", userSetGoogleCreds);
+        console.log(
+          "userSetGoogleCreds userSetGoogleCreds",
+          userSetGoogleCreds,
+        );
         setIsUserGoogleCreds(userSetGoogleCreds);
       } catch (error) {
         console.error("Error fetching user Google credentials:", error);
       }
     };
-  
+
     fetchUserSetGoogleCreds();
   }, [isGoogleCreds]);
-  
 
   useEffect(() => {
     const handleResize = () => setScreenSize(window.innerWidth);
@@ -277,98 +283,111 @@ const Navbar = () => {
       className={`w-full flex justify-between navBar relative`}
     >
       {
-      // userLoggedIn && accessLevel === "L2" && !userData ? (
-      //   <Loader
-      //     message={
-      //       "Hold on tight while your account loads Up. We might reload the page."
-      //     }
-      //   />
-      // )
-      // : userLoggedIn && userData ? (
-      //   <>
-      //     <div className="ml-5 my-auto py-5">
-      //       <img src={TDLogo} alt="TubeDominator Logo" className="h-6"/>
-      //     </div>
-      //     <div className="flex my-auto">
-      //       <TooltipComponent content="Profile" position="BottomCenter">
-      //         <div
-      //           className="flex items-center gap-2 cursor-pointer hover:bg-light-gray rounded-full px-2 py-2 mr-10"
-      //           onClick={() => handleClick("userProfile")}
-      //           style={{ backgroundColor: "#EAEAFF" }}
-      //         >
-      //           <img
-      //             className="rounded-full w-5 h-5"
-      //             src={userData.channel_image_link}
-      //             alt="user-profile"
-      //           />
-      //           <p className="">
-      //             <span className="text-gray-400 font-bold ml-1 text-14">
-      //               {userData.firstName}
-      //             </span>
-      //           </p>
-      //           <MdKeyboardArrowDown className="text-gray-400 text-14" />
-      //         </div>
-      //       </TooltipComponent>
-      //       {isClicked.userProfile && <UserProfile />}
-      //     </div>
-      //   </>
-      // )
-      userLoggedIn ? (
-        <div className="w-full flex justify-between p-2 md:ml-6 md:mr-6 relative homeHeader">
-                    <div className="ml-5 my-auto py-5">
-            {/* <div className="pageTitle text-3xl font-semibold">{pageTitle}</div>
+        // userLoggedIn && accessLevel === "L2" && !userData ? (
+        //   <Loader
+        //     message={
+        //       "Hold on tight while your account loads Up. We might reload the page."
+        //     }
+        //   />
+        // )
+        // : userLoggedIn && userData ? (
+        //   <>
+        //     <div className="ml-5 my-auto py-5">
+        //       <img src={TDLogo} alt="TubeDominator Logo" className="h-6"/>
+        //     </div>
+        //     <div className="flex my-auto">
+        //       <TooltipComponent content="Profile" position="BottomCenter">
+        //         <div
+        //           className="flex items-center gap-2 cursor-pointer hover:bg-light-gray rounded-full px-2 py-2 mr-10"
+        //           onClick={() => handleClick("userProfile")}
+        //           style={{ backgroundColor: "#EAEAFF" }}
+        //         >
+        //           <img
+        //             className="rounded-full w-5 h-5"
+        //             src={userData.channel_image_link}
+        //             alt="user-profile"
+        //           />
+        //           <p className="">
+        //             <span className="text-gray-400 font-bold ml-1 text-14">
+        //               {userData.firstName}
+        //             </span>
+        //           </p>
+        //           <MdKeyboardArrowDown className="text-gray-400 text-14" />
+        //         </div>
+        //       </TooltipComponent>
+        //       {isClicked.userProfile && <UserProfile />}
+        //     </div>
+        //   </>
+        // )
+        userLoggedIn ? (
+          <div className="w-full flex justify-between p-2 md:ml-6 md:mr-6 relative homeHeader">
+            <div className="ml-5 my-auto py-5">
+              {/* <div className="pageTitle text-3xl font-semibold">{pageTitle}</div>
             <div className="tag text-md mt-2 text-xs">{pageTag}</div> */}
-            <img src={TDLogo} alt="TubeDominator Logo" className="h-6"/>
-          </div>
-          <div className="navbar-nav ms-auto py-0 flex justify-between items-center text-lg">
-            {/* Welcome,{" "}
+              <img src={TDLogo} alt="TubeDominator Logo" className="h-6" />
+            </div>
+            <div className="navbar-nav ms-auto py-0 flex justify-between items-center text-lg">
+              {/* Welcome,{" "}
             <span className="text-2xl ml-2 font-semibold">
               {localStorage.getItem("userFirstName")}
             </span> */}
-            {
+              {/* {
               isUserGoogleCreds === false && (
                 <span className="text-md ml-4 font-semibold flex items-center">
                   <IoIosWarning color="#D25C87" /><a style={{color: "blue"}} href={`${process.env.REACT_APP_BASE_URL}/settings`}>You need to connect your Api Key and Client ID. Click here</a>
               </span>
               )
-            }
-          </div>  
-          <div className="flex my-auto">
-            <TooltipComponent content="Profile" position="BottomCenter">
-              <div
-                className="flex items-center gap-2 cursor-pointer hover:bg-light-gray rounded-full px-2 py-2 mr-10"
-                onClick={() => handleClick("userProfile")}
-                style={{ backgroundColor: "#EAEAFF" }}
+            } */}
+              <Link
+                className="text-md ml-4 font-semibold flex items-center cursor-pointer text-blue-500"
+                to={"/training"}
               >
-                <img
-                  className="rounded-full w-5 h-5"
-                  src={userAvatar}
-                  alt="user-profile"
-                />
-                <p className="">
-                  <span className="text-gray-400 font-bold ml-1 text-14">
-                    {localStorage.getItem('userFirstName')}
-                  </span>
-                </p>
-                <MdKeyboardArrowDown className="text-gray-400 text-14" />
-              </div>
-            </TooltipComponent>
-            {isClicked.userProfile && <UserProfile />}
+                Start By Watching Our Training Videos
+              </Link>
+            </div>
+            <div className="flex my-auto">
+              <TooltipComponent content="Profile" position="BottomCenter">
+                <div
+                  className="flex items-center gap-2 cursor-pointer hover:bg-light-gray rounded-full px-2 py-2 mr-10"
+                  onClick={() => handleClick("userProfile")}
+                  style={{ backgroundColor: "#EAEAFF" }}
+                >
+                  <img
+                    className="rounded-full w-5 h-5"
+                    src={
+                      userProfilePic
+                        ? URL.createObjectURL(userProfilePic)
+                        : userAvatar
+                    }
+                    alt="user-profile"
+                  />
+                  <p className="">
+                    <span className="text-gray-400 font-bold ml-1 text-14">
+                      {localStorage.getItem("userFirstName")}
+                    </span>
+                  </p>
+                  <MdKeyboardArrowDown className="text-gray-400 text-14" />
+                </div>
+              </TooltipComponent>
+              {isClicked.userProfile && <UserProfile />}
+            </div>
           </div>
-        </div>
-      ) : (
-        <div
-          className="w-full flex justify-between p-2 relative homeHeader"
-          style={{ backgroundColor: "#1C1F33", borderRadius: "0 0 20px 20px" }}
-        >
-          <Link to={"/"}>
-            <img
-              className="h-8 my-auto"
-              src={TDLogoWhite}
-              alt="Tubedominator Logo"
-            />
-          </Link>
-          {/* <div className="navbar-nav ms-auto py-0 flex justify-between items-center">
+        ) : (
+          <div
+            className="w-full flex justify-between p-2 relative homeHeader"
+            style={{
+              backgroundColor: "#1C1F33",
+              borderRadius: "0 0 20px 20px",
+            }}
+          >
+            <Link to={"/"}>
+              <img
+                className="h-8 my-auto"
+                src={TDLogoWhite}
+                alt="Tubedominator Logo"
+              />
+            </Link>
+            {/* <div className="navbar-nav ms-auto py-0 flex justify-between items-center">
             <a href="/project" className="nav-item nav-link mr-8">
               Services
             </a>
@@ -385,9 +404,9 @@ const Navbar = () => {
               About
             </a>
           </div> */}
-          <div className="flex">
-            <div className="flex items-center gap-2 cursor-pointer p-1 rounded-lg">
-              {/* <Link
+            <div className="flex">
+              <div className="flex items-center gap-2 cursor-pointer p-1 rounded-lg">
+                {/* <Link
                 className="text-xs mr-4 py-2 px-5 rounded-full text-white flex items-center"
                 to="/sign-up"
                 style={{
@@ -398,14 +417,14 @@ const Navbar = () => {
                 <GoPlus className="mr-2" />
                 Register
               </Link> */}
-              <Link
-                className="text-xs mr-4 text-black py-2 px-8 rounded-full"
-                to="/sign-in"
-                style={{ backgroundColor: "#9999ff" }}
-              >
-                Log In
-              </Link>
-              {/* <p>
+                <Link
+                  className="text-xs mr-4 text-black py-2 px-8 rounded-full"
+                  to="/sign-in"
+                  style={{ backgroundColor: "#9999ff" }}
+                >
+                  Log In
+                </Link>
+                {/* <p>
                 <button
                   type="submit"
                   style={{ backgroundColor: "#7438FF" }}
@@ -414,10 +433,11 @@ const Navbar = () => {
                   Talk to an Expert
                 </button>
               </p> */}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
     </div>
   );
 };

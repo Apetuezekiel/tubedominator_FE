@@ -28,13 +28,13 @@ function Home() {
               services to grow their YouTube channel.
             </div>
             <div className="flex justify-center items-center mt-5 mr-5">
-              <Link to="/sign-up">
-              <button
-                style={{ backgroundColor: "#7438FF" }}
-                className="w-full text-lg text-white py-3 px-5 rounded-full"
-              >
-                Start Your Journey Now
-              </button>
+              <Link to="/sign-in">
+                <button
+                  style={{ backgroundColor: "#7438FF" }}
+                  className="w-full text-lg text-white py-2 px-5 rounded-full"
+                >
+                  Start Your Journey Now
+                </button>
               </Link>
             </div>
           </div>

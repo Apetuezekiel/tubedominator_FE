@@ -41,6 +41,8 @@ const GoogleLoginComp = forwardRef((props, ref) => {
     const fetchData = async () => {
       try {
         const fetchedUser = await fetchUser();
+
+        console.log(fetchedUser);
         setFetchUserData(fetchedUser);
         console.log("fetched user data: ", fetchedUser);
       } catch (error) {
@@ -196,8 +198,8 @@ const GoogleLoginComp = forwardRef((props, ref) => {
       )} */}
       {initialized && fetchUserData.apiKey && fetchUserData.ClientId && (
         <GoogleApiInitializer
-          apiKey={fetchUserData.apiKey}
-          ClientId={fetchUserData.ClientId}
+          // apiKey={fetchUserData.apiKey}
+          clientId={fetchUserData.ClientId}
           initializeOnLoad={true}
         />
       )}
@@ -207,18 +209,21 @@ const GoogleLoginComp = forwardRef((props, ref) => {
           console.error("Error: apiKey or ClientId is not available");
         })()} */}
 
-      <button onClick={() => handleLoginClick()}>
-        <GoogleLogin
-          ClientId={process.env.REACT_APP_CLIENT_ID}
-          // ClientId={fetchUserData.ClientId}
-          buttonText="Login with Google"
-          onSuccess={onLoginSuccess}
-          onFailure={onLoginFailure}
-          cookiePolicy="single_host_origin"
-          isSignedIn={true}
-          className="google-login-button rounded-full"
-        />
-      </button>
+      {fetchUserData.apiKey && fetchUserData.ClientId && (
+        <button onClick={() => handleLoginClick()}>
+          <GoogleLogin
+            // ClientId={process.env.REACT_APP_CLIENT_ID}
+            clientId={fetchUserData.ClientId}
+            buttonText="Login with Google"
+            onSuccess={onLoginSuccess}
+            onFailure={onLoginFailure}
+            cookiePolicy="single_host_origin"
+            isSignedIn={true}
+            className="google-login-button rounded-full"
+            redirectUri="http://localhost:3000/youtube"
+          />
+        </button>
+      )}
     </div>
   );
 });
