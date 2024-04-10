@@ -7,7 +7,11 @@ import showToast from "../../utils/toastUtils";
 import axios from "axios";
 import { BiLoaderCircle } from "react-icons/bi";
 import { Link, useNavigate } from "react-router-dom";
-import { useUserAccessLevel, useUserLoggedin } from "../../state/state";
+import {
+  useUserAccessLevel,
+  useUserChannelConnected,
+  useUserLoggedin,
+} from "../../state/state";
 import {
   getUserEncryptedDataFromDb,
   isChannelRegistered,
@@ -34,6 +38,17 @@ const SignInPage = () => {
   const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
   const accessLevel = useUserAccessLevel((state) => state.accessLevel);
   const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
+  const userChannelConnected = useUserChannelConnected(
+    (state) => state.userChannelConnected,
+  );
+  const setUserChannelConnected = useUserChannelConnected(
+    (state) => state.setUserChannelConnected,
+  );
+
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleSubmit = async (e) => {
     setIsLoading(true);
@@ -41,12 +56,24 @@ const SignInPage = () => {
 
     // Validation logic goes here
     // For instance:
+    // if (!formData.email) {
+    //   setValidationErrors((prevErrors) => ({
+    //     ...prevErrors,
+    //     email: "Email is required",
+    //   }));
+    //   return;
+    // }
+
     if (!formData.email) {
       setValidationErrors((prevErrors) => ({
         ...prevErrors,
         email: "Email is required",
       }));
-      return;
+    } else if (!isValidEmail(formData.email)) {
+      setValidationErrors((prevErrors) => ({
+        ...prevErrors,
+        email: "Invalid email format",
+      }));
     }
 
     if (!formData.password) {
@@ -89,8 +116,16 @@ const SignInPage = () => {
         localStorage.setItem("userFirstName", data.firstName);
         localStorage.setItem("userLastName", data.lastName);
         localStorage.setItem("userRegEmail", formData.email);
+        localStorage.setItem("userProfilePic", formData.profilePic);
         localStorage.setItem("userPackage", data.package);
-        console.log("data.package", data.package, localStorage.getItem("userPackage"));
+        console.log("from log in page", data.package);
+        localStorage.setItem("channelConnected", data.channelConnected);
+        setUserChannelConnected(1);
+        console.log(
+          "channelConnected",
+          data.channelConnected,
+          localStorage.getItem("channelConnected"),
+        );
 
         setAccessLevel("L1");
         setUserLoggedIn(true);
@@ -103,7 +138,7 @@ const SignInPage = () => {
     } catch (error) {
       setLoginError(true);
       console.error("Error Logging User in:", error);
-      showToast("error", `Couldn't Log you in`, 3000);
+      showToast("error", error.response.data.message, 3000);
       setIsLoading(false);
     }
   };
@@ -126,6 +161,11 @@ const SignInPage = () => {
                     {validationErrors.email}
                   </div>
                 )} */}
+                {validationErrors.email && (
+                  <div className="text-red-500 text-sm mb-1">
+                    {validationErrors.email}
+                  </div>
+                )}
                 <div className="text-xs mb-1 ml-1 text-gray-500">Email</div>
                 <input
                   className={`w-full px-8 py-4 mb-5 rounded-full font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-xs focus:outline-none focus:border-gray-400 focus:bg-white  ${

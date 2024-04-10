@@ -1,10 +1,10 @@
 const countriesWithLanguages = [
-  {
-    country: "Global",
-    language: "English",
-    languageCode: "en",
-    countryCode: "GLB",
-  },
+  // {
+  //   country: "Global",
+  //   language: "English",
+  //   languageCode: "en",
+  //   countryCode: "GLB",
+  // },
   {
     country: "Algeria",
     language: "Arabic",

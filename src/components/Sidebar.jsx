@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { SiShopware } from "react-icons/si";
-import { MdOutlineCancel } from "react-icons/md";
+import { MdNotificationsActive, MdOutlineCancel } from "react-icons/md";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 import { FaYoutube, FaGoogle, FaPlus } from "react-icons/fa";
 import tubedominatorLogo from "../assets/images/TDLogo.png";
@@ -11,58 +11,62 @@ import GoogleLoginComp from "../pages/UserAuth/GoogleLogin";
 
 import {
   accountActions,
+  adminMenuLink,
   bundleLinks,
   menuLinks,
   optimizationMenuLink,
+  resellerMenuLink,
 } from "../data/dummy";
 import { useStateContext } from "../contexts/ContextProvider";
 import { FcGoogle } from "react-icons/fc";
 import GoogleLogOut from "../pages/UserAuth/GoogleLogOut";
-import { useUserAccessLevel, useUserChannelConnected } from "../state/state";
+import {
+  useUserAccessLevel,
+  useUserChannelConnected,
+  useUserConnectionEntry,
+  useUserPackage,
+} from "../state/state";
 import { fetchUser } from "../data/api/calls";
+import { RiNotification2Fill, RiNotification3Line } from "react-icons/ri";
 
 const Sidebar = () => {
   const { currentColor, activeMenu, setActiveMenu, screenSize } =
     useStateContext();
-  // localStorage.removeItem("userPackage");
   const accessLevel = useUserAccessLevel((state) => state.accessLevel);
   const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
-  const [userPackage, setUserPackage] = useState(
-    localStorage.getItem("userPackage"),
-  );
-  // const [userPackage, setUserPackage] = useState(
-  //   localStorage.getItem("userPackage"),
-  // );
   const userChannelConnected = useUserChannelConnected(
     (state) => state.userChannelConnected,
   );
+  const userPackage = useUserPackage((state) => state.userPackage);
   const setUserChannelConnected = useUserChannelConnected(
     (state) => state.setUserChannelConnected,
   );
+  const userConnectionEntry = useUserConnectionEntry(
+    (state) => state.userConnectionEntry,
+  );
+  const setUserConnectionEntry = useUserConnectionEntry(
+    (state) => state.setUserConnectionEntry,
+  );
+
   if (accessLevel === "" || null) {
     setAccessLevel(localStorage.getItem("accessLevel"));
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const storedUserPackage = localStorage.getItem("userPackage");
-        if (!userPackage) {
-          setUserPackage(storedUserPackage);
-        } else {
-          const fetchedUser = await fetchUser();
-          console.log("fetchedUser from sidebar", fetchedUser);
-          setUserPackage(fetchedUser.package);
-          localStorage.setItem("userPackage", fetchedUser.package);
-          setUserChannelConnected(fetchedUser.channelConnected);
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const fetchedUser = await fetchUser();
+  //       console.log("fetchedUser from sidebar", fetchedUser);
+  //       setUserPackage(fetchedUser.package);
+  //       localStorage.setItem("userPackage", fetchedUser.package);
+  //       setUserChannelConnected(fetchedUser.channelConnected);
+  //     } catch (error) {
+  //       console.error("Error fetching user data:", error);
+  //     }
+  //   };
 
-    fetchData();
-  }, [userChannelConnected]);
+  //   fetchData();
+  // }, [userChannelConnected]);
 
   const handleCloseSideBar = () => {
     if (activeMenu !== undefined && screenSize <= 900) {
@@ -165,6 +169,7 @@ const Sidebar = () => {
                 ))}
               </div>
             ))}
+
             {userChannelConnected === 1 &&
               optimizationMenuLink.map((item, index) => (
                 <div key={index} className="">
@@ -200,8 +205,90 @@ const Sidebar = () => {
                   ))}
                 </div>
               ))}
+
             <br />
-            {userPackage === "bundle" &&
+
+            {userPackage === "reseller" &&
+              resellerMenuLink.map((item, index) => (
+                <div key={index} className="">
+                  <p className="text-gray-400 dark:text-gray-400 m-3 mt-4 uppercase">
+                    {item.title}
+                  </p>
+                  {item.links.map((link, index) => (
+                    <div
+                      className="flex flex-col w-16 justify-center m-auto"
+                      key={index}
+                    >
+                      <NavLink
+                        to={`/${link.link}`}
+                        key={link.name}
+                        onClick={handleCloseSideBar}
+                        style={({ isActive }) => ({
+                          backgroundColor: isActive ? "#EAEAFE" : "",
+                          border: isActive
+                            ? "#9999FF 1px solid"
+                            : "#E5E4E2 1px solid",
+                          color: isActive ? "#9999FF" : "#000000",
+                          borderRadius: "6px",
+                          // pointerEvents: isDisabled ? "none" : "auto",
+                          // opacity: isDisabled ? 0.5 : 1,
+                        })}
+                        className={({ isActive }) =>
+                          isActive ? activeLink : normalLink
+                        }
+                      >
+                        <div className="" style={{ color: "green" }}>
+                          {link.icon}
+                        </div>
+                      </NavLink>
+                    </div>
+                  ))}
+                </div>
+              ))}
+
+            <br />
+
+            {userPackage === "admin" &&
+              adminMenuLink.map((item, index) => (
+                <div key={index} className="">
+                  <p className="text-gray-400 dark:text-gray-400 m-3 mt-4 uppercase">
+                    {item.title}
+                  </p>
+                  {item.links.map((link, index) => (
+                    <div
+                      className="flex flex-col w-16 justify-center m-auto"
+                      key={index}
+                    >
+                      <NavLink
+                        to={`/${link.link}`}
+                        key={link.name}
+                        onClick={handleCloseSideBar}
+                        style={({ isActive }) => ({
+                          backgroundColor: isActive ? "#EAEAFE" : "",
+                          border: isActive
+                            ? "#9999FF 1px solid"
+                            : "#E5E4E2 1px solid",
+                          color: isActive ? "#9999FF" : "#000000",
+                          borderRadius: "6px",
+                          // pointerEvents: isDisabled ? "none" : "auto",
+                          // opacity: isDisabled ? 0.5 : 1,
+                        })}
+                        className={({ isActive }) =>
+                          isActive ? activeLink : normalLink
+                        }
+                      >
+                        <div className="" style={{ color: "green" }}>
+                          {link.icon}
+                        </div>
+                      </NavLink>
+                    </div>
+                  ))}
+                </div>
+              ))}
+
+            <br />
+
+            {(userPackage === "bundle" || userPackage === "admin") &&
               bundleLinks.map((item, index) => (
                 <div key={index} className="">
                   <p className="text-gray-400 dark:text-gray-400 m-3 mt-4 uppercase">
@@ -238,7 +325,9 @@ const Sidebar = () => {
                   ))}
                 </div>
               ))}
+
             <br />
+
             {accountActions.map((item, index) => (
               <div key={index} className="">
                 <p className="text-gray-400 dark:text-gray-400 m-3 mt-4 uppercase">
@@ -257,29 +346,36 @@ const Sidebar = () => {
                         backgroundColor: isActive ? "#EAEAFE" : "",
                         border: isActive
                           ? "#9999FF 1px solid"
+                          : userChannelConnected === 0
+                          ? "red 1px solid"
                           : "#E5E4E2 1px solid",
                         color: isActive ? "#9999FF" : "#000000",
                         borderRadius: "6px",
-                        // pointerEvents: isDisabled ? "none" : "auto",
-                        // opacity: isDisabled ? 0.5 : 1,
+                        position: "relative",
                       })}
                       className={({ isActive }) =>
                         isActive ? activeLink : normalLink
                       }
                     >
                       <div className="">{link.icon}</div>
-                      {/* <div className="capitalize pr-4">{link.name}</div> */}
+                      {(userChannelConnected === 0 ||
+                        userConnectionEntry === "manual") && (
+                        <span
+                          style={{
+                            position: "absolute",
+                            right: "1px",
+                            top: "0",
+                            transform: "translateY(-50%)",
+                          }}
+                        >
+                          <MdNotificationsActive color="red" />
+                        </span>
+                      )}
                     </NavLink>
-                    {/* {isDisabled && ( // Show a message on hover if accessLevel is not 'L2'
-                      <div className="tooltip bg-white">
-                        Connect to Youtube to access feature
-                      </div>
-                    )} */}
                   </div>
                 ))}
               </div>
             ))}
-            <div className="">{/* <GoogleLogOut /> */}</div>
           </div>
         </>
       )}

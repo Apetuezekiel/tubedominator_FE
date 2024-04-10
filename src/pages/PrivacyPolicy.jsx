@@ -76,6 +76,19 @@ const PrivacyPolicy = () => (
             This includes usernames, email addresses, and other relevant details
             necessary for user account management.
           </p>
+
+          <h3 className="font-bold text-xs mb-2">
+            2.5 AI Model Interaction Consent:
+          </h3>
+          <p className="text-xs">
+            Before proceeding with the account creation process, Tubedominator
+            seeks your explicit consent to utilize AI models for enhancing your
+            experience. This involves analyzing the search keywords you provide
+            to generate personalized recommendations. This consent is crucial
+            for tailoring our services to your preferences. By agreeing, you
+            allow us to use this data for optimizing your content strategy and
+            providing valuable insights.
+          </p>
         </section>
 
         <section className="mb-6">
@@ -97,6 +110,17 @@ const PrivacyPolicy = () => (
             User account information is utilized for managing and enhancing your
             experience on Tubedominator, including features like saving and
             categorizing ideas.
+          </p>
+
+          <h3 className="font-bold text-xs mb-2">
+            3.3 Consent for AI Model Interaction:
+          </h3>
+          <p className="text-xs">
+            Tubedominator utilizes AI models to enhance your experience. Before
+            sharing user search keywords with these AI models, explicit consent
+            will be obtained from users through a separate consent process,
+            ensuring transparency and user control. This consent will be
+            independent of any permissions granted through Google OAuth.
           </p>
         </section>
 

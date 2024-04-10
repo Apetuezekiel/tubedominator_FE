@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import showToast from "../utils/toastUtils";
 import { Link, useNavigate } from "react-router-dom";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaInfoCircle, FaYoutube } from "react-icons/fa";
 import { BiLoaderCircle } from "react-icons/bi";
 import { IoCloudUploadSharp } from "react-icons/io5";
 import { checkClientAndApiKey, fetchUser } from "../data/api/calls";
@@ -11,6 +11,7 @@ import Loader from "../components/Loader";
 import userAvatar from "../assets/images/man-avatar-profile-picture-vector-illustration_268834-538.avif";
 import { useUserGoogleCreds, useUserProfilePic } from "../state/state";
 import { FiCamera } from "react-icons/fi";
+import GoogleLoginComp from "./UserAuth/GoogleLogin";
 
 function Settings() {
   const navigate = useNavigate();
@@ -53,40 +54,51 @@ function Settings() {
   });
 
   useEffect(() => {
+    let isMounted = true; // Flag to track whether the component is mounted
+
     setLoadingUserData(true);
+
     const fetchData = async () => {
       try {
         const fetchedUser = await fetchUser();
-        setFetchUserData(fetchedUser);
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          email: fetchedUser.email,
-          firstName: fetchedUser.firstName,
-          apiKey: fetchedUser.apiKey,
-          channelName: fetchedUser.channelName,
-          lastName: fetchedUser.lastName,
-        }));
-        setFormDataGoogleCreds((prevFormData) => ({
-          ...prevFormData,
-          apiKey: fetchedUser.apiKey,
-          channelName: fetchedUser.channelName,
-        }));
-        console.log("fetchedUser", fetchedUser);
-        setFormDataUserImage((prevFormData) => ({
-          ...prevFormData,
-          profilePic: fetchedUser.profilePic,
-        }));  
-        setLoadingUserData(false);
+        if (isMounted) {
+          setFetchUserData(fetchedUser);
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            email: fetchedUser.email,
+            firstName: fetchedUser.firstName,
+            apiKey: fetchedUser.apiKey,
+            channelName: fetchedUser.channelName,
+            lastName: fetchedUser.lastName,
+          }));
+          setFormDataGoogleCreds((prevFormData) => ({
+            ...prevFormData,
+            apiKey: fetchedUser.apiKey,
+            channelName: fetchedUser.channelName,
+          }));
+          console.log("fetchedUser", fetchedUser);
+          setFormDataUserImage((prevFormData) => ({
+            ...prevFormData,
+            profilePic: fetchedUser.profilePic,
+          }));
+          setLoadingUserData(false);
+        }
 
         console.log("fetched user data: ", fetchedUser);
       } catch (error) {
-        setLoadingUserData(false);
-
-        console.error("Error fetching user data:", error);
+        if (isMounted) {
+          setLoadingUserData(false);
+          console.error("Error fetching user data:", error);
+        }
       }
     };
 
     fetchData();
+
+    // Cleanup function to execute on unmount
+    return () => {
+      isMounted = false;
+    };
   }, [loadingUserDataFailed]);
 
   const [isLoading, setIsLoading] = useState({
@@ -291,8 +303,8 @@ function Settings() {
       if (data.success) {
         showToast("success", `Profile picture updated successfully`, 3000);
 
-        localStorage.setItem("profilePic", formDataUserImage.profilePic);
-        setUserProfilePic(selectedImage);
+        localStorage.setItem("profilePic", selectedImage);
+        setUserProfilePic(formDataUserImage.profilePic);
         // localStorage.setItem("profilePic", JSON.stringify())
         console.log("selectedImage", selectedImage);
         setSavingImage(false);
@@ -330,11 +342,9 @@ function Settings() {
             <div className="p-3 rounded-lg">
               <img
                 src={
-                  userProfilePic
-                    ? URL.createObjectURL(userProfilePic)
-                    : selectedImage
+                  selectedImage
                     ? URL.createObjectURL(selectedImage)
-                    : userAvatar
+                    : userProfilePic || userAvatar
                 }
                 alt=""
                 className="h-24 w-24 rounded-full"
@@ -445,7 +455,7 @@ function Settings() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mb-10">
             <div className="flex flex-col">
               <div className="text-xs mb-1 ml-1 text-gray-400">Password</div>
               <div className="relative">
@@ -541,7 +551,12 @@ function Settings() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 mt-10">
+          <br />
+          <br />
+          <br />
+          <br />
+
+          {/* <div className="flex items-center gap-3 mt-10">
             <div className="flex flex-col">
               <div className="text-xs mb-1 ml-1 text-gray-400">
                 Google API key
@@ -630,9 +645,83 @@ function Settings() {
                 </Link>
               )}
             </div>
-          </div>
-          <div className="text-xs mb-1 ml-1 text-gray-400">
-            how to setup google api key for youtube ?
+          </div> */}
+          {console.log("channelConnected", localStorage.getItem("channelConnected"))}
+          {console.log("connectionEntry", localStorage.getItem("connectionEntry"))}
+          {localStorage.getItem("channelConnected") === 0 ||
+          localStorage.getItem("connectionEntry") === "manual" ? (
+            <div className="mt-10">
+              <div className="-mb-24 ml-10 opacity-0">
+                <GoogleLoginComp />
+              </div>
+              <div
+                className="flex items-center justify-center mt-10 px-1 py-3 rounded-md"
+                style={{
+                  maxWidth: "300px",
+                  // margin: "0 auto",
+                  background:
+                    "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                  color: "white",
+                }}
+              >
+                <div className="mr-3">
+                  <FaYoutube size={20} />
+                </div>
+                <div className="capitalize pr-4 text-white">
+                  Connect your Youtube
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div
+              className="flex items-center justify-center mt-10 px-1 py-3 rounded-md"
+              style={{
+                maxWidth: "300px",
+                backgroundColor: "green",
+                color: "white",
+              }}
+            >
+              <div className="mr-3">
+                <FaYoutube size={20} />
+              </div>
+              <div className="capitalize pr-4 text-white">
+                Youtube Channel Connected . But if you do not have a way ot get
+                ths ak sdjhgs fdjfhfsfl; fdjfg dfkkgbc kif b
+              </div>
+            </div>
+          )}
+
+          {/* <Link
+            to="/training"
+            className="text-xs mb-1 ml-1 text-gray-400 cursor-pointer"
+          >
+            Learn how to setup google api key for youtube from the Optimization
+            Function training on our training page.
+          </Link> */}
+          <hr />
+          <div
+            className="text-sm mb-1 ml-1 text-white cursor-pointer mt-10 rounded-md px-10 py-5 flex flex-col justify-center items-center gap-3"
+            style={{
+              background:
+                "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+              color: "white",
+            }}
+          >
+            <FaInfoCircle size={30} />
+            <span>
+              TubeDominator complies with the Google API Services User Data
+              Policy, including Limited Use requirements. Information obtained
+              from Google APIs is used and transferred within the app in
+              adherence to these policies. For details, please refer to the
+              <a
+                href="https://developers.google.com/terms/api-services-user-data-policy"
+                className="underline pl-2"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Google API Services User Data Policy.
+              </a>
+            </span>
           </div>
         </div>
       )}

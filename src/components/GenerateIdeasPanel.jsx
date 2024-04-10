@@ -4,18 +4,22 @@ import { HiLightningBolt } from "react-icons/hi";
 import countriesWithLanguages from "../data/countries";
 import { BsLightningChargeFill } from "react-icons/bs";
 import { FaLongArrowAltRight } from "react-icons/fa";
+import "../index.css";
 
 const GenerateIdeasPanel = ({
   onSearchChange,
   setShowSearchPanel,
   setSearchQueryComplete,
+  setPostData,
+  postData,
   handleGetIdeas,
   handleGetIdeasOnEnter,
 }) => {
   const initialCountry = {
-    countryCode: "GLB",
+    countryCode: "US",
     languageCode: "en",
   };
+
   const [selectedCountry, setSelectedCountry] = useState(initialCountry);
   const [searchQuery, setSearchQuery] = useState("");
   //   const [searchQueryComplete, setSearchQueryComplete] = useState("");
@@ -29,12 +33,27 @@ const GenerateIdeasPanel = ({
       countryCode: selectedCountryCode,
       languageCode: selectedLanguageCode,
     });
+
+    setPostData({
+      ...postData,
+      countryCode: selectedCountryCode,
+      languageCode: selectedLanguageCode,
+    });
+
+    console.log("setPostData", postData);
   };
 
   const handleSearchChange = (event) => {
     const query = event.target.value;
     setSearchQuery(query);
     onSearchChange(query);
+
+    setPostData({
+      ...postData,
+      countryCode: selectedCountry.countryCode,
+      languageCode: selectedCountry.languageCode,
+      keyword: query,
+    });
   };
 
   const isSearchEmpty = searchQuery.trim() === "";
@@ -95,7 +114,7 @@ const GenerateIdeasPanel = ({
                   value={`${selectedCountry.countryCode}:${selectedCountry.languageCode}`}
                   onChange={handleCountryChange}
                 >
-                  <option value="GLB:en">Global (English)</option>
+                  <option value="US:en">United States (English)</option>
                   {countriesWithLanguages.map((item, index) => (
                     <option
                       key={index}
@@ -120,7 +139,7 @@ const GenerateIdeasPanel = ({
           style={{
             background: isSearchEmpty
               ? "rgba(169, 169, 169, 0.5)" // Grayed out background
-              : "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%)",
+              : "var(--special-background)",
           }}
         >
           GENERATE

@@ -16,6 +16,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useUserAccessLevel, useUserLoggedin } from "../../state/state";
 import makeYoutubeWork from "../../assets/images/We Make YouTube Work for Businesses.png";
+import UserConsentPanel from "../../components/UserConsentPanel";
 
 const SignUpBundlePage = () => {
   const [formData, setFormData] = useState({
@@ -30,6 +31,7 @@ const SignUpBundlePage = () => {
   });
   const [validationErrors, setValidationErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showUserConsentPanel, setShowUserConsentPanel] = useState(false);
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const setUserLoggedIn = useUserLoggedin((state) => state.setUserLoggedIn);
@@ -121,7 +123,7 @@ const SignUpBundlePage = () => {
         }
       } catch (error) {
         console.error("Error Registering User:", error);
-        showToast("error", `Couldn't Sign you up`, 3000);
+        showToast("error", error.response.data.message, 3000);
         setIsLoading(false);
       }
     }
@@ -309,12 +311,14 @@ const SignUpBundlePage = () => {
                       className="w-4 h-4 mr-2 cursor-pointer text-xs"
                       type="checkbox"
                       checked={formData.agreeToTerms}
-                      onChange={() =>
-                        setFormData({
-                          ...formData,
-                          agreeToTerms: !formData.agreeToTerms,
-                        })
-                      }
+                      // onClick={setShowUserConsentPanel(true)}
+                      onChange={() => {
+                        setShowUserConsentPanel(true);
+                        // setFormData({
+                        //   ...formData,
+                        //   agreeToTerms: !formData.agreeToTerms,
+                        // });
+                      }}
                     />
                     <span
                       className={`text-xs font-medium ${
@@ -323,7 +327,24 @@ const SignUpBundlePage = () => {
                           : "text-gray-900"
                       }`}
                     >
-                      I agree to abide by Tubedominator's Terms of Service
+                      I agree to abide by Tubedominator's{" "}
+                      <a
+                        className="underline text-blue-800"
+                        href={`${process.env.REACT_APP_BASE_URL}/privacy-policy`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Terms of Service
+                      </a>{" "}
+                      and{" "}
+                      <a
+                        className="underline text-blue-800"
+                        href={`${process.env.REACT_APP_BASE_URL}/privacy-policy`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        privacy policy
+                      </a>
                     </span>
                   </label>
                 </div>
@@ -413,6 +434,13 @@ const SignUpBundlePage = () => {
           </div>
         </div>
       </div>
+      {showUserConsentPanel && (
+        <UserConsentPanel
+          setShowUserConsentPanel={setShowUserConsentPanel}
+          formData={formData}
+          setFormData={setFormData}
+        />
+      )}
     </div>
   );
 };

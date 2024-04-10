@@ -1,6 +1,6 @@
 /* eslint-disable */
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   GridComponent,
@@ -30,6 +30,7 @@ import { useKeywordStore } from "../state/state";
 import CryptoJS from "crypto-js";
 import {
   checkDraftExistence,
+  encryptAndStoreData,
   getAllYoutubePosts,
   userFullDataDecrypted,
 } from "../data/api/calls";
@@ -40,6 +41,7 @@ import Opitimize from "../components/Opitimize";
 import Loader from "../components/Loader";
 import { formatNumberToKMBPlus } from "../data/helper-funtions/helper";
 import { FiEye } from "react-icons/fi";
+import GoogleAccessToken from "./UserAuth/GoogleAccessToken";
 
 const Ideation = () => {
   const decryptAndRetrieveData = (data) => {
@@ -67,7 +69,7 @@ const Ideation = () => {
   const clerkUser = JSON.parse(localStorage.getItem("clerkUser"));
   const userAuthToken = useUserAuthToken((state) => state.userAuthToken);
   const setUserAuthToken = useUserAuthToken((state) => state.setUserAuthToken);
-  // const decryptedFullData = userFullDataDecrypted();
+  const decryptedFullData = userFullDataDecrypted();
   const [isUserDataLoaded, setIsuserDataLoaded] = useState(false);
   const [selectedVideoId, setSelectedVideoId] = useState("");
   const [selectedVideoLikeCount, setSelectedVideoLikeCount] = useState("");
@@ -78,6 +80,8 @@ const Ideation = () => {
   // console.log("decryptedFullData OptimizationPage", decryptedFullData);
   const navigate = useNavigate();
   const [isOptimizeVideo, setIsOptimizeVideo] = useState(false);
+  const [accessToken, setAccessToken] = useState("");
+  const [isGapiInitialized, setIsGapiInitialized] = useState(false);
 
   function removeUndefinedOrNull(arr) {
     return arr.filter((item) => item !== undefined && item !== null);
@@ -149,74 +153,55 @@ const Ideation = () => {
     },
   ];
 
+  const googleAccessTokenRef = useRef();
+
+  // useEffect(() => {
+  //   const accessToken = googleAccessTokenRef.current.getAccessToken();
+  //   if (accessToken) {
+  //     // Now you can use the accessToken
+  //     console.log("Access Token:", accessToken);
+  //     // Perform any actions with the access token
+  //   }
+  // }, []);
+
+  const isTokenExpired = (expiryDate) => {
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+    return expiryDate && currentTimestamp > expiryDate;
+  };
+
   useEffect(() => {
-    // console.log("allUserDeetsallUserDeetsallUserDeets", decryptedFullData);
     let isMounted = true;
 
-    // const fetchDataFromLocalStorage = async () => {
-    //   const storedYoutubePosts = localStorage.getItem("Youtube_Posts");
+    const authInfo = googleAccessTokenRef.current?.authInfo;
 
-    //   if (storedYoutubePosts) {
-    //     const gottenYoutubePosts = await getAllYoutubePosts();
-    //     const updatedData = JSON.parse(storedYoutubePosts).map(
-    //       (item1, index1) => {
-    //         const item2 = gottenYoutubePosts.find(
-    //           (item2) => item1.videoId === item2.video_id,
-    //         );
-
-    //         // Check if item2 is null and set default values
-    //         const defaultValues = {
-    //           optimizationPercentage: "N/A",
-    //           optimizationImpact: "N/A",
-    //         };
-
-    //         if (item2) {
-    //           const analyzedVideoPerformance = analyzeVideoPerformance(
-    //             item2.likeCount,
-    //             item1.likeCount,
-    //             item2.commentCount,
-    //             item1.commentCount,
-    //             item2.viewCount,
-    //             item1.viewCount,
-    //           );
-
-    //           return {
-    //             ...item1,
-    //             optimizationPercentage:
-    //               analyzedVideoPerformance.optimizationPercentage,
-    //             optimizationImpact: analyzedVideoPerformance.optimizationImpact,
-    //           };
-    //         } else {
-    //           // If item2 is null, set default values
-    //           return {
-    //             ...item1,
-    //             ...defaultValues,
-    //           };
-    //         }
-    //       },
-    //     );
-
-    //     setUserYoutubeData(updatedData);
-    //     setIsuserDataLoaded(true);
-    //   } else {
-    //     fetchDataFromAPI();
-    //   }
-    // };
+    console.log("authInfo 1 from optimization", authInfo);
 
     const fetchDataFromAPI = async () => {
       const userRegEmail = localStorage.getItem("userRegEmail");
       try {
+        // Check if the token is expired or needs refreshing
+        // if (!decryptedFullData || isTokenExpired(decryptedFullData.expiryDate)) {
+        //   // Token is expired or not set; refresh the token
+        //   console.log("I refreshed fam");
+        //   const refreshedData = refreshAccessToken(decryptedFullData);
+        //   if (refreshedData) {
+        //     // Update decryptedFullData with the refreshed token data
+        //     encryptAndStoreData(refreshedData);
+        //   } else {
+        //     // Handle the case where token refresh fails or is not available
+        //     // You may redirect the user to re-authenticate or handle it as needed
+        //     console.error("Token refresh failed or not available");
+        //     return;
+        //   }
+        // }
         const response = await axios.get(
           `${process.env.REACT_APP_API_BASE_URL}/fetchMyYoutubeInfo?email=${userRegEmail}`,
           {
-            // params: {
-            //   channel_id: decryptedFullData.channelId,
-            // },
             headers: {
               "Content-Type": "application/json",
               "x-api-key": process.env.REACT_APP_X_API_KEY,
               // Authorization: `Bearer ${decryptedFullData.token}`,
-              // gToken: decryptedFullData.gToken,
+              gToken: decryptedFullData.gToken,
             },
           },
         );
@@ -314,13 +299,64 @@ const Ideation = () => {
       }
     };
 
-    fetchDataFromAPI();
+    const refreshAccessToken = (decryptedFullData) => {
+      try {
+        if (!isGapiInitialized) {
+          console.error("Google API client is not initialized");
+          return null;
+        }
+
+        const authInfo = googleAccessTokenRef.current?.authInfo;
+
+        if (!authInfo) {
+          // Handle the case where authInfo is not available
+          console.error("Authentication information is not available");
+          return null;
+        }
+
+        console.log("accessTokeeeeeeeeeennnnnn", authInfo);
+
+        // Update the decryptedFullData with the refreshed token data
+        const updatedDecryptedFullData = {
+          ...decryptedFullData,
+          gToken: authInfo.access_token,
+          expiryDate: Math.floor(Date.now() / 1000 + authInfo.expires_in),
+        };
+
+        return updatedDecryptedFullData;
+      } catch (error) {
+        console.error("Error refreshing token:", error);
+        return null;
+      }
+    };
+
+    setTimeout(() => {
+      fetchDataFromAPI();
+    }, 10000);
     // fetchMyPlaylists();
 
     return () => {
       isMounted = false;
     };
   }, []);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    const previousPathname = sessionStorage.getItem("previousPathname");
+
+    if (
+      previousPathname === "/ideation" &&
+      location.pathname === "/optimization"
+    ) {
+      alert(
+        "TubeDominator complies with the Google API Services User Data Policy, including Limited Use requirements. Information obtained from Google APIs is used and transferred within the app in adherence to these policies. For details, please refer to the Google API Services User Data Policy.",
+      );
+    }
+
+    // Store the current pathname for the next route change
+    sessionStorage.setItem("previousPathname", location.pathname);
+  }, [location.pathname]);
 
   const analyzeVideoPerformance = (
     oldLikeCount,
@@ -691,6 +727,7 @@ const Ideation = () => {
 
   return (
     <div>
+      {/* <div className="hidden"><GoogleAccessToken ref={googleAccessTokenRef} isGapiInitialized={isGapiInitialized} setIsGapiInitialized={setIsGapiInitialized}/></div> */}
       {/* {isOptimizeVideo ? (
         selectedVideoId && (
           <Opitimize
@@ -925,6 +962,15 @@ const Ideation = () => {
                   ]}
                 />
               </GridComponent>
+              <div className="opacity-1">
+                {/* <GoogleAccessToken setAccessToken={setAccessToken} /> */}
+                {/* <div className="opacity-0"><GoogleAccessToken ref={googleAccessTokenRef} /></div> */}
+                {/* {(!decryptedFullData || isTokenExpired(decryptedFullData.expiryDate)) && (
+        <div className="opacity-0">
+    <GoogleAccessToken ref={googleAccessTokenRef} />
+  </div>
+)} */}
+              </div>
             </div>
           </div>
         )}

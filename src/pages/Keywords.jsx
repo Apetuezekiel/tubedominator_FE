@@ -46,6 +46,7 @@ import { MdCancel } from "react-icons/md";
 import Loader from "../components/Loader";
 import exportIcon from "../data/icons/export.png";
 import TDLogo from "../assets/images/TubeDominator 500x500.png";
+import countriesWithLanguages from "../data/countries";
 // import deleteChannelKeyword from "../data/api/calls";
 
 const Keyword2 = () => {
@@ -116,6 +117,11 @@ const Keyword2 = () => {
   const settings = { persistSelection: true };
   let unconventionalKeyword = "God";
   const [displayPreviewKeyword, setDisplayPreviewKeyword] = useState(false);
+  const initialCountry = {
+    countryCode: "US",
+    languageCode: "en",
+  };
+  const [selectedCountry, setSelectedCountry] = useState(initialCountry);
 
   const toggleSave = async (keyword, save) => {
     // fetchSavedIdeasData()
@@ -196,7 +202,7 @@ const Keyword2 = () => {
   useEffect(() => {
     setLoadingUserChannelKeyword(true);
     const userEmail = localStorage.getItem("userRegEmail");
-    // console.log("decryptedFullData", decryptedFullData);
+    console.log("userEmail", userEmail);
     const fetchUserKeywords = async () => {
       try {
         const response = await axios.get(
@@ -292,8 +298,10 @@ const Keyword2 = () => {
         // Authorization: `Bearer ${decryptedFullData.token}`,
       };
 
+      const userEmail = localStorage.getItem("userRegEmail");
+
       const responseDelete = await axios.delete(
-        `${process.env.REACT_APP_API_BASE_URL}/deleteUserKeyword/${props.id}`,
+        `${process.env.REACT_APP_API_BASE_URL}/deleteUserKeyword/${props.id}?email=${userEmail}`,
         { headers },
       );
 
@@ -508,8 +516,8 @@ const Keyword2 = () => {
 
     const postData = {
       keyword: userKeyword,
-      countryCode: "GLB",
-      languageCode: "en",
+      countryCode: selectedCountry.countryCode,
+      languageCode: selectedCountry.languageCode,
     };
 
     try {
@@ -555,7 +563,7 @@ const Keyword2 = () => {
           showToast("success", "Keyword Added Successfully", 2000);
         }
       } else {
-        setAddingKeyword(true);
+        setAddingKeyword(false);
         console.error("Error occured");
         showToast(
           "error",
@@ -564,7 +572,7 @@ const Keyword2 = () => {
         );
       }
     } catch (error) {
-      setAddingKeyword(true);
+      setAddingKeyword(false);
       console.error("Error while making API call:", error);
       showToast(
         "error",
@@ -594,6 +602,21 @@ const Keyword2 = () => {
     showToast("success", unconventionalKeywordd, 2000);
     setIsShowPreviewKw(!isShowPreviewKw);
     handleClick("previewKw");
+  };
+
+  const handleCountryChange = (event) => {
+    const selectedValue = event.target.value;
+    const [selectedCountryCode, selectedLanguageCode] =
+      selectedValue.split(":");
+
+    console.log(selectedCountryCode, selectedLanguageCode);
+
+    // if (selectedCountryData) {
+    setSelectedCountry({
+      countryCode: selectedCountryCode,
+      languageCode: selectedLanguageCode,
+    });
+    // }
   };
 
   const previewYoutubeKwSearch = (props) => {
@@ -713,7 +736,7 @@ const Keyword2 = () => {
                 </div>
               </div>
               {isAddKeyword ? (
-                <div>
+                <div className="flex flex-col">
                   <input
                     type="text"
                     id="keywords"
@@ -721,9 +744,29 @@ const Keyword2 = () => {
                     value={userKeyword}
                     onChange={handleChange}
                     onKeyDown={handleSubmitUserKeywordOnEnter}
-                    className="mt-1 p-2 border rounded-lg w-full mr-2"
-                    placeholder="keywords your channel focuses on"
+                    className="rounded-lg py-2 px-2 mt-3 border border-gray-300 bg-white text-xs"
+                    placeholder="Keywords your channel focuses on"
                   />
+
+                  <div className="mt-2 relative">
+                    <select
+                      id="countrySelect"
+                      className="rounded-lg py-2 px-10 border border-gray-300 bg-white text-xs"
+                      value={`${selectedCountry.countryCode}:${selectedCountry.languageCode}`}
+                      onChange={handleCountryChange}
+                    >
+                      <option value="US:en">United States (English)</option>
+                      {countriesWithLanguages.map((item, index) => (
+                        <option
+                          key={index}
+                          value={`${item.countryCode}:${item.languageCode}`}
+                        >
+                          {`${item.country} (${item.language})`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
                   <button
                     onClick={submitUserKeyword}
                     style={{

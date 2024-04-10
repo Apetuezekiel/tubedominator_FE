@@ -19,11 +19,7 @@ import {
   Inject,
 } from "@syncfusion/ej2-react-grids";
 import { useStateContext } from "../contexts/ContextProvider";
-import {
-  FaYoutube,
-  FaCalendarAlt,
-  FaAngleDown,
-} from "react-icons/fa";
+import { FaYoutube, FaCalendarAlt, FaAngleDown } from "react-icons/fa";
 import tubicsLogo from "../data/tubicon.svg";
 import { userFullDataDecrypted } from "../data/api/calls";
 import axios from "axios";

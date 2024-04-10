@@ -12,7 +12,6 @@ const IdeasCategoryDelete = ({
   setShowSavedIdeaCategoryPanel,
   setUpdatedSavedIdea,
 }) => {
-  console.log("dataSet", dataSet);
   const [categories, setCategories] = useState(["Uncategorized Ideas"]);
   const [fetchedSavedIdeas, setFetchedSavedIdeas] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
@@ -30,8 +29,6 @@ const IdeasCategoryDelete = ({
     const fetchData = async () => {
       try {
         const userSavedIdeas = await getSavedIdeas();
-        console.log("userSavedIdeas from ideas category view", userSavedIdeas);
-
         // Create a Set to store unique categories
         const uniqueCategories = new Set();
 
@@ -47,7 +44,6 @@ const IdeasCategoryDelete = ({
         setCategories(uniqueCategoriesArray);
 
         setFetchedSavedIdeas(true); // Data fetched successfully
-        console.log("categories, categories", categories);
       } catch (error) {
         setFetchedSavedIdeas(false); // Handle the error
         console.error("Error fetching saved ideas:", error);
@@ -93,7 +89,6 @@ const IdeasCategoryDelete = ({
         },
       },
     );
-    console.log(" and response:", responseDelete);
     if (responseDelete.data.success) {
       setUpdatedSavedIdea((prevState) => !prevState);
       setDeletingKeywordIdea(false);
@@ -129,7 +124,6 @@ const IdeasCategoryDelete = ({
       },
     );
 
-    console.log(" and response:", response);
     if (response.data.success) {
       localStorage.removeItem("savedIdeasData");
       setUpdatedSavedIdea((prevState) => !prevState);

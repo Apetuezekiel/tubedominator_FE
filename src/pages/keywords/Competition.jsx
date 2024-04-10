@@ -92,6 +92,7 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
   };
 
   useEffect(() => {
+    const userRegEmail = localStorage.getItem("userRegEmail");
     let isMounted = true;
     if (serpYoutubeVideosInfo.data.analyzed_video_details ?? false) {
       console.log(
@@ -122,16 +123,19 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
       );
     } else {
       axios
-        .get(`${process.env.REACT_APP_API_BASE_URL}/fetchSerpYoutubeVideos`, {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": process.env.REACT_APP_X_API_KEY,
-            // Authorization: `Bearer ${decryptedFullData.token}`,
+        .get(
+          `${process.env.REACT_APP_API_BASE_URL}/fetchSerpYoutubeVideos?email=${userRegEmail}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.REACT_APP_X_API_KEY,
+              // Authorization: `Bearer ${decryptedFullData.token}`,
+            },
+            params: {
+              keyword: dataSet.keyword,
+            },
           },
-          params: {
-            keyword: dataSet.keyword,
-          },
-        })
+        )
         .then((response) => {
           console.log("fetchSerpYoutubeVideos", response);
           if (isMounted) {
@@ -327,7 +331,8 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
                 </span>
               </div>
               <div className="text-lg font-bold pt-3 text-gray-800">
-                {competitionInsights.averageLikesComments != null
+                {competitionInsights.averageLikesComments !== null &&
+                !isNaN(competitionInsights.averageLikesComments)
                   ? formatNumberToKMBPlus(
                       Math.ceil(competitionInsights.averageLikesComments),
                     )
@@ -335,7 +340,8 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
               </div>
               <div className="text-xs text-gray-800 flex items-center mt-3">
                 Least:{" "}
-                {competitionInsights.leastLikesComments != null
+                {competitionInsights.leastLikesComments !== null &&
+                !isNaN(competitionInsights.leastLikesComments)
                   ? formatNumberToKMBPlus(
                       Math.ceil(competitionInsights.leastLikesComments),
                     )
@@ -343,7 +349,8 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
               </div>
               <div className="text-xs text-gray-800 flex items-center mt-1">
                 Most:{" "}
-                {competitionInsights.mostLikesComments != null
+                {competitionInsights.mostLikesComments !== null &&
+                !isNaN(competitionInsights.mostLikesComments)
                   ? formatNumberToKMBPlus(
                       Math.ceil(competitionInsights.mostLikesComments),
                     )
@@ -425,7 +432,7 @@ function Competition({ dataSet, setShowInsights, setShowCompetition }) {
                                 alt=""
                                 className="h-10 w-10 rounded-full mr-3"
                               />{" "}
-                              {item.channel.name} |{" "}
+                              {item?.channel.name} |{" "}
                               {item?.channel_details?.subscriber_count &&
                                 formatNumberToKMBPlus(
                                   item?.channel_details?.subscriber_count,

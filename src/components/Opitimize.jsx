@@ -20,7 +20,7 @@ import {
   getDraftPost,
 } from "../data/api/calls";
 import axios from "axios";
-import { FiCamera, FiLoader } from "react-icons/fi";
+import { FiCamera, FiLoader, FiSearch } from "react-icons/fi";
 import { BiSearch } from "react-icons/bi";
 import {
   AiFillCheckCircle,
@@ -56,6 +56,7 @@ import { MdDeleteSweep } from "react-icons/md";
 import countriesWithLanguages from "../data/countries";
 import { useLocation } from "react-router-dom";
 import Loader from "./Loader";
+import LoaderPanel from "./LoaderPanel";
 // const exactKeywordData = useKeywordStore((state) => state.exactKeywordData);
 // const setExactKeywordData = useKeywordStore(
 //   (state) => state.setExactKeywordData,
@@ -78,11 +79,11 @@ function Opitimize() {
 
   // console.log("videoId, likeCount, commentCount, viewCount", videoId, likeCount, commentCount, viewCount);
   const initialCountry = {
-    countryCode: "GLB",
+    countryCode: "US",
     languageCode: "en",
   };
   const [selectedCountry, setSelectedCountry] = useState(initialCountry);
-  // const decryptedFullData = userFullDataDecrypted();
+  const decryptedFullData = userFullDataDecrypted();
   const userYoutubeData = useUserYoutubeInfo((state) => state.userYoutubeData);
   const setUserYoutubeData = useUserYoutubeInfo(
     (state) => state.setUserYoutubeData,
@@ -136,7 +137,12 @@ function Opitimize() {
   const userSavedSearchTerm = useUserSavedSearchTerm(
     (state) => state.userSavedSearchTerm,
   );
+  const setUserSavedSearchTerm = useUserSavedSearchTerm(
+    (state) => state.setUserSavedSearchTerm,
+  );
   const [draftExists, setDraftExists] = useState(false);
+  const [savingToBookmark, setSavingToBookmark] = useState(false);
+  const [removingFromBookmark, setRemovingFromBookmark] = useState(false);
   const [youtubeDraftPost, setYoutubeDraftPost] = useState([]);
 
   const targetVideoData = userYoutubeData.find(
@@ -233,7 +239,7 @@ function Opitimize() {
 
       if (savedSearchTermData) {
         console.log(
-          "now serving search term from local storage",
+          "now serving search term in keyword Tab from local storage",
           savedSearchTermData,
         );
       }
@@ -347,19 +353,22 @@ function Opitimize() {
     }
   }, []);
 
-  // Loading searchTerms from localstorage
   useEffect(() => {
+    // setFetchingSearchTerms(true);
     const fetchUserKeywords = async () => {
-      const savedDataJSON = localStorage.getItem("searchedItems");
-      if (!savedDataJSON) {
-        console.log("nothing in local storage");
-        return;
-      }
-
       try {
-        savedData = JSON.parse(savedDataJSON);
-        console.log("now serving from local storage", savedData);
+        // Fetch data from localStorage
+        const savedDataJSON = localStorage.getItem("searchTermData");
+        let savedData = [];
 
+        if (savedDataJSON) {
+          savedData = JSON.parse(savedDataJSON);
+          console.log("Now serving bookmarks from localStorage", savedData);
+        } else {
+          console.log("No bookmarks in localStorage");
+        }
+
+        // Fetch data from the API
         try {
           const response = await axios.get(
             `${process.env.REACT_APP_API_BASE_URL}/allBookmarkSearchTerms`,
@@ -370,47 +379,42 @@ function Opitimize() {
               headers: {
                 "Content-Type": "application/json",
                 "x-api-key": process.env.REACT_APP_X_API_KEY,
-                // Authorization: `Bearer ${decryptedFullData.token}`,
               },
             },
           );
 
           const data = response.data;
-          console.log("data", response);
+          console.log("Bookmarked data", data);
 
-          if (response.data.success === "trueNut") {
-            showToast("error", "No saved search terms", 2000);
-          } else if (response.data.success == true) {
+          if (data.success) {
             setUserSearchTerms(data.data);
 
-            if (savedDataJSON) {
-              const updatedArray1 = savedData.map((obj1) => {
+            // Update the processedUserSearchTerms based on the fetched data
+            if (savedData.length > 0) {
+              const updatedArray = savedData.map((obj1) => {
                 const matchingObj2 = data.data.find(
                   (obj2) => obj2.keyword === obj1.keyword,
                 );
 
-                if (matchingObj2) {
-                  return { ...obj1, bookmarked: true };
-                }
-                return obj1;
+                return matchingObj2 ? { ...obj1, bookmarked: true } : obj1;
               });
 
-              setProcessedUserSearchTerms(updatedArray1);
-              console.log("updatedArray1", updatedArray1);
+              setProcessedUserSearchTerms(updatedArray);
+              console.log("Updated Array", updatedArray);
             }
           } else {
             showToast(
               "error",
-              "An error occured with fetching your saved search terms",
+              "An error occurred with fetching your saved search terms",
               2000,
             );
           }
         } catch (error) {
-          console.error("Error fetching data:", error);
+          console.error("Error fetching data from the API:", error);
           showToast("error", "No saved search terms", 2000);
         }
       } catch (error) {
-        console.error("Error parsing data from local storage", error);
+        console.error("Error parsing data from localStorage:", error);
       }
     };
 
@@ -601,10 +605,91 @@ function Opitimize() {
     setIsSavedSearchTerm(false);
   };
 
-  const toggleSave = async (props, save) => {
-    console.log("props", props);
-    setProcessingBookmarked(true);
-    if (save) {
+  // const toggleSave = async (props, save) => {
+  //   console.log("props", props);
+  //   setProcessingBookmarked(true);
+  //   if (save) {
+  //     const response = await axios.post(
+  //       `${process.env.REACT_APP_API_BASE_URL}/bookmarkSearchTerm`,
+  //       {
+  //         keyword: props.keyword,
+  //         search_volume: props.monthlysearch,
+  //         email: localStorage.getItem("userRegEmail"),
+  //       },
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           "x-api-key": process.env.REACT_APP_X_API_KEY,
+  //           // Authorization: `Bearer ${decryptedFullData.token}`,
+  //         },
+  //       },
+  //     );
+
+  //     setProcessingBookmarked(false);
+  //     // console.log("Data saved successfully and response:", foundObject);
+  //     if (response.data.success) {
+  //       setUserSearchTerms([...userSearchTerms, props]);
+  //       setProcessedUserSearchTerms((prevState) => {
+  //         return prevState.map((obj) => {
+  //           if (obj.keyword === props.keyword) {
+  //             return { ...obj, bookmarked: true };
+  //           }
+  //           return obj;
+  //         });
+  //       });
+  //       setSaveSuccess(true);
+  //       showToast("success", "Search Term saved successfully", 2000);
+  //     } else {
+  //       showToast("error", "Search Term wasn't saved. Try again", 2000);
+  //     }
+  //   } else {
+  //     try {
+  //       const responseDelete = await axios.delete(
+  //         `${process.env.REACT_APP_API_BASE_URL}/deleteSavedIdeaBookmarkSearchTerm`,
+  //         {
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             "x-api-key": process.env.REACT_APP_X_API_KEY,
+  //             // Authorization: `Bearer ${decryptedFullData.token}`,
+  //           },
+  //           params: {
+  //             keyword: props.keyword,
+  //           },
+  //         },
+  //       );
+  //       console.log("Data removed successfully", props.keyword);
+  //       if (responseDelete.data.success) {
+  //         setSaveSuccess(true);
+  //         setUserSearchTerms((prevData) =>
+  //           prevData.filter((d) => d.keyword !== props.keyword),
+  //         );
+  //         setProcessedUserSearchTerms((prevState) => {
+  //           return prevState.map((obj) => {
+  //             if (obj.keyword === props.keyword) {
+  //               return { ...obj, bookmarked: false };
+  //             }
+  //             return obj;
+  //           });
+  //         });
+  //         showToast("success", "Search Term removed from Search Terms", 2000);
+  //       } else {
+  //         showToast("error", "Search Term wasn't removed. Try again", 2000);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //       throw error;
+  //     }
+  //   }
+  //   // } catch (error) {
+  //   //   console.error("Error saving/removing data:", error);
+  //   //   showToast("error", "Error saving/removing data", 2000);
+  //   // }
+  // };
+
+  const saveSearchTerm = async (props) => {
+    setSavingToBookmark(true);
+
+    try {
       const response = await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}/bookmarkSearchTerm`,
         {
@@ -616,70 +701,124 @@ function Opitimize() {
           headers: {
             "Content-Type": "application/json",
             "x-api-key": process.env.REACT_APP_X_API_KEY,
-            // Authorization: `Bearer ${decryptedFullData.token}`,
           },
         },
       );
 
-      setProcessingBookmarked(false);
-      // console.log("Data saved successfully and response:", foundObject);
       if (response.data.success) {
+        console.log("userSearchTerms", userSearchTerms, "props", props);
         setUserSearchTerms([...userSearchTerms, props]);
+        setProcessedUserSearchTerms((prevState) =>
+          prevState.map((obj) =>
+            obj.keyword === props.keyword ? { ...obj, bookmarked: true } : obj,
+          ),
+        );
+        setSaveSuccess(true);
+        setSavingToBookmark(false);
+
+        showToast("success", "Search Term saved successfully", 2000);
+      } else {
+        setSavingToBookmark(false);
+
+        showToast("error", "Search Term wasn't saved. Try again", 2000);
+      }
+    } catch (error) {
+      setSavingToBookmark(false);
+
+      console.error("Error saving data:", error);
+      throw error;
+    }
+  };
+
+  const removeSearchTerm = async (props) => {
+    setRemovingFromBookmark(true);
+
+    try {
+      const responseDelete = await axios.delete(
+        `${process.env.REACT_APP_API_BASE_URL}/deleteSavedIdeaBookmarkSearchTerm`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
+          },
+          params: {
+            keyword: props.keyword,
+          },
+        },
+      );
+
+      console.log("Data removed successfully", props.keyword);
+
+      if (responseDelete.data.success) {
+        setSaveSuccess(true);
+        setUserSearchTerms((prevData) =>
+          prevData.filter((d) => d.keyword !== props.keyword),
+        );
+        setProcessedUserSearchTerms((prevState) =>
+          prevState.map((obj) =>
+            obj.keyword === props.keyword ? { ...obj, bookmarked: false } : obj,
+          ),
+        );
+        setRemovingFromBookmark(false);
+
+        showToast("success", "Search Term removed from Search Terms", 2000);
+      } else {
+        setRemovingFromBookmark(false);
+
+        showToast("error", "Search Term wasn't removed. Try again", 2000);
+      }
+    } catch (error) {
+      setRemovingFromBookmark(false);
+
+      console.error("Error removing data:", error);
+      throw error;
+    }
+  };
+
+  const deleteSavedIdeaBookmarkSearchTerm = async (props) => {
+    setRemovingFromBookmark(true);
+    try {
+      const responseDelete = await axios.delete(
+        `${process.env.REACT_APP_API_BASE_URL}/deleteSavedIdeaBookmarkSearchTerm`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
+          },
+          params: {
+            keyword: props.keyword,
+          },
+        },
+      );
+
+      console.log("Data removed successfully", props.keyword);
+
+      if (responseDelete.data.success) {
+        setRemovingFromBookmark(false);
+
+        setSaveSuccess(true);
+        setUserSearchTerms((prevData) =>
+          prevData.filter((d) => d.keyword !== props.keyword),
+        );
         setProcessedUserSearchTerms((prevState) => {
           return prevState.map((obj) => {
             if (obj.keyword === props.keyword) {
-              return { ...obj, bookmarked: true };
+              return { ...obj, bookmarked: false };
             }
             return obj;
           });
         });
-        setSaveSuccess(true);
-        showToast("success", "Search Term saved successfully", 2000);
+        showToast("success", "Search Term removed from Bookmarks", 2000);
       } else {
-        showToast("error", "Search Term wasn't saved. Try again", 2000);
+        setRemovingFromBookmark(false);
+
+        showToast("error", "Search Term wasn't removed. Try again", 2000);
+        console.log("Search Term wasn't removed. Try again");
       }
-    } else {
-      try {
-        const responseDelete = await axios.delete(
-          `${process.env.REACT_APP_API_BASE_URL}/deleteSavedIdeaBookmarkSearchTerm`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "x-api-key": process.env.REACT_APP_X_API_KEY,
-              // Authorization: `Bearer ${decryptedFullData.token}`,
-            },
-            params: {
-              keyword: props.keyword,
-            },
-          },
-        );
-        console.log("Data removed successfully", props.keyword);
-        if (responseDelete.data.success) {
-          setSaveSuccess(true);
-          setUserSearchTerms((prevData) =>
-            prevData.filter((d) => d.keyword !== props.keyword),
-          );
-          setProcessedUserSearchTerms((prevState) => {
-            return prevState.map((obj) => {
-              if (obj.keyword === props.keyword) {
-                return { ...obj, bookmarked: false };
-              }
-              return obj;
-            });
-          });
-          showToast("success", "Search Term removed from Search Terms", 2000);
-        } else {
-          showToast("error", "Search Term wasn't removed. Try again", 2000);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        throw error;
-      }
+    } catch (error) {
+      console.error("Error deleting data:", error);
+      throw error;
     }
-    // } catch (error) {
-    //   console.error("Error saving/removing data:", error);
-    //   showToast("error", "Error saving/removing data", 2000);
-    // }
   };
 
   const validateAndAddToFixed = (index, condition, errorMessage) => {
@@ -770,6 +909,11 @@ function Opitimize() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSearchTermChange = (e) => {
+    const { name, value } = e.target;
+    setUserSavedSearchTerm(value);
   };
 
   // const handleFileChange = (event) => {
@@ -902,29 +1046,31 @@ function Opitimize() {
       "Content-Type": "application/json",
       "x-api-key": process.env.REACT_APP_X_API_KEY,
       // Authorization: `Bearer ${decryptedFullData.token}`,
-      // gToken: decryptedFullData.gToken,
+      gToken: decryptedFullData.gToken,
     };
 
-    try {
-      const response = await axios.put(
-        `${process.env.REACT_APP_API_BASE_URL}/updateMyYoutubeVideos`,
-        requestData,
-        { headers: requestHeaders },
-      );
+    // try {
+    const response = await axios.put(
+      `${process.env.REACT_APP_API_BASE_URL}/updateMyYoutubeVideos`,
+      requestData,
+      { headers: requestHeaders },
+    );
 
-      console.log("updateMyYoutubeVideos response", response);
+    console.log("updateMyYoutubeVideos response", response);
 
-      if (response.data.status === "success") {
-        await deleteDraftPost();
-        showToast("success", "Post updated successfully", 2000);
-      } else {
-        showToast("error", "Post updating failed", 2000);
-      }
-    } catch (error) {
-      console.error("Error updating YouTube videos:", error);
-    } finally {
+    if (response.data.status === "success") {
+      // await deleteDraftPost(videoId);
+      showToast("success", "Post updated successfully", 2000);
+      setUpdatingYtPost(false);
+    } else {
+      showToast("error", "Post updating failed", 2000);
       setUpdatingYtPost(false);
     }
+    // } catch (error) {
+    //   console.error("Error updating YouTube videos:", error);
+    // } finally {
+    //   setUpdatingYtPost(false);
+    // }
   };
 
   const [ThingsToFixState, setThingsToFixAccordion] = useState(
@@ -984,10 +1130,10 @@ function Opitimize() {
     const bookmarkIcon = props.bookmarked ? (
       <BsFillBookmarkCheckFill
         color="#7352FF"
-        onClick={() => toggleSave(props, false)}
+        onClick={() => removeSearchTerm(props)}
       />
     ) : (
-      <BsBookmark color="#7352FF" onClick={() => toggleSave(props, true)} />
+      <BsBookmark color="#7352FF" onClick={() => saveSearchTerm(props)} />
     );
 
     return (
@@ -995,7 +1141,7 @@ function Opitimize() {
         <span className="mr-5">{formatedNumber}</span>
         <span className="mr-3 cursor-pointer text-sm flex items-center">
           <span className="mr-2">{bookmarkIcon}</span>
-          <span>{processingBookmarked && <BiLoaderCircle size={20} />}</span>
+          {/* <span>{processingBookmarked && <BiLoaderCircle size={20} />}</span> */}
         </span>
         {/* <AiOutlineCopy color="#7352FF" className="cursor-pointer"/> */}
         <div className="relative">
@@ -1020,7 +1166,7 @@ function Opitimize() {
 
   const formatBookmarkedSearchVolumeViews = (props) => {
     const [isCopied, setIsCopied] = useState(false);
-    const monthlysearch = parseInt(props.search_volume);
+    const monthlysearch = parseInt(props.monthlysearch);
     const formatedNumber = formatNumberToKMBPlus(monthlysearch);
 
     const copyToClipboard = () => {
@@ -1070,10 +1216,7 @@ function Opitimize() {
         </div>
         <span className="mr-3 cursor-pointer text-sm flex items-center">
           <span className="mr-2">
-            <TiDelete
-              color="#7352FF"
-              onClick={() => toggleSave(props, false)}
-            />
+            <TiDelete color="#7352FF" onClick={() => removeSearchTerm(props)} />
           </span>
         </span>
       </div>
@@ -1418,6 +1561,10 @@ function Opitimize() {
                               value={`${selectedCountry.countryCode}:${selectedCountry.languageCode}`}
                               onChange={handleCountryChange}
                             >
+                              <option value="US:en">
+                                United States (English)
+                              </option>
+
                               {countriesWithLanguages.map((item, index) => (
                                 <option
                                   key={index}
@@ -1432,14 +1579,17 @@ function Opitimize() {
                         <br />
                         <div>
                           {isLoading ? (
-                            <div className="flex flex-col justify-center items-center w-full mt-20">
-                              <BiLoaderCircle
-                                className="animate-spin text-center"
-                                color="#7352FF"
-                                size={30}
-                              />
-                              <div>Gathering Insights for your Keyword.</div>
-                            </div>
+                            // <div className="flex flex-col justify-center items-center w-full mt-20">
+                            //   <BiLoaderCircle
+                            //     className="animate-spin text-center"
+                            //     color="#7352FF"
+                            //     size={30}
+                            //   />
+                            //   <div>Gathering Insights for your Keyword.</div>
+                            // </div>
+                            <Loader
+                              message={"Gathering Insights for your Keyword."}
+                            />
                           ) : (
                             <div className=""></div>
                           )}
@@ -1863,6 +2013,9 @@ function Opitimize() {
     );
   };
 
+  localStorage.setItem("connectionEntry", "google_auth");
+  const connectionEntry = localStorage.getItem("connectionEntry");
+
   return (
     <div className="flex flex-col px-10 py-5">
       <span className="my-3 flex items-center cursor-pointer" onClick={goBack}>
@@ -1933,34 +2086,75 @@ function Opitimize() {
               ) : (
                 ""
               )}
-
-              {/* <button
-                onClick={updateUserVideo}
-                style={{
-                  background:
-                    "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
-                  color: "white",
-                }}
-                className="text-md text-white py-2 px-5 rounded-full ml-10 mr-3"
+              <Tooltip
+                title={
+                  connectionEntry === "manual"
+                    ? "To unlock this feature reconnect your youtube account from Settings page"
+                    : "Directly update your youtube video after editing"
+                }
+                position="top"
+                trigger="mouseenter"
+                animation="fade"
+                theme="translucent"
               >
-                Update on Youtube
-              </button>
+                <button
+                  onClick={updateUserVideo}
+                  style={{
+                    background:
+                      connectionEntry === "manual"
+                        ? "grey"
+                        : "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                    color: connectionEntry === "manual" ? "black" : "white",
+                    cursor:
+                      connectionEntry === "manual" ? "not-allowed" : "pointer",
+                  }}
+                  disabled={connectionEntry === "manual"}
+                  className="text-md text-white py-2 px-5 rounded-full ml-10 mr-3 flex items-center justify-center"
+                >
+                  <div className="mr-3">
+                    <FaYoutube size={20} />
+                  </div>
+                  Update on Youtube
+                </button>
+              </Tooltip>
+
               {updatingYtPost && (
                 <BiLoaderCircle
                   className="animate-spin"
                   color="#7438FF"
                   size={20}
                 />
-              )} */}
+              )}
             </div>
           </div>
           <div className="flex pl-5 pb-5 border-b border-t pt-5">
             <div className="w-1/2 items-center flex">
               Search Term:
               {userSavedSearchTerm ? (
-                <span className="flex justify-center items-center ml-2">
-                  <span className="underline">{userSavedSearchTerm}</span>{" "}
-                  <div className="relative">
+                <span className="flex justify-center items-center ml-3">
+                  <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    value={userSavedSearchTerm ?? ""}
+                    onChange={handleSearchTermChange}
+                    className="mt-1 p-2 border rounded w-full text-xs"
+                    placeholder="Enter a search term"
+                  />
+                  <AiFillCheckCircle
+                    onClick={() => setShowSearchTermPanel(false)}
+                    color="#7438FF"
+                    size={30}
+                    className="mt-2 cursor-pointer w-1/5 ml-2"
+                  />
+                  <FiSearch
+                    onClick={() => setShowSearchTermPanel(true)}
+                    color="#7438FF"
+                    size={30}
+                    className="mt-2 cursor-pointer w-1/5 ml-2"
+                  />
+                  {/* <span className="underline">{userSavedSearchTerm}</span>{" "} */}
+                  {/* <div className="relative+">
                     <Tooltip
                       title="Edit the search term  for your video"
                       position="top"
@@ -1973,10 +2167,33 @@ function Opitimize() {
                         onClick={() => setShowSearchTermPanel(true)}
                       />
                     </Tooltip>
-                  </div>
+                  </div> */}
                 </span>
               ) : (
-                <div className="relative">
+                <div className="relative flex items-center ml-3">
+                  <div className="flex items-center">
+                    <input
+                      type="text"
+                      id="title"
+                      name="title"
+                      value={userSavedSearchTerm ?? ""}
+                      onChange={handleSearchTermChange}
+                      className="mt-1 p-2 border rounded w-full text-xs"
+                      placeholder="Enter a search term"
+                    />
+                    <AiFillCheckCircle
+                      onClick={() => setShowSearchTermPanel(false)}
+                      color="#7438FF"
+                      size={30}
+                      className="mt-2 cursor-pointer w-1/5 ml-2"
+                    />
+                    <FiSearch
+                      onClick={() => setShowSearchTermPanel(true)}
+                      color="#7438FF"
+                      size={30}
+                      className="mt-2 cursor-pointer w-1/5 ml-2"
+                    />
+                  </div>
                   <Tooltip
                     title="Set a search term  for your video"
                     position="top"
@@ -1985,9 +2202,9 @@ function Opitimize() {
                     theme="translucent"
                   >
                     <AiFillWarning
-                      className="ml-3"
+                      className="ml-3 mt-2"
                       color="#F49C0E"
-                      size={20}
+                      size={30}
                       onClick={() => setShowSearchTermPanel(true)}
                     />
                   </Tooltip>
@@ -2131,6 +2348,12 @@ function Opitimize() {
               {activeView === "thingsToFix" && ThingsToFixView()}
               {activeView === "KeywordsView" && KeywordsView()}
               {activeView === "TemplatesView" && TemplatesView()}
+              {savingToBookmark && (
+                <LoaderPanel message={"Saving to Bookmark"} />
+              )}
+              {removingFromBookmark && (
+                <LoaderPanel message={"Removing from Bookmark"} />
+              )}
             </div>
           )}
         </div>

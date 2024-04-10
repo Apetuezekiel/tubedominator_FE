@@ -1,10 +1,7 @@
 /* eslint-disable */
 
 import React from "react";
-import {
-  BsBarChart,
-  BsYoutube,
-} from "react-icons/bs";
+import { BsBarChart, BsYoutube } from "react-icons/bs";
 import {
   RiContactsLine,
   RiLightbulbFlashLine,
@@ -13,11 +10,11 @@ import {
 import {
   MdOutlineSocialDistance,
   MdScreenSearchDesktop,
+  MdPeople,
 } from "react-icons/md";
-import { FaRegHeart, FaUserAlt } from "react-icons/fa";
+import { FaChalkboardTeacher, FaRegHeart, FaUserAlt, FaUserTie } from "react-icons/fa";
 import { IoRocketOutline, IoSettings } from "react-icons/io5";
 import { SiCampaignmonitor, SiGoogleanalytics } from "react-icons/si";
-
 
 export const menuLinks = [
   {
@@ -33,6 +30,13 @@ export const menuLinks = [
         name: "ideation",
         link: "ideation",
         icon: <RiLightbulbFlashLine />,
+        available: true,
+        package: "general",
+      },
+      {
+        name: "Tube AI",
+        link: "tube-ai",
+        icon: <FaChalkboardTeacher />,
         available: true,
         package: "general",
       },
@@ -122,6 +126,7 @@ export const accountActions = [
     ],
   },
 ];
+
 export const optimizationMenuLink = [
   {
     title: "",
@@ -130,6 +135,36 @@ export const optimizationMenuLink = [
         name: "optimization",
         link: "optimization",
         icon: <IoRocketOutline />,
+        available: true,
+        package: "general",
+      },
+    ],
+  },
+];
+
+export const adminMenuLink = [
+  {
+    title: "",
+    links: [
+      {
+        name: "Users",
+        link: "users",
+        icon: <FaUserTie />,
+        available: true,
+        package: "general",
+      },
+    ],
+  },
+];
+
+export const resellerMenuLink = [
+  {
+    title: "",
+    links: [
+      {
+        name: "Resellers",
+        link: "reseller-users",
+        icon: <MdPeople />,
         available: true,
         package: "general",
       },

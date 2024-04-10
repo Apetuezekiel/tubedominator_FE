@@ -47,9 +47,7 @@ export async function generateThumbnail(prompt) {
     );
 
     if (response.data.success) {
-      console.log("Thumbnail", response);
       const thumbnailUrl = response.data.data.data[0].url;
-      console.log("Thumbnail URL", thumbnailUrl);
       localStorage.setItem("generatedThumbnail", JSON.stringify(thumbnailUrl));
       return thumbnailUrl;
     } else {
@@ -79,7 +77,6 @@ export async function getCategorySavedIdeas(category) {
     );
 
     if (response.data.success) {
-      console.log("Category Ideas", response.data.data);
       localStorage.setItem(
         "savedCatIdeasData",
         JSON.stringify(response.data.data),
@@ -112,8 +109,6 @@ export async function getSavedIdeas() {
     );
 
     const data = response.data.data;
-    console.log("response.data.data", response.data.data);
-
     return data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -135,8 +130,6 @@ export async function checkClientAndApiKey() {
     );
 
     const data = response.data.success;
-    console.log("checkClientAndApiKey", data);
-
     return data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -146,8 +139,6 @@ export async function checkClientAndApiKey() {
 
 export async function fetchUser() {
   const userRegEmail = localStorage.getItem("userRegEmail");
-  console.log("userRegEmail, userRegEmail", userRegEmail);
-
   try {
     const response = await axios.get(
       `${process.env.REACT_APP_API_BASE_URL}/fetchUser?email=${userRegEmail}`,
@@ -160,8 +151,6 @@ export async function fetchUser() {
     );
 
     const data = response.data;
-    console.log("response.data", response);
-
     return data.user;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -169,11 +158,218 @@ export async function fetchUser() {
   }
 }
 
+export async function fetchUsers(
+  userType,
+  page = 1,
+  pageSize = 20,
+  userId = null,
+) {
+  console.log("page: ", page, " pageSize: ", pageSize);
+  try {
+    let apiUrl = `${process.env.REACT_APP_API_BASE_URL}/fetchUsers`;
+
+    if (userId) {
+      apiUrl += `/${userId}`;
+    } else {
+      apiUrl += `?userType=${userType}&page=${page}&pageSize=${pageSize}`;
+    }
+
+    const response = await axios.get(apiUrl, {
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.REACT_APP_X_API_KEY,
+      },
+    });
+
+    const data = userId ? response.data.user : response.data.users.data;
+
+    return {
+      data,
+      totalPages: response.data.meta.last_page,
+      currentPage: response.data.meta.current_page,
+    };
+  } catch (error) {
+    console.error(`Error fetching ${userType} data:`, error);
+    return { data: userId ? null : [], totalPages: 0, currentPage: 1 };
+  }
+}
+
+export async function searchUsers(
+  searchQuery,
+  userType,
+  page = 1,
+  pageSize = 20,
+) {
+  console.log("page: ", page, " pageSize: ", pageSize);
+  try {
+    const apiUrl = `${process.env.REACT_APP_API_BASE_URL}/searchUsers`;
+
+    const response = await axios.get(apiUrl, {
+      params: {
+        search: searchQuery,
+        userType: userType,
+        page: page,
+        pageSize: pageSize,
+      },
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.REACT_APP_X_API_KEY,
+      },
+    });
+
+    return {
+      data: response.data.users.data,
+      totalPages: response.data.meta.last_page,
+      currentPage: response.data.meta.current_page,
+    };
+  } catch (error) {
+    console.error(`Error searching ${userType} data:`, error);
+    return { data: [], totalPages: 0, currentPage: 1 };
+  }
+}
+
+export async function deleteUser(userId) {
+  try {
+    const response = await axios.delete(
+      `${process.env.REACT_APP_API_BASE_URL}/deleteUser/${userId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+        },
+      },
+    );
+
+    const data = response.data;
+    return data;
+  } catch (error) {
+    console.error(`Error deleting user:`, error);
+    return { success: false, message: "An error occurred" };
+  }
+}
+
+export async function updateUserStatus(action, userId) {
+  try {
+    if (!["block", "unblock"].includes(action)) {
+      console.error("Invalid action:", action);
+      return { success: false, message: "Invalid action" };
+    }
+
+    const response = await axios.put(
+      `${process.env.REACT_APP_API_BASE_URL}/updateUserStatus/${userId}`,
+      { action }, // Pass the 'action' parameter in the request body
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+        },
+      },
+    );
+
+    const data = response.data;
+    return data;
+  } catch (error) {
+    console.error(`Error updating user ${userId} status:`, error);
+    return { success: false, message: "An error occurred" };
+  }
+}
+
+// RESELLER API FUNCTIONS
+export async function fetchResellerUsers(
+  userType,
+  page = 1,
+  pageSize = 20,
+  userId = null,
+) {
+  const sellerId = localStorage.getItem("userRecordId");
+  console.log("fetchResellerUsers-userType", userType, sellerId);
+
+  try {
+    let apiUrl = `${process.env.REACT_APP_API_BASE_URL}/fetchResellerUsers`;
+
+    if (userId) {
+      apiUrl += `/${userId}`;
+    } else {
+      apiUrl += `?userType=${userType}&sellerId=${sellerId}&page=${page}&pageSize=${pageSize}`;
+    }
+
+    const response = await axios.get(apiUrl, {
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.REACT_APP_X_API_KEY,
+      },
+    });
+
+    const data = userId ? response.data.user : response.data.users.data;
+
+    return {
+      data,
+      totalPages: response.data.meta.last_page,
+      currentPage: response.data.meta.current_page,
+    };
+  } catch (error) {
+    console.error(`Error fetching ${userType} data:`, error);
+    return { data: userId ? null : [], totalPages: 0, currentPage: 1 };
+  }
+}
+
+export async function deleteResellerUser(userId) {
+  const sellerId = localStorage.getItem("userRecordId");
+
+  try {
+    const response = await axios.delete(
+      `${process.env.REACT_APP_API_BASE_URL}/deleteResellerUser/${userId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+        },
+        params: { sellerId: sellerId },
+      },
+    );
+
+    const data = response.data;
+    return data;
+  } catch (error) {
+    console.error(`Error deleting user:`, error);
+    return { success: false, message: "An error occurred" };
+  }
+}
+
+export async function updateResellerUserStatus(action, userId) {
+  const sellerId = localStorage.getItem("userRecordId");
+
+  try {
+    if (!["block", "unblock"].includes(action)) {
+      console.error("Invalid action:", action);
+      return { success: false, message: "Invalid action" };
+    }
+
+    const response = await axios.put(
+      `${process.env.REACT_APP_API_BASE_URL}/updateResellerUserStatus/${userId}`,
+      { action, sellerId }, // Pass the 'action' and 'sellerId' parameters in the request body
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+        },
+      },
+    );
+
+    const data = response.data;
+    return data;
+  } catch (error) {
+    console.error(`Error updating user ${userId} status:`, error);
+    return { success: false, message: "An error occurred" };
+  }
+}
+/////////////////////////END///////////////////////////
+
 export async function getUserEncryptedDataFromDb(gId) {
-  console.log("Fetching use details from DB");
+  const userRegEmail = localStorage.getItem("userRegEmail");
   try {
     const response = await axios.get(
-      `${process.env.REACT_APP_API_BASE_URL}/getUserEncryptedData`,
+      `${process.env.REACT_APP_API_BASE_URL}/getUserEncryptedData?email=${userRegEmail}`,
       {
         params: {
           user_id: `TUBE_${gId}`,
@@ -192,8 +388,6 @@ export async function getUserEncryptedDataFromDb(gId) {
     throw error;
   }
 }
-
-// console.log("getUserEncryptedDataFromDb(107055926455841084977)", getUserEncryptedDataFromDb("107055926455841084977"));
 
 export async function getUserEncryptedData() {
   // const userLoggedIn = useUserLoggedin((state) => state.userLoggedIn);
@@ -220,7 +414,6 @@ export async function getUserEncryptedData() {
       );
       // return response.data;
       const data = response.data.data.encryptedData;
-      console.log("datadatadatadata", data);
       // Get saved data from localStorage
       // const userEncryptedData = localStorage.getItem("encryptedFullData");
       // const decryptedFullData = decryptAndRetrieveData(userEncryptedData);
@@ -269,7 +462,7 @@ export const deleteChannelKeyword = async (props, setUserChannelKeywords) => {
       },
     );
 
-    console.log("Data removed successfully", props.keyword);
+    console.log("Data removed successfully");
 
     if (responseDelete.data.success) {
       setUserChannelKeywords((prevData) =>
@@ -306,11 +499,11 @@ export const isChannelRegistered = async (user_id) => {
 
     return response.data.success;
   } catch (error) {
-    showToast(
-      "error",
-      "Your network is unstable. We couldn't verify your channel details",
-      2000,
-    );
+    // showToast(
+    //   "error",
+    //   "Your network is unstable. We couldn't verify your channel details",
+    //   2000,
+    // );
     console.error("Error fetching data:", error);
     throw error;
   }
@@ -493,10 +686,6 @@ export const mergedVideosChannelsData = (
     );
 
     if (channelDetail) {
-      // // Log relevant information before returning
-      // console.log("channelId:", channelId);
-      // console.log("channelDetail:", channelDetail);
-
       return { ...video, channel_details: channelDetail };
     } else {
       return video;
@@ -710,17 +899,6 @@ export const saveYoutubePost = async (
   commentCount,
   viewCount,
 ) => {
-  console.log("data to save", {
-    video_id: videoId,
-    video_title: title,
-    video_description: description,
-    video_tags: tags,
-    video_thumbnail: thumbnails,
-    email: localStorage.getItem("userRegEmail"),
-    likeCount,
-    commentCount,
-    viewCount,
-  });
   try {
     const response = await axios.post(
       `${process.env.REACT_APP_API_BASE_URL}/saveYoutubePost`,
@@ -744,21 +922,19 @@ export const saveYoutubePost = async (
       },
     );
 
-    console.log("response", response);
-
     if (response.data.success) {
-      showToast("success", "Youtube Video saved successfully", 2000);
-      // localStorage.setItem(`${videoId}-preserved`, "true");
+      console.log("Youtube Video saved successfully");
     } else {
-      showToast("error", "Youtube Video wasn't saved. Try again", 2000);
+      // showToast("error", "Youtube Video wasn't saved. Try again", 2000);
+      console.log("Youtube Video wasnt saved");
     }
   } catch (error) {
     console.error("Error saving YouTube Video:", error);
-    showToast(
-      "error",
-      "An error occurred saving video. Please try again later.",
-      2000,
-    );
+    // showToast(
+    //   "error",
+    //   "An error occurred saving video. Please try again later.",
+    //   2000,
+    // );
   }
 };
 
@@ -779,10 +955,7 @@ export const getYoutubePost = async (videoId) => {
       },
     );
 
-    console.log("response", response);
-
     if (response.data.success) {
-      console.log("gottenYoutubePost", response.data.data);
       return response.data.data;
     } else {
       showToast(
@@ -817,12 +990,10 @@ export const getAllYoutubePosts = async () => {
       },
     );
 
-    console.log("response", response);
-
     if (response.data.success) {
       return response.data.data;
     } else {
-      return []
+      return [];
       // showToast("error", "Youtube videos werent retrieved. Try again", 2000);
     }
   } catch (error) {
@@ -860,6 +1031,8 @@ export const checkDraftExistence = async (videoId) => {
 };
 
 export const deleteDraftPost = async (videoId) => {
+  const decryptedFullData = userFullDataDecrypted();
+
   try {
     const responseDelete = await axios.delete(
       `${process.env.REACT_APP_API_BASE_URL}/deleteDraftPost`,
@@ -903,10 +1076,7 @@ export const getDraftPost = async (videoId) => {
       },
     );
 
-    console.log("response", response);
-
     if (response.data.success) {
-      console.log("gottenDraftPost", response.data.data);
       return response.data.data;
     } else {
       showToast("error", "Draft post wasn't retrieved. Try again", 2000);
@@ -922,32 +1092,129 @@ export const getDraftPost = async (videoId) => {
   }
 };
 
-
 // VIDEO GENERATION
-export async function getVideoTemplates() {
-  console.log("Loading video Templates");
+export async function getActorVoices() {
+  try {
+    const response = await axios.get(`http://localhost:8080/api/listVoices`, {
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.REACT_APP_X_API_KEY,
+      },
+    });
 
+    console.log("VOOIIIIICCCEEEESSSSS", response.data.items);
+
+    if (response.data.items) {
+      const newData = response.data.items;
+
+      console.log("actor Voices", newData);
+      return newData;
+    } else {
+      console.error("Error fetching actor voices:", response);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching actor voices:", error);
+    return null;
+  }
+}
+
+export async function getActors() {
+  try {
+    const response = await axios.get(`http://localhost:8080/api/listActors`, {
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.REACT_APP_X_API_KEY,
+      },
+    });
+
+    console.log("ACCCTTTOOOOSSS", response.data.items);
+
+    if (response.data.items) {
+      const newData = response.data.items;
+
+      console.log("ACTORS", newData);
+      return newData;
+    } else {
+      console.error("Error fetching actors:", response);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching actors:", error);
+    return null;
+  }
+}
+
+export async function retrieveClip(videoId) {
   try {
     const response = await axios.get(
-      `https://apis.elai.io/api/v1/videos?type=template`,
+      `http://localhost:8080/api/retrieveClip?videoId=${videoId}`,
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer AY9rruDSr9obNYh1ip7palwlli0LaN7H`,
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
         },
       },
     );
 
-    if (response) {
-      const newData = response.data.videos;
-      console.log("getVideoTemplates", newData);
+    console.log("RETRIEVED VIDEO", response.data);
+
+    if (response.data) {
+      const newData = response.data;
+
+      console.log("ACTORS", newData);
       return newData;
     } else {
-      console.error("Error fetching video templates:", response.data.error);
+      console.error("Error fetching finished video:", response);
       return null;
     }
   } catch (error) {
-    console.error("Error fetching video templates:", error);
+    console.error("Error fetching finished video:", error);
+    return null;
+  }
+}
+
+export async function generateClip(
+  actorId,
+  voiceId = null,
+  language = null,
+  script,
+  transparent = true,
+) {
+  const scriptWithoutNewlines = script.replace(/\n/g, "");
+  // console.log(`actorId ${actorId}`, `voiceId ${voiceId}`, `language: ${language}`, `script: ${scriptWithoutNewlines}`);
+  // return;
+  try {
+    const response = await axios.post(
+      `http://localhost:8080/api/generateClip`,
+      {
+        actorId: actorId,
+        voiceId: voiceId !== null && voiceId,
+        language: language !== null && language,
+        script: scriptWithoutNewlines,
+        transparent: transparent,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.REACT_APP_X_API_KEY,
+        },
+      },
+    );
+
+    console.log("Generation fired", response.data);
+
+    if (response.data) {
+      const newData = response.data;
+
+      console.log("ACTORS", newData);
+      return newData;
+    } else {
+      console.error("Error fetching actors:", response);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching actors:", error);
     return null;
   }
 }
@@ -957,8 +1224,6 @@ export const generateVideo = async (source, prompt, templateId) => {
     return null;
   }
 
-  console.log("Generating video, please hold", source);
-
   const endpoint = source === "text" ? "text" : "html";
 
   try {
@@ -966,13 +1231,14 @@ export const generateVideo = async (source, prompt, templateId) => {
       `https://apis.elai.io/api/v1/story/${endpoint}`,
       {
         from: prompt,
-        templateId: "642e88ff081e30cae04420a4",
-        folderId: "6565c5e36ea56bc610eb2138",
+        templateId: templateId,
+        // templateId: "642e88ff081e30cae04420a4",
+        folderId: "65a7ed4b503912ebae8cd7df",
       },
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer AY9rruDSr9obNYh1ip7palwlli0LaN7H`,
+          Authorization: `Bearer vs7XLEpgXKjSFuYgyF84uPTitQXCfN2L`,
         },
       },
     );
@@ -992,6 +1258,77 @@ export const generateVideo = async (source, prompt, templateId) => {
   }
 };
 
+export async function getVideoTemplates() {
+  try {
+    const response = await axios.get(
+      `https://apis.elai.io/api/v1/videos?type=template`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer vs7XLEpgXKjSFuYgyF84uPTitQXCfN2L`,
+        },
+      },
+    );
+
+    if (response && response.data && response.data.videos) {
+      const newData = response.data.videos;
+
+      // Filter out objects with template.type that isn't "text-to-video"
+      const filteredData = newData.filter((template) => {
+        return template.template && template.template.type === "text-to-video";
+      });
+
+      console.log("Video Templates", filteredData);
+      return filteredData;
+    } else {
+      console.error("Error fetching video templates:", response.data.error);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching video templates:", error);
+    return null;
+  }
+}
+
+// export const generateVideo = async (source, prompt, templateId) => {
+//   if (!source) {
+//     return null;
+//   }
+
+//   const endpoint = source === "text" ? "text" : "html";
+
+//   try {
+//     const response = await axios.post(
+//       `https://apis.elai.io/api/v1/story/${endpoint}`,
+//       {
+//         from: prompt,
+//         templateId: templateId,
+//         // templateId: "642e88ff081e30cae04420a4",
+//         folderId: "65a7ed4b503912ebae8cd7df",
+//       },
+//       {
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer vs7XLEpgXKjSFuYgyF84uPTitQXCfN2L`,
+//         },
+//       },
+//     );
+
+//     if (response) {
+//       console.log("VIDEO CREATED SUCCESSFULLY: ", response.data);
+//       return response.data;
+//       // const renderingVideo = renderVideo(response.data.data._id);
+//       // return renderingVideo.data.data.accepted;
+//     } else {
+//       console.error("Error creating Video:", response);
+//       return null;
+//     }
+//   } catch (error) {
+//     console.error("Error creating Video:", error);
+//     return null;
+//   }
+// };
+
 export const generateVideoSlides = async (video_id) => {
   if (!video_id) {
     console.error("Video Id wasn't passed to rendering engine");
@@ -1006,7 +1343,7 @@ export const generateVideoSlides = async (video_id) => {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer AY9rruDSr9obNYh1ip7palwlli0LaN7H`,
+          Authorization: `Bearer vs7XLEpgXKjSFuYgyF84uPTitQXCfN2L`,
         },
       },
     );
@@ -1038,7 +1375,7 @@ export const renderVideo = async (video_id) => {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer AY9rruDSr9obNYh1ip7palwlli0LaN7H`,
+          Authorization: `Bearer vs7XLEpgXKjSFuYgyF84uPTitQXCfN2L`,
         },
       },
     );
@@ -1069,7 +1406,7 @@ export const retrieveVideo = async (video_id) => {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer AY9rruDSr9obNYh1ip7palwlli0LaN7H`,
+          Authorization: `Bearer vs7XLEpgXKjSFuYgyF84uPTitQXCfN2L`,
         },
       },
     );
@@ -1084,10 +1421,10 @@ export const retrieveVideo = async (video_id) => {
 
 // USER
 export const saveUser = async (postData) => {
-  console.log("postData", postData);
   try {
     const response = await axios.post(
-      `${process.env.REACT_APP_API_BASE_URL}/saveUser`,postData,
+      `${process.env.REACT_APP_API_BASE_URL}/saveUser`,
+      postData,
       {
         headers: {
           "Content-Type": "application/json",
@@ -1101,4 +1438,3 @@ export const saveUser = async (postData) => {
     console.error("Error saving user details:", error);
   }
 };
-

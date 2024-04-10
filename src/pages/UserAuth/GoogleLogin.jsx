@@ -15,12 +15,19 @@ import {
   encryptAndStoreData,
   fetchUser,
   getUserEncryptedDataFromDb,
+  saveUser,
   userFullDataDecrypted,
 } from "../../data/api/calls";
-import { useUserAccessLevel, useUserLoggedin } from "../../state/state";
+import {
+  useInitializeOAuth,
+  useUserAccessLevel,
+  useUserChannelConnected,
+  useUserLoggedin,
+} from "../../state/state";
 import showToast from "../../utils/toastUtils";
 import CryptoJS from "crypto-js";
 import { Link, useNavigate } from "react-router-dom";
+import { gapi } from "gapi-script";
 
 const GoogleLoginComp = forwardRef((props, ref) => {
   const internalRef = useRef(null);
@@ -36,8 +43,19 @@ const GoogleLoginComp = forwardRef((props, ref) => {
   const [fetchUserData, setFetchUserData] = useState(false);
   const accessLevel = useUserAccessLevel((state) => state.accessLevel);
   const setAccessLevel = useUserAccessLevel((state) => state.setAccessLevel);
-
+  const initializeOAuth = useInitializeOAuth((state) => state.initializeOAuth);
+  const setInitializeOAuth = useInitializeOAuth(
+    (state) => state.setInitializeOAuth,
+  );
+  const userChannelConnected = useUserChannelConnected(
+    (state) => state.userChannelConnected,
+  );
+  const setUserChannelConnected = useUserChannelConnected(
+    (state) => state.setUserChannelConnected,
+  );
   useEffect(() => {
+    // setInitializeOAuth(true);
+
     const fetchData = async () => {
       try {
         const fetchedUser = await fetchUser();
@@ -51,6 +69,30 @@ const GoogleLoginComp = forwardRef((props, ref) => {
     };
 
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchDataAndInitGAPI = async () => {
+      try {
+        console.log("google login INITIALIZED ");
+        // Initialize gapi.client inside the try block
+        gapi.load("client:auth2", () => {
+          gapi.client.init({
+            apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
+            clientId: process.env.REACT_APP_CLIENT_ID,
+            scope:
+              "https://www.googleapis.com/auth/youtube.readonly " +
+              "https://www.googleapis.com/auth/youtube.force-ssl " +
+              "https://www.googleapis.com/auth/youtube " +
+              "https://www.googleapis.com/auth/youtube.upload",
+          });
+        });
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchDataAndInitGAPI();
   }, []);
 
   const isChannelRegistered = async (user_id, GUserData) => {
@@ -84,11 +126,17 @@ const GoogleLoginComp = forwardRef((props, ref) => {
             encryptAndStoreData(userDataFromDb);
             localStorage.setItem("accessLevel", "L2");
             setAccessLevel(localStorage.getItem("accessLevel"));
+            localStorage.setItem("channelConnected", 1);
+            setUserChannelConnected(1);
+            await saveUser({
+              channelConnected: 1,
+              email: localStorage.getItem("userRegEmail"),
+            });
+            console.log("I JUST LOGGEDDDD IN");
             navigate("/ideation");
           } catch (error) {
             encryptAndStoreData(GUserData);
             console.error("Error fetching user data:", error);
-            // Handle the error as needed
           }
         }
 
@@ -164,10 +212,19 @@ const GoogleLoginComp = forwardRef((props, ref) => {
 
   const onLoginSuccess = (res) => {
     console.log("Login Success, res:", res);
-    const { email, givenName, familyName, name, imageUrl, tokenObj, googleId } =
-      res.profileObj;
+    const {
+      email,
+      givenName,
+      familyName,
+      name,
+      imageUrl,
+      tokenObj,
+      googleId,
+      expires_in,
+    } = res.profileObj;
 
     const gToken = res.tokenObj.access_token;
+    const expiryDate = res.tokenObj.expires_in;
     const GUserData = {
       email,
       firstName: givenName,
@@ -175,12 +232,16 @@ const GoogleLoginComp = forwardRef((props, ref) => {
       fullName: name,
       imageUrl,
       gToken,
+      expiryDate,
+      bants: "jst for bants",
       gId: googleId,
     };
+    encryptAndStoreData(GUserData);
     showToast("success", "Login Successful", 2000);
-    // setUserLoggedIn(true);
-    // localStorage.setItem("userLoggedin", true);
-    isChannelRegistered(`TUBE_${googleId}`, GUserData);
+    setInitializeOAuth(false);
+    navigate("/channel");
+
+    // isChannelRegistered(`TUBE_${googleId}`, GUserData);
   };
 
   const handleLoginClick = () => {
@@ -189,41 +250,29 @@ const GoogleLoginComp = forwardRef((props, ref) => {
 
   return (
     <div>
-      {/* {initialized && (
-        <GoogleApiInitializer
-          apiKey={process.env.REACT_APP_GOOGLE_API_KEY}
-          ClientId={process.env.REACT_APP_CLIENT_ID}
-          initializeOnLoad={true}
-        />
-      )} */}
-      {initialized && fetchUserData.apiKey && fetchUserData.ClientId && (
-        <GoogleApiInitializer
-          // apiKey={fetchUserData.apiKey}
-          clientId={fetchUserData.ClientId}
-          initializeOnLoad={true}
-        />
-      )}
-
-      {/* {(!fetchUserData.apiKey || !fetchUserData.ClientId) &&
-        (() => {
-          console.error("Error: apiKey or ClientId is not available");
-        })()} */}
-
-      {fetchUserData.apiKey && fetchUserData.ClientId && (
+      {/* {localStorage.getItem("channelConnected") === 0 && ( */}
+      <>
+        {initialized && (
+          <GoogleApiInitializer
+            apiKey={process.env.REACT_APP_GOOGLE_API_KEY}
+            ClientId={process.env.REACT_APP_CLIENT_ID}
+            // initializeOnLoad={true}
+          />
+        )}
         <button onClick={() => handleLoginClick()}>
           <GoogleLogin
-            // ClientId={process.env.REACT_APP_CLIENT_ID}
-            clientId={fetchUserData.ClientId}
+            // clientId={process.env.REACT_APP_CLIENT_ID}
             buttonText="Login with Google"
             onSuccess={onLoginSuccess}
             onFailure={onLoginFailure}
             cookiePolicy="single_host_origin"
             isSignedIn={true}
             className="google-login-button rounded-full"
-            redirectUri="http://localhost:3000/youtube"
+            // redirectUri={`${process.env.REACT_APP_BASE_URL}/optimization`}
           />
         </button>
-      )}
+      </>
+      {/* )} */}
     </div>
   );
 });

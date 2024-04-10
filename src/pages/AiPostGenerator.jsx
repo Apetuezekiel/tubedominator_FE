@@ -16,6 +16,14 @@ import showToast from "../utils/toastUtils";
 import { Tooltip } from "react-tooltip";
 import TDLogo from "../assets/images/TubeDominator 500x500.png";
 import Tags from "../components/Tags";
+import PreviewActor from "../components/PreviewActor";
+import languagesData from "../data/actorLanguages.json";
+import {
+  generateClip,
+  getActorVoices,
+  getActors,
+  retrieveClip,
+} from "../data/api/videoGeneration";
 
 function AiPostGenerator({ display }) {
   // const decryptedFullData = userFullDataDecrypted();
@@ -23,14 +31,28 @@ function AiPostGenerator({ display }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(null);
   const [loadedYoutubePost, setLoadedYoutubePost] = useState(false);
+  const [showPreviewActorPanel, setShowPreviewActorPanel] = useState(false);
   const [generatedThumbnail, setGeneratedThumbnail] = useState("");
   const [generatingThumbnail, setGeneratingThumbnail] = useState(false);
-  const [videoTemplates, setVideoTemplates] = useState(false);
-  const [selectedVideoTemplate, setSelectedVideoTemplate] = useState({
+  const [actorTemplates, setActorTemplates] = useState([]);
+  const [voiceTemplates, setVoiceTemplates] = useState([]);
+  const [selectedLanguage, setSelectedLanguage] = useState("en-US");
+
+  const [selectedActors, setSelectedActors] = useState({
     index: null,
-    templateId: "",
+    id: "",
+    headshotImagePath: "",
+    previewVideoPath: "",
+    name: "",
+    gender: "",
+    age: "",
+    ethnicity: "",
+    thumbnailImagePath: "",
+    staticImagePath: "",
+    language: selectedLanguage || "",
   });
-  const [loadingVideoTemplates, setLoadingVideoTemplates] = useState(false);
+  const [loadingActorTemplates, setLoadingActorTemplates] = useState(false);
+  const [loadingVoiceTemplates, setLoadingVoiceTemplates] = useState(false);
   const [creatingVideo, setCreatingVideo] = useState(false);
   const [videoCreated, setVideoCreated] = useState(false);
   const [videoCreationFailed, setVideoCreationFailed] = useState(false);
@@ -51,6 +73,35 @@ function AiPostGenerator({ display }) {
     description: false,
     // Add more sections as needed
   });
+
+  // console.log("languagesData", languagesData);
+  const handleLanguageChange = (event) => {
+    setSelectedLanguage(event.target.value);
+    setSelectedActors((prevState) => ({
+      ...prevState,
+      language: event.target.value,
+    }));
+  };
+
+  const filteredLanguages = languagesData.filter((language) =>
+    language.Language.toLowerCase().includes(selectedLanguage.toLowerCase()),
+  );
+
+  const resetSelectedActors = () => {
+    setSelectedActors({
+      index: null,
+      id: "",
+      headshotImagePath: "",
+      previewVideoPath: "",
+      name: "",
+      gender: "",
+      age: "",
+      ethnicity: "",
+      thumbnailImagePath: "",
+      staticImagePath: "",
+      language: selectedLanguage || "",
+    });
+  };
 
   const isSearchEmpty = searchQuery.trim() === "";
 
@@ -137,44 +188,57 @@ function AiPostGenerator({ display }) {
     return null;
   };
 
-  useEffect(() => {
-    const progressInfo = getProgressFromLocalStorage();
+  // useEffect(() => {
+  //   const progressInfo = getProgressFromLocalStorage();
 
-    if (progressInfo) {
-      const { progress, videoId } = progressInfo;
+  //   if (progressInfo) {
+  //     const { progress, videoId } = progressInfo;
 
-      // Reset all states to false initially
-      setCreatingVideo(false);
-      setVideoCreated(false);
-      setVideoCreationFailed(false);
-      setGeneratingSlides(false);
-      setSlidesGenerated(false);
-      setVideoRendered(false);
-      setVideoRenderingFailed(false);
-      setVideoRetrieved(false);
-      setRetrievingVideo(false);
+  //     // Reset all states to false initially
+  //     setCreatingVideo(false);
+  //     setVideoCreated(false);
+  //     setVideoCreationFailed(false);
+  //     setGeneratingSlides(false);
+  //     setSlidesGenerated(false);
+  //     setVideoRendered(false);
+  //     setVideoRenderingFailed(false);
+  //     setVideoRetrieved(false);
+  //     setRetrievingVideo(false);
 
-      // Set the corresponding state based on progress
+  //     // Set the corresponding state based on progress
 
-      if (progress === "generateSlides") {
-        setVideoCreated(true);
-      } else if (progress === "render") {
-        setSlidesGenerated(true);
-      } else if (progress === "retrieve") {
-        setVideoRendered(true);
-      } else if (progress === "display") {
-        setVideoRetrieved(true);
-      }
+  //     if (progress === "generateSlides") {
+  //       setVideoCreated(true);
+  //     } else if (progress === "render") {
+  //       setSlidesGenerated(true);
+  //     } else if (progress === "retrieve") {
+  //       setVideoRendered(true);
+  //     } else if (progress === "display") {
+  //       setVideoRetrieved(true);
+  //     }
+  //   }
+  // }, []);
 
-      // ... (set other states based on your progress)
-    }
-  }, []);
+  const clearVideoCreationStates = () => {
+    setCreatingVideo(false);
+    setVideoCreated(false);
+    setVideoCreationFailed(false);
+    setGeneratingSlides(false);
+    setSlidesGenerated(false);
+    setVideoRendered(false);
+    setVideoRenderingFailed(false);
+    setVideoRetrieved(false);
+    setRetrievingVideo(false);
+    setInputValue("");
+  };
 
   const handleGetIdeas = async () => {
     setLoadedYoutubePost(false);
     if (!searchQuery.trim()) {
       return;
     }
+
+    clearVideoCreationStates();
 
     const postData = {
       idea: searchQuery,
@@ -218,7 +282,7 @@ function AiPostGenerator({ display }) {
       console.error("Error fetching data:", error);
       showToast(
         "warning",
-        `Oops. You might want to try that again`,
+        `Whoops! It looks like there was a hiccup. Please go ahead and give it another shot`,
         5000,
       );
       setIsLoading(false);
@@ -266,15 +330,74 @@ function AiPostGenerator({ display }) {
     console.log(`Selected option: ${selectedOption}`);
   };
 
-  const fetchVideoTemplates = async () => {
-    setLoadingVideoTemplates(true);
-    const templates = await getVideoTemplates();
-    if (templates === null) {
-      setLoadingVideoTemplates(false);
+  const fetchActorVoices = async () => {
+    setLoadingVoiceTemplates(true);
+    const voices = await getActorVoices();
+    console.log("VOICES FROM AI POST JS", voices);
+    if (voices === null) {
+      setLoadingVoiceTemplates(false);
     }
-    setVideoTemplates(templates);
-    setLoadingVideoTemplates(false);
+    setVoiceTemplates(voices);
+    setLoadingVoiceTemplates(false);
   };
+
+  const fetchActors = async () => {
+    setLoadingActorTemplates(true);
+    console.log("loadingActorTemplates", loadingActorTemplates);
+    const actors = await getActors();
+    console.log("ACTORS FROM AI POST JS", actors);
+    if (actors === null) {
+      setLoadingActorTemplates(false);
+    }
+    setActorTemplates(actors);
+    setLoadingActorTemplates(false);
+  };
+
+  const createClip = async () => {
+    setCreatingVideo(true);
+    try {
+      const generatedClip = await generateClip(
+        selectedActors.id,
+        selectedActors.language,
+        inputValue,
+      );
+
+      if (generatedClip !== null) {
+        const videoId = generatedClip.id;
+        localStorage.setItem("videoCreatedId", videoId);
+        setProgressInLocalStorage("create", videoId);
+        setCreatingVideo(false);
+        // setVideoCreated(true);
+
+        return retrieveReadyVideo();
+      } else {
+        setCreatingVideo(false);
+        setRetrievingVideo(false);
+        setVideoCreationFailed(true);
+        resetSelectedActors(); // So the Create Video button doesnt disappear when video creation fails here
+        return null;
+      }
+    } catch (error) {
+      console.error("Error during video creation:", error);
+      setCreatingVideo(false);
+      setRetrievingVideo(false);
+      setVideoCreationFailed(true);
+      resetSelectedActors(); // So the Create Video button doesnt disappear when video creation fails here
+      return null;
+    }
+  };
+
+  // const createVideo = async () => {
+  //   setLoadingActorTemplates(true);
+  //   console.log("loadingActorTemplates", loadingActorTemplates);
+  //   const actors = await getActors();
+  //   console.log("ACTORS FROM AI POST JS", actors);
+  //   if (actors === null) {
+  //     setLoadingActorTemplates(false);
+  //   }
+  //   setActorTemplates(actors);
+  //   setLoadingActorTemplates(false);
+  // };
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
@@ -287,7 +410,7 @@ function AiPostGenerator({ display }) {
 
   // const convertToVideo = async () => {
   //   setCreatingVideo(true);
-  //   const convertVideo = await generateVideo(textSource, selectedVideoTemplate.templateId);
+  //   const convertVideo = await generateVideo(textSource, selectedActors.templateId);
   //   if (convertVideo !== null) {
   //     const video_id = convertVideo._id;
   //     const renderingVideo = await renderVideo(video_id);
@@ -307,37 +430,6 @@ function AiPostGenerator({ display }) {
   //     }
   //   }
   // }
-
-  const createVideo = async () => {
-    setCreatingVideo(true);
-
-    try {
-      const convertVideo = await generateVideo(
-        textSource,
-        textSource === "text" ? generatedYoutubePost.videoScript : inputValue,
-        selectedVideoTemplate.templateId,
-      );
-
-      if (convertVideo !== null) {
-        // alert(convertVideo._id);
-        const videoId = convertVideo._id;
-        localStorage.setItem("videoCreatedId", videoId);
-        setProgressInLocalStorage("create", videoId);
-        setCreatingVideo(false);
-        setVideoCreated(true);
-        return videoId;
-      } else {
-        setCreatingVideo(false);
-        setVideoCreationFailed(true);
-        return null;
-      }
-    } catch (error) {
-      console.error("Error during video creation:", error);
-      setCreatingVideo(false);
-      setVideoCreationFailed(true);
-      return null;
-    }
-  };
 
   const generateSlides = async () => {
     const videoCreatedId = localStorage.getItem("videoCreatedId");
@@ -397,7 +489,11 @@ function AiPostGenerator({ display }) {
   const retrieveReadyVideo = async (attemptCount = 0) => {
     setRetrievingVideo(true);
     if (attemptCount >= 5) {
-      showToast("error", "Looks like your video creation failed, If it persists reach support", 5000)
+      showToast(
+        "error",
+        "Looks like your video creation failed, If it persists reach support",
+        5000,
+      );
       console.error("Max attempts reached. Unable to retrieve ready video.");
       setVideoRetrievalFailed(true);
       setRetrievingVideo(false);
@@ -408,17 +504,15 @@ function AiPostGenerator({ display }) {
     const videoCreatedId = localStorage.getItem("videoCreatedId");
 
     try {
-      const retrievingVideo = await retrieveVideo(videoCreatedId);
+      const retrievingVideo = await retrieveClip(videoCreatedId);
+      console.log("retrievingVideo.status", retrievingVideo.status);
+      console.log("retrievingVideo", retrievingVideo);
 
-      if (
-        retrievingVideo !== null &&
-        retrievingVideo.url !== null &&
-        retrievingVideo.url !== undefined
-      ) {
-        const readyVideoId = retrievingVideo._id;
+      if (retrievingVideo !== null && retrievingVideo.status === "Completed") {
+        const readyVideoId = retrievingVideo.id;
         console.log("Ready Video ID:", readyVideoId);
 
-        const readyVideoUrl = retrievingVideo.url;
+        const readyVideoUrl = retrievingVideo.videoUrl;
         console.log("Ready Video URL:", readyVideoUrl);
         localStorage.setItem("readyVideoUrl", readyVideoUrl);
         setVideoRendered(false);
@@ -426,8 +520,25 @@ function AiPostGenerator({ display }) {
         setRetrievingVideo(false);
         setProgressInLocalStorage("retrieve", videoCreatedId);
         return readyVideoUrl;
-      } else {
-        setTimeout(() => retrieveReadyVideo(attemptCount + 1), 3 * 60 * 1000);
+      } else if (
+        retrievingVideo !== null &&
+        retrievingVideo.status === "Pending"
+      ) {
+        // setTimeout(() => retrieveReadyVideo(attemptCount + 1), 3 * 60 * 1000);
+        setTimeout(() => retrieveReadyVideo(attemptCount + 1), 1 * 60 * 1000);
+
+        return null;
+      } else if (
+        retrievingVideo !== null &&
+        retrievingVideo.status === "Failed"
+      ) {
+        console.error("Error during video retrieval");
+        setVideoRendered(false);
+        setVideoRetrievalFailed(true);
+        setRetrievingVideo(false);
+        setVideoCreationFailed(true);
+        setRenderingVideo(false);
+
         return null;
       }
     } catch (error) {
@@ -435,6 +546,8 @@ function AiPostGenerator({ display }) {
       setVideoRendered(false);
       setVideoRetrievalFailed(true);
       setRetrievingVideo(false);
+      setVideoCreationFailed(true);
+      setRenderingVideo(false);
       return null;
     }
   };
@@ -459,8 +572,6 @@ function AiPostGenerator({ display }) {
       handleGetIdeas();
     }
   };
-
-
 
   return (
     <section className={`w-full z-50 ${display} min-h-screen`}>
@@ -726,18 +837,18 @@ function AiPostGenerator({ display }) {
                     </div>
                   </div>
 
-                  <div className="section1 m-2 mt-5 p-2 px-5 py-10 border-2 bg-white rounded w-full">
+                  <div className="section1 m-2 mt-5 p-2 px-5 py-10 border-2 bg-white rounded w-full flex flex-col justify-center items-center">
                     <header className="flex justify-between w-full">
                       <span className="font-semibold">Generate Video</span>
                       <span className="relative">
-                        <select
+                        {/* <select
                           name="generateOption"
                           id="generateOption"
                           onChange={(e) => handleGenerateOptionChange(e)}
                         >
                           <option value="text">Text</option>
                           <option value="url">URL</option>
-                        </select>
+                        </select> */}
                       </span>
                     </header>
 
@@ -751,19 +862,20 @@ function AiPostGenerator({ display }) {
                       />
                     ) : renderingVideo ? (
                       <Loader message={"We are now rendering your Video"} />
-                    ) : retrievingVideo ? (
-                      <Loader
-                      messages={[
-                        'We are building the final part of your Video. Hang in there. This will take between 5 to 15 minutes.',
-                        'Still gearing this up for you',
-                        'Your video will soon be ready. Grab a pop corn',
-                        'More time, better video. Hold on tight',
-                        'Took a while, but we are close.',
-                      ]}
-                      size={20}
-                      iconColor="#7352FF"
-                    />
-                    ) : videoCreated ? (
+                    ) : // : retrievingVideo ? (
+                    //   <Loader
+                    //     messages={[
+                    //       "We are building the final part of your Video. Hang in there. This will take between 5 to 15 minutes.",
+                    //       "Still gearing this up for you",
+                    //       "Your video will soon be ready. Grab a pop corn",
+                    //       "More time, better video. Hold on tight",
+                    //       "Took a while, but we are close.",
+                    //     ]}
+                    //     size={20}
+                    //     iconColor="#7352FF"
+                    //   />
+                    // )
+                    videoCreated ? (
                       <div className="w-full flex flex-col justify-center items-center mt-5">
                         <button
                           className={`py-2 px-3 rounded mt-5 text-xs`}
@@ -849,7 +961,7 @@ function AiPostGenerator({ display }) {
                         </button>
                       </div>
                     ) : (
-                      <div className="mt-5 flex flex-col justify-center items-center">
+                      <div className="mt-5 w-full flex flex-col justify-center items-center">
                         {textSource === "text" ? (
                           <textarea
                             name=""
@@ -862,7 +974,7 @@ function AiPostGenerator({ display }) {
                               width: "98%",
                             }}
                             className="p-5 text-xs"
-                            readOnly
+                            // readOnly
                           ></textarea>
                         ) : (
                           <input
@@ -877,32 +989,41 @@ function AiPostGenerator({ display }) {
                             }}
                           />
                         )}
-                        {videoTemplates ? (
-                          <div className="w-full flex flex-col justify-center items-center mt-5">
+                        {actorTemplates && (
+                          <div className="w-full ml-10 flex flex-col justify-center items-center mt-5">
                             <div className={`flex flex-wrap`}>
-                              {videoTemplates.map((item, index) => (
+                              {actorTemplates.map((item, index) => (
                                 <div key={index} className="m-2 flex">
                                   <div
                                     className="rounded-md bg-gray-200 p-2 cursor-pointer"
                                     style={{
-                                      backgroundColor: `${
-                                        selectedVideoTemplate.index === index
+                                      backgroundColor: "#EAEAF5",
+                                      border: `solid 2px ${
+                                        selectedActors.index === index
                                           ? "#9999FF"
                                           : "#EAEAF5"
                                       }`,
                                     }}
                                     onClick={() =>
-                                      setSelectedVideoTemplate(
-                                        (prevSelected) => ({
-                                          ...prevSelected,
-                                          index,
-                                          templateId: item._id,
-                                        }),
-                                      )
+                                      setSelectedActors((prevSelected) => ({
+                                        ...prevSelected,
+                                        index,
+                                        id: item.id,
+                                        headshotImagePath:
+                                          item.headshotImagePath,
+                                        previewVideoPath: item.previewVideoPath,
+                                        name: item.name,
+                                        gender: item.gender,
+                                        age: item.age,
+                                        ethnicity: item.ethnicity,
+                                        thumbnailImagePath:
+                                          item.thumbnailImagePath,
+                                        staticImagePath: item.staticImagePath,
+                                      }))
                                     }
                                   >
                                     <img
-                                      src={item.thumbnail}
+                                      src={item.thumbnailImagePath}
                                       alt=""
                                       className="h-20"
                                     />
@@ -910,34 +1031,124 @@ function AiPostGenerator({ display }) {
                                 </div>
                               ))}
                             </div>
-                            <button
-                              className={`py-2 px-3 rounded-full mt-5 text-xs ${
-                                selectedVideoTemplate.index === null
-                                  ? "bg-gray-600 cursor-not-allowed"
-                                  : ""
-                              }`}
-                              style={{
-                                background:
-                                  "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
-                                color: "white",
-                              }}
-                              disabled={selectedVideoTemplate === null}
-                              onClick={createVideo}
-                            >
-                              Convert {textSource.toUpperCase()} to Video
-                            </button>
-                            {/* {selectedVideoTemplate.templateId === "" &&
-                              videoProcessFailed(
-                                "Please select a template from above",
-                              )} */}
+                            {loadingActorTemplates === true && (
+                              <Loader
+                                message={"Loading the best Actors for you"}
+                              />
+                            )}
+                            {selectedActors.index !== null && (
+                              <div className="mt-5 flex flex-col justify-center items-center text-xs">
+                                <p>
+                                  Name:{" "}
+                                  <span className="text-sm font-semibold">
+                                    {selectedActors.name}
+                                  </span>
+                                </p>
+                                <p>Gender: {selectedActors.gender}</p>
+                                <p>Age: {selectedActors.age}</p>
+                                <p>Ethnicity: {selectedActors.ethnicity}</p>
+                                <div className="mt-3">
+                                  <label
+                                    htmlFor="languageSelect"
+                                    className="mr-2"
+                                  >
+                                    Choose Language:
+                                  </label>
+                                  <select
+                                    id="languageSelect"
+                                    value={selectedLanguage}
+                                    onChange={handleLanguageChange}
+                                  >
+                                    {languagesData.map((language) => (
+                                      <option
+                                        key={language.LanguageCode}
+                                        value={language.LanguageCode}
+                                      >
+                                        {language.Language}({language.Locale})
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                                <button
+                                  className="py-2 px-3 rounded-full mt-5 text-xs text-white"
+                                  style={{
+                                    background:
+                                      "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                                    color: "white",
+                                  }}
+                                  onClick={() => {
+                                    setShowPreviewActorPanel(true);
+                                  }}
+                                >
+                                  Watch Preview Video
+                                </button>
+                              </div>
+                            )}
+                            {creatingVideo && (
+                              <Loader
+                                message={"Creating your video. Hold on"}
+                              />
+                            )}
+                            {retrievingVideo && (
+                              <Loader
+                                messages={[
+                                  "We are building the final part of your Video. Hang in there. This will take between 5 to 15 minutes.",
+                                  "Still gearing this up for you",
+                                  "Your video will soon be ready. Grab a pop corn",
+                                  "More time, better video. Hold on tight",
+                                  "Took a while, but we are close.",
+                                ]}
+                                size={20}
+                                iconColor="#7352FF"
+                              />
+                            )}
                             {videoCreationFailed &&
                               videoProcessFailed("Video creation Failed")}
+                            {selectedActors.index == null && (
+                              <button
+                                className={`py-2 px-3 rounded-full mt-5 text-xs`}
+                                style={{
+                                  background:
+                                    "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                                  color: "white",
+                                }}
+                                onClick={() => {
+                                  fetchActors();
+                                  // console.log("loadingActorTemplates", loadingActorTemplates);
+                                }}
+                              >
+                                Load your Actors
+                              </button>
+                            )}
+                            {selectedActors.index !== null && (
+                              <button
+                                className={`py-2 px-3 rounded-full mt-5 text-xs`}
+                                style={{
+                                  background:
+                                    "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                                  color: "white",
+                                }}
+                                onClick={() => {
+                                  createClip();
+                                }}
+                              >
+                                Create Video
+                              </button>
+                            )}
+
+                            {/* {selectedActors.templateId === "" &&
+                                videoProcessFailed(
+                                  "Please select a template from above",
+                                )} */}
                           </div>
-                        ) : loadingVideoTemplates ? (
-                          <Loader message={"Loading Templates for you"} />
+                        )}
+                        {/* : loadingActorTemplates === true ? (
+                          <Loader message={"Loading the best Actors for you"} />
+                        ) : loadingVoiceTemplates ? (
+                          <Loader message={"Loading the best VOICES for you"} />
                         ) : (
                           <button
-                            onClick={() => fetchVideoTemplates()}
+                            onClick={() => fetchActorVoices()}
                             className="mt-5 cursor-pointer text-xs font-bold py-2 px-4 rounded"
                             style={{
                               background:
@@ -945,9 +1156,9 @@ function AiPostGenerator({ display }) {
                               color: "white",
                             }}
                           >
-                            Load Templates
+                            Select a Voice
                           </button>
-                        )}
+                        )} */}
                       </div>
                     )}
                     {/* <video width="400" controls>
@@ -1003,6 +1214,12 @@ function AiPostGenerator({ display }) {
           )}
         </div>
       </div>
+      {showPreviewActorPanel && (
+        <PreviewActor
+          setShowPanel={setShowPreviewActorPanel}
+          actorPreviewUrl={selectedActors.previewVideoPath}
+        />
+      )}
     </section>
   );
 }

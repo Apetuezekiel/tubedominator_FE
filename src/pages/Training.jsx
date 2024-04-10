@@ -95,6 +95,21 @@ function Training() {
             </div>
             <script src="https://player.vimeo.com/api/player.js"></script>
           </div>
+
+          <div>
+            <div className="text-sm mb-3 font-semibold">
+              6. Linking Your YouTube Channel To TubeDominator
+            </div>
+            <div>
+              <iframe
+                src="https://player.vimeo.com/video/898717658?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+                frameBorder="0"
+                allow="autoplay; fullscreen; picture-in-picture"
+                title="Linking Your YouTube Channel To TubeDominator"
+              ></iframe>
+            </div>
+            <script src="https://player.vimeo.com/api/player.js"></script>
+          </div>
         </div>
 
         {/* Repeat the same structure for other videos */}

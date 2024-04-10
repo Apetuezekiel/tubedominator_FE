@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React, { useEffect, useState } from "react";
+import "../index.css";
 import axios from "axios";
 import {
   GridComponent,
@@ -116,11 +117,15 @@ const Ideation = () => {
   const [showCompetition, setShowCompetition] = useState(false);
   const [showSearchPanel, setShowSearchPanel] = useState(false);
   const [searchQueryComplete, setSearchQueryComplete] = useState("");
-
   const initialCountry = {
     countryCode: "GLB",
     languageCode: "en",
   };
+  const [postData, setPostData] = useState({
+    keyword: "",
+    countryCode: "",
+    languageCode: "",
+  });
   const [selectedCountry, setSelectedCountry] = useState(initialCountry);
   const [selectedOption, setSelectedOption] = useState("all");
   // console.log(decryptedFullData);
@@ -663,12 +668,6 @@ const Ideation = () => {
       return;
     }
 
-    const postData = {
-      keyword: searchQuery,
-      countryCode: selectedCountry.countryCode,
-      languageCode: selectedCountry.languageCode,
-    };
-
     console.log("postData", postData);
 
     try {
@@ -829,8 +828,7 @@ const Ideation = () => {
             }}
             // disabled={isSearchEmpty}
             style={{
-              background:
-                "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%)",
+              background: "var(--special-background)",
             }}
           >
             <BsLightningChargeFill className="mr-2" color="white" />
@@ -839,6 +837,8 @@ const Ideation = () => {
           {showSearchPanel && (
             <GenerateIdeasPanel
               onSearchChange={handleSearchChange}
+              setPostData={setPostData}
+              postData={postData}
               setShowSearchPanel={setShowSearchPanel}
               setSearchQueryComplete={setSearchQueryComplete}
               handleGetIdeas={handleGetIdeas}

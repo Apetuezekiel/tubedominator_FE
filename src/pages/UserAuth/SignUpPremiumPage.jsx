@@ -323,7 +323,24 @@ const SignUpPremiumPage = () => {
                           : "text-gray-900"
                       }`}
                     >
-                      I agree to abide by Tubedominator's Terms of Service
+                      I agree to abide by Tubedominator's{" "}
+                      <a
+                        className="underline text-blue-800"
+                        href={`${process.env.REACT_APP_BASE_URL}/privacy-policy`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Terms of Service
+                      </a>{" "}
+                      and{" "}
+                      <a
+                        className="underline text-blue-800"
+                        href={`${process.env.REACT_APP_BASE_URL}/privacy-policy`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        privacy policy
+                      </a>
                     </span>
                   </label>
                 </div>

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { AiOutlineMenu } from "react-icons/ai";
 // import { FiShoppingCart } from "react-icons/fi";
 // import { BsChatLeft } from "react-icons/bs";
-// import { RiNotification3Line } from "react-icons/ri";
+import { RiNotification3Line } from "react-icons/ri";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 import { GoogleLogin } from "react-google-login";
@@ -354,11 +354,7 @@ const Navbar = () => {
                 >
                   <img
                     className="rounded-full w-5 h-5"
-                    src={
-                      userProfilePic
-                        ? URL.createObjectURL(userProfilePic)
-                        : userAvatar
-                    }
+                    src={userProfilePic ? userProfilePic : userAvatar}
                     alt="user-profile"
                   />
                   <p className="">

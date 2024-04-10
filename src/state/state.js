@@ -77,8 +77,23 @@ export const useUserChannelConnected = create((set) => ({
 }));
 
 export const useUserProfilePic = create((set) => ({
-  userProfilePic: "",
+  userProfilePic: localStorage.getItem("userProfilePic"),
   setUserProfilePic: (data) => set({ userProfilePic: data }),
+}));
+
+export const useUserPackage = create((set) => ({
+  userPackage: localStorage.getItem("userPackage"),
+  setUserPackage: (data) => set({ userPackage: data }),
+}));
+
+export const useInitializeOAuth = create((set) => ({
+  initializeOAuth: false,
+  setInitializeOAuth: (data) => set({ initializeOAuth: data }),
+}));
+
+export const useUserConnectionEntry = create((set) => ({
+  userConnectionEntry: "",
+  setUserConnectionEntry: (data) => set({ userConnectionEntry: data }),
 }));
 
 export const useSerpYoutubeVideosInfo = create((set) => ({

@@ -11,6 +11,7 @@ import {
   useUserAccessLevel,
   useUserAuthToken,
   useUserChannelConnected,
+  useUserConnectionEntry,
   useUserData,
   useUserLoggedin,
   // useUserLoggedin,
@@ -63,8 +64,7 @@ const RegistrationForm = () => {
   const allUserDeets = useAllUserDeets((state) => state.allUserDeets);
   const setAllUserDeets = useAllUserDeets((state) => state.setAllUserDeets);
   const secretKey = "+)()^77---<@#$>";
-  // const decryptedFullData = userFullDataDecrypted();
-  // console.log("decryptedFullDataaaaaa", decryptedFullData);
+  const decryptedFullData = userFullDataDecrypted();
   const initialCountry = {
     countryCode: "GLB",
     languageCode: "en",
@@ -77,8 +77,16 @@ const RegistrationForm = () => {
     (state) => state.setUserChannelConnected,
   );
   const userRecordId = localStorage.getItem("userRecordId");
-  console.log(userRecordId, userRecordId, userRecordId);
 
+  const setUserConnectionEntry = useUserConnectionEntry(
+    (state) => state.setUserConnectionEntry,
+  );
+
+  console.log(
+    "4567890987654323456789",
+    localStorage.getItem("channelConnected"),
+    localStorage.getItem("connectionEntry"),
+  );
   useEffect(() => {
     if (!userRecordId || userRecordId.trim() === "" || userRecordId === null) {
       showToast("error", "Error occurred. Kindly login again", 2000);
@@ -94,6 +102,7 @@ const RegistrationForm = () => {
   }, []);
 
   useEffect(() => {
+    console.log("goteen decryptedFullData: ", decryptedFullData);
     const userRegEmail = localStorage.getItem("userRegEmail");
     const fetchChannel = () => {
       setIsLoading(true);
@@ -104,23 +113,22 @@ const RegistrationForm = () => {
             headers: {
               "Content-Type": "application/json",
               "x-api-key": process.env.REACT_APP_X_API_KEY,
-              // gToken: decryptedFullData.gToken,
+              gToken: decryptedFullData.gToken,
             },
           },
         )
         .then((response) => {
           setIsLoading(false);
-          // showToast('success', 'Channel Found!', '1000')
           // Extract channel title and image from the response
           const channelData = response.data.map((channel) => ({
             title: channel.channelTitle,
             image: channel.thumbnailUrl,
-            id: channel.channelId.channelId,
+            id: channel.channelId || channel.channelId.channelId,
             description: channel.description,
           }));
+          console.log("channelData from api for this user", channelData);
           setChannels(channelData);
           setShowChannel(true);
-          console.log("channelData", channelData);
         })
         .catch((error) => {
           console.error("Error fetching channel data:", error);
@@ -132,8 +140,48 @@ const RegistrationForm = () => {
     fetchChannel();
   }, [callForUserChannels]);
 
+  const fetchChannelsForUser = async (channelName) => {
+    console.log("goteen decryptedFullData: ", decryptedFullData);
+    const userRegEmail = localStorage.getItem("userRegEmail");
+    setIsLoading(true);
+
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_BASE_URL}/getMyChannels`,
+        {
+          params: {
+            email: userRegEmail,
+            channelName: channelName,
+          },
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.REACT_APP_X_API_KEY,
+            gToken: decryptedFullData.gToken,
+          },
+        },
+      );
+
+      const channelData = response.data.map((channel) => ({
+        title: channel.channelTitle,
+        image: channel.thumbnailUrl,
+        id: channel.channelId.channelId,
+        description: channel.description,
+      }));
+
+      setChannels(channelData);
+      setShowChannel(true);
+    } catch (error) {
+      console.error("Error fetching channel data:", error);
+      showToast("error", "Channel search did not work. Search again", 5000);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Call the function with the desired channelName
+  // fetchChannelsForUser("yourChannelName");
+
   const selectChannel = (channel) => {
-    console.log("channel", channel);
     setClearSelectedChannel(true);
     setShowChannel(false);
     setSelectedFormData(channel.title);
@@ -142,7 +190,6 @@ const RegistrationForm = () => {
       ...prevData,
       channel_name: channel.title,
     }));
-    console.log("selectedChannel", selectedChannel);
   };
 
   const handleChange = (e) => {
@@ -167,8 +214,9 @@ const RegistrationForm = () => {
   };
 
   const saveUserToken = async (token, updatedFormData) => {
+    const userRegEmail = localStorage.getItem("userRegEmail");
     const updatedGUserData = {
-      // ...decryptedFullData,
+      ...decryptedFullData,
       token,
       channelId: selectedChannel.id,
       channelImage: selectedChannel.image,
@@ -184,6 +232,7 @@ const RegistrationForm = () => {
         `${process.env.REACT_APP_API_BASE_URL}/saveUserToken`,
         {
           encryptedFullData,
+          email: userRegEmail,
         },
         {
           headers: {
@@ -194,12 +243,11 @@ const RegistrationForm = () => {
         },
       )
       .then(async (response) => {
-        console.log("Token stored successfully", response.data.message);
         // await fetchUserYoutubeInfo();
         setConnectingChannel(false);
         setUserData(updatedFormData);
         setUserLoggedIn(true);
-        navigate("/ideation");
+        navigate("/optimization");
       })
       .catch((error) => {
         setConnectingChannel(false);
@@ -217,6 +265,11 @@ const RegistrationForm = () => {
   };
 
   const handleSubmit = async (e) => {
+    if (!selectedChannel) {
+      showToast("warning", "Kindly select your channel first", 3000);
+      e.preventDefault();
+      return;
+    }
     setConnectingChannel(true);
     e.preventDefault();
     // Extract relevant user data
@@ -239,14 +292,18 @@ const RegistrationForm = () => {
       channelFullName: userFullName,
       channel_image_link: channel_image_link,
       description: description,
+      connectionEntry: "google_auth",
       user_id,
       userRecordId: localStorage.getItem("userRecordId"),
     };
 
-    console.log("updatedFormData", updatedFormData);
-
     try {
-      // Send updated form data to the server
+      // Send updated form data to the
+      console.log(
+        "updatedFormData from channel reg page",
+        updatedFormData,
+        selectedChannel,
+      );
       const response = await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}/saveUserYoutubeInfo`,
         updatedFormData,
@@ -258,15 +315,20 @@ const RegistrationForm = () => {
         },
       );
 
-      console.log(response, response);
       if (response.data.success) {
-        localStorage.setItem("accessLevel", "L2");  
+        localStorage.setItem("accessLevel", "L2");
+        localStorage.setItem("channel_id", selectedChannel.id);
         setAccessLevel("L2");
-        console.log("Channel details stored successfully", response.data.token);
+        console.log("Channel details stored successfully");
         const token = response.data.token;
         localStorage.setItem("channelConnected", 1);
+        localStorage.setItem("connectionEntry", "google_auth");
+        setUserConnectionEntry("google_auth");
         setUserChannelConnected(1);
-        await saveUser({channelConnected: 1, email: localStorage.getItem("userRegEmail")});
+        await saveUser({
+          channelConnected: 1,
+          email: localStorage.getItem("userRegEmail"),
+        });
         setTimeout(() => {
           saveUserToken(token, updatedFormData);
         }, 2000);
@@ -284,7 +346,6 @@ const RegistrationForm = () => {
   };
 
   function redirectToHome() {
-    console.log("got here baby");
     window.location.href = "http://localhost:3000/";
   }
 
@@ -383,10 +444,13 @@ const RegistrationForm = () => {
                 id="channel_name"
                 name="channel_name"
                 placeholder="keywords your channel focuses on"
+                // value={formData.channel_name}
+                // onChange={handleChange}
                 className={`${
                   selectedFormData ? "selectedChannel" : ""
                 } mt-1 p-2 border rounded w-full mr-3`}
               >
+                <br />
                 {clearSelectedChannel === false ? (
                   <span style={{ color: "#999", fontStyle: "italic" }}>
                     click Channel below or the Search Icon to search for your
@@ -406,12 +470,19 @@ const RegistrationForm = () => {
                 )}
               </div>
               {selectedFormData ? (
-                <MdCancel size={30} onClick={unselectChannel} />
+                <MdCancel
+                  size={30}
+                  onClick={unselectChannel}
+                  className="cursor-pointer"
+                />
               ) : (
                 <button
                   type="button"
                   className="text-lg mr-3"
-                  onClick={() => setCallForUserChannels(!callForUserChannels)}
+                  onClick={() => {
+                    setCallForUserChannels(!callForUserChannels);
+                    // fetchChannelsForUser(formData.channel_name)
+                  }}
                 >
                   <IoSearchCircle size={30} />
                 </button>
@@ -505,8 +576,12 @@ const RegistrationForm = () => {
             type="submit"
             style={{
               background:
-                "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
+                selectedChannel === null
+                  ? "grey"
+                  : "linear-gradient(270deg, #4B49AC 0.05%, #9999FF 99.97%), linear-gradient(0deg, rgba(0, 0, 21, 0.1), rgba(0, 0, 21, 0.1))",
               color: "white",
+              cursor: selectedChannel === null ? "not-allowed" : "pointer",
+              // pointerEvents: selectedChannel === null && "none"
             }}
             className="w-full text-white p-2 rounded flex items-center cursor-pointer justify-center"
           >

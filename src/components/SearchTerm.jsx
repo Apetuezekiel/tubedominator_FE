@@ -33,6 +33,7 @@ import {
 } from "@syncfusion/ej2-react-grids";
 import showToast from "../utils/toastUtils";
 import countriesWithLanguages from "../data/countries";
+import Loader from "./Loader";
 
 const staticData = [
   { keyword: "Keyword 1", source: "Source 1", monthlysearch: 1000 },
@@ -77,7 +78,7 @@ function SearchTerm({ videoId }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const initialCountry = {
-    countryCode: "GLB",
+    countryCode: "US",
     languageCode: "en",
   };
   const [selectedCountry, setSelectedCountry] = useState(initialCountry);
@@ -180,7 +181,7 @@ function SearchTerm({ videoId }) {
           headers: {
             "Content-Type": "application/json",
             "x-api-key": process.env.REACT_APP_X_API_KEY,
-            Authorization: `Bearer ${decryptedFullData.token}`,
+            // Authorization: `Bearer ${decryptedFullData.token}`,
           },
         },
       );
@@ -333,8 +334,8 @@ function SearchTerm({ videoId }) {
     const requestHeaders = {
       "Content-Type": "application/json",
       "x-api-key": process.env.REACT_APP_X_API_KEY,
-      Authorization: `Bearer ${decryptedFullData.token}`,
-      gToken: decryptedFullData.gToken,
+      // Authorization: `Bearer ${decryptedFullData.token}`,
+      // gToken: decryptedFullData.gToken,
     };
 
     try {
@@ -591,7 +592,9 @@ function SearchTerm({ videoId }) {
                             value={`${selectedCountry.countryCode}:${selectedCountry.languageCode}`}
                             onChange={handleCountryChange}
                           >
-                            {/* <option value="GLB:en">Global (English)</option> */}
+                            <option value="US:en">
+                              United States (English)
+                            </option>
                             {countriesWithLanguages.map((item, index) => (
                               <option
                                 key={index}
@@ -609,14 +612,17 @@ function SearchTerm({ videoId }) {
                     </div>
                     <div>
                       {isLoading ? (
-                        <div className="flex flex-col justify-center items-center w-full mt-20">
-                          <BiLoaderCircle
-                            className="animate-spin text-center"
-                            color="#7352FF"
-                            size={30}
-                          />
-                          <div>Gathering Insights for your Keyword.</div>
-                        </div>
+                        // <div className="flex flex-col justify-center items-center w-full mt-20">
+                        //   <BiLoaderCircle
+                        //     className="animate-spin text-center"
+                        //     color="#7352FF"
+                        //     size={30}
+                        //   />
+                        //   <div>Gathering Insights for your Keyword.</div>
+                        // </div>
+                        <Loader
+                          message={"Gathering Insights for your Keyword."}
+                        />
                       ) : (
                         <div className=""></div>
                       )}

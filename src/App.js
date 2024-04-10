@@ -29,9 +29,14 @@ import "./App.css";
 import RegistrationForm from "./pages/UserAuth/registration/index2";
 
 import {
+  useInitializeOAuth,
   useUserAccessLevel,
+  useUserChannelConnected,
+  useUserConnectionEntry,
   useUserData,
   useUserLoggedin,
+  useUserPackage,
+  useUserProfilePic,
 } from "./state/state";
 import SignInPage from "./pages/UserAuth/SignInPage";
 import SignUpPage from "./pages/UserAuth/SignUpPage";
@@ -42,9 +47,11 @@ import SavedIdeasCategories from "./pages/SavedIdeasCategories";
 import PreviewKeyword from "./components/PreviewKeyword";
 import { useStateContext } from "./contexts/ContextProvider";
 import Home from "./pages/Home";
+import GoogleHomePage from "./pages/GoogleHomePage";
 import { gapi } from "gapi-script";
 import Insights from "./pages/keywords/Insights";
 import Competition from "./pages/keywords/Competition";
+import AICoach from "./pages/AiCoach/AiCoach";
 import ConnectYoutube from "./pages/ConnectYoutube";
 import AiPostGenerator from "./pages/AiPostGenerator";
 import { fetchUser, userFullDataDecrypted } from "./data/api/calls";
@@ -53,11 +60,26 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Settings from "./pages/Settings";
 import SignUpBundlePage from "./pages/UserAuth/SignUpBundlePage";
 import SignUpPremiumPage from "./pages/UserAuth/SignUpPremiumPage";
+import SignUpResellerPage from "./pages/UserAuth/SignUpResellerPage";
 import DFYSEOAgency from "./pages/bundle/DFYSEOAgency";
 import AffilliateMarketingCoaching from "./pages/bundle/AffilliateMarketingCoaching";
 import DFYCampaigns from "./pages/bundle/25DFYCampaigns";
 import UnlimitedTraffic from "./pages/bundle/UnlimitedTraffic";
 import Training from "./pages/Training";
+// import AICoach from "./pages/AiCoach/AiCoach"; 
+import {
+  AllUsers,
+  BundleUsers,
+  PremiumUsers,
+  Resellers,
+  UserTypes,
+} from "./pages/userAdmin";
+import {
+  ResellerAllUsers,
+  ResellerBundleUsers,
+  ResellerPremiumUsers,
+  ResellerUserTypes,
+} from "./pages/Reseller";
 
 const App = () => {
   // const decryptedFullData = userFullDataDecrypted();
@@ -77,6 +99,27 @@ const App = () => {
   const setAccessLevel = useUserLoggedin((state) => state.setAccessLevel);
   const userData = useUserData((state) => state.userData);
   const setUserData = useUserData((state) => state.setUserData);
+  const initializeOAuth = useInitializeOAuth((state) => state.initializeOAuth);
+  const setInitializeOAuth = useInitializeOAuth(
+    (state) => state.setInitializeOAuth,
+  );
+  const setUserConnectionEntry = useUserConnectionEntry(
+    (state) => state.setUserConnectionEntry,
+  );
+  const userProfilePic = useUserProfilePic((state) => state.userProfilePic);
+  const setUserProfilePic = useUserProfilePic(
+    (state) => state.setUserProfilePic,
+  );
+  const userChannelConnected = useUserChannelConnected(
+    (state) => state.userChannelConnected,
+  );
+  const setUserChannelConnected = useUserChannelConnected(
+    (state) => state.setUserChannelConnected,
+  );
+  const setUserPackage = useUserPackage(
+    (state) => state.setUserPackage,
+  );
+
   function ProtectedRoute() {
     return userLoggedIn ? <Outlet /> : <Navigate to="/" />;
   }
@@ -92,6 +135,10 @@ const App = () => {
           <Route index element={<Ideation />} />
           <Route path="competition" element={<Competition />} />
           <Route path="insights" element={<Insights />} />
+        </Route>
+
+        <Route path="/tube-ai" element={<ProtectedRoute />}>
+          <Route index element={<AICoach />} />
         </Route>
 
         <Route path="/optimization" element={<ProtectedRoute />}>
@@ -117,6 +164,35 @@ const App = () => {
           <Route index element={<Keywords />} />
         </Route>
 
+        <Route path="/users-reseller" element={<ProtectedRoute />}>
+          <Route index element={<Resellers />} />
+        </Route>
+
+        <Route path="/users-bundle" element={<ProtectedRoute />}>
+          <Route index element={<BundleUsers />} />
+        </Route>
+
+        <Route path="/users-premium" element={<ProtectedRoute />}>
+          <Route index element={<PremiumUsers />} />
+        </Route>
+
+        <Route path="/users-all" element={<ProtectedRoute />}>
+          <Route index element={<AllUsers />} />
+        </Route>
+
+        {/* RESELLER ROUTES */}
+        <Route path="/reseller-users-bundle" element={<ProtectedRoute />}>
+          <Route index element={<ResellerBundleUsers />} />
+        </Route>
+
+        <Route path="/reseller-users-premium" element={<ProtectedRoute />}>
+          <Route index element={<ResellerPremiumUsers />} />
+        </Route>
+
+        <Route path="/reseller-users-all" element={<ProtectedRoute />}>
+          <Route index element={<ResellerAllUsers />} />
+        </Route>
+
         <Route path="rankings" element={<Rankings />} />
 
         <Route path="/searchterm" element={<ProtectedRoute />}>
@@ -135,6 +211,11 @@ const App = () => {
         {/* User-Specific Routes */}
         <Route path="/ideascategory" element={<IdeasCategoryView />} />
         <Route path="/saved-ideas-cat" element={<SavedIdeasCategories />} />
+
+        <Route path="/users" element={<UserTypes />} />
+        <Route path="/reseller-users" element={<ResellerUserTypes />} />
+        <Route path="/ai-coach" element={<AICoach />} />
+
         <Route path="/preview" element={<PreviewKeyword />} />
         <Route path="/youtube" element={<ConnectYoutube />} />
         <Route path="/dfy-seo-agency" element={<DFYSEOAgency />} />
@@ -157,21 +238,65 @@ const App = () => {
     }
   }, []);
 
+  useEffect(() => {}, []);
+
   // useEffect(() => {
-  //   const fetchData = async () => {
+  //   const fetchDataAndInitGAPI = async () => {
   //     try {
-  //       const fetchedUser = await fetchUser();
-  //       setFetchUserData(fetchedUser);
-
-  //       console.log("fetched user data: ", fetchedUser);
+  //       gapi.load("client:auth2", () => {
+  //         gapi.client.init({
+  //           apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
+  //           clientId: process.env.REACT_APP_CLIENT_ID,
+  //           scope:
+  //             "https://www.googleapis.com/auth/youtube.readonly " +
+  //             "https://www.googleapis.com/auth/youtube.force-ssl " +
+  //             "https://www.googleapis.com/auth/youtube " +
+  //             "https://www.googleapis.com/auth/youtube.upload ",
+  //         });
+  //       });
   //     } catch (error) {
-
   //       console.error("Error fetching user data:", error);
   //     }
   //   };
 
-  //   fetchData();
+  //   // initializeOAuth && fetchDataAndInitGAPI();
+  //   fetchDataAndInitGAPI();
   // }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const fetchedUser = await fetchUser();
+        console.log("fetchedUser from APP>JS", fetchedUser);
+        
+        // Check if userProfilePic in localStorage is empty or null
+        const storedProfilePic = localStorage.getItem("userProfilePic");
+        if (!storedProfilePic) {
+          setUserProfilePic(fetchedUser.profilePic);
+          localStorage.setItem("userProfilePic", fetchedUser.profilePic);
+        }
+        
+        setUserPackage(fetchedUser.package);
+        localStorage.setItem("userPackage", fetchedUser.package);
+        setUserChannelConnected(fetchedUser.channelConnected);
+        localStorage.setItem("channelConnected", fetchedUser.channelConnected);
+        
+        if (
+          fetchedUser.channelConnected === 1 &&
+          fetchedUser.connectionEntry === "manual"
+        ) {
+          setUserConnectionEntry("manual");
+          localStorage.setItem("connectionEntry", fetchedUser.connectionEntry);
+        }
+        console.log("fetched user data: ", fetchedUser);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+  
+    fetchData();
+  }, [userChannelConnected]);
+  
 
   // useEffect(() => {
   //   const fetchUserYoutubeInfo = async () => {
@@ -206,34 +331,29 @@ const App = () => {
   //   }
   // }, [userLoggedIn]);
 
-  useEffect(() => {
-    const fetchDataAndInitGAPI = async () => {
-      try {
-        const fetchedUser = await fetchUser();
-        console.log("fetched user data: ", fetchedUser);
+  // useEffect(() => {
+  //   const fetchDataAndInitGAPI = async () => {
+  //     try {
+  //       console.log("google login INITIALIZED ")
+  //       // Initialize gapi.client inside the try block
+  //       gapi.load("client:auth2", () => {
+  //         gapi.client.init({
+  //           apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
+  //           clientId: process.env.REACT_APP_CLIENT_ID,
+  //           scope:
+  //             "https://www.googleapis.com/auth/youtube.readonly " +
+  //             "https://www.googleapis.com/auth/youtube.force-ssl " +
+  //             "https://www.googleapis.com/auth/youtube " +
+  //             "https://www.googleapis.com/auth/youtube.upload"
+  //         });
+  //       });
+  //     } catch (error) {
+  //       console.error("Error fetching user data:", error);
+  //     }
+  //   };
 
-        // Initialize gapi.client inside the try block
-        gapi.load("client:auth2", () => {
-          gapi.client.init({
-            // apiKey: fetchedUser.apiKey,
-            clientId: fetchedUser.ClientId,
-            // apiKey: process.env.REACT_APP_GOOGLE_API_KEY,
-            // clientId: process.env.REACT_APP_CLIENT_ID,
-            scope:
-              "https://www.googleapis.com/auth/youtube.readonly " +
-              "https://www.googleapis.com/auth/youtube.force-ssl " +
-              "https://www.googleapis.com/auth/youtube " +
-              "https://www.googleapis.com/auth/youtube.upload " +
-              "https://www.googleapis.com/auth/cse",
-          });
-        });
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
-
-    fetchDataAndInitGAPI();
-  }, []);
+  //   fetchDataAndInitGAPI();
+  // }, []);
 
   // useEffect(() =>{
   //   const userRegEmail = localStorage.getItem("userRegEmail");
@@ -294,7 +414,7 @@ const App = () => {
         closeOnClick
         // pauseOnFocusLoss
         // pauseOnHover
-        toastStyle={{ zIndex: 10000 }}
+        toastStyle={{ zIndex: 9999 }}
       ></ToastContainer>
       <BrowserRouter>
         <div className="relative w-full">
@@ -302,12 +422,12 @@ const App = () => {
             <Navbar />
           </div>
           <Routes>
-          <Route
-        path="/"
-        element={userLoggedIn ? <Navigate to="/ideation" /> : <Home />}
-      />
+            <Route
+              path="/"
+              element={userLoggedIn ? <Navigate to="/ideation" /> : <Home />}
+            />
 
-
+            <Route path="/home" element={<GoogleHomePage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             {/* Sign-In and Sign-Up */}
             <Route path="/sign-up" element={<ProtectedRouteLoggedIn />}>
@@ -332,6 +452,15 @@ const App = () => {
               <Route
                 path="/bundle-account-create"
                 element={<SignUpBundlePage />}
+              />
+            </Route>
+            <Route
+              path="/reseller-account-create"
+              element={<ProtectedRouteLoggedIn />}
+            >
+              <Route
+                path="/reseller-account-create"
+                element={<SignUpResellerPage />}
               />
             </Route>
             {/* <Route path="/sign-in" element={<SignInPage />} />

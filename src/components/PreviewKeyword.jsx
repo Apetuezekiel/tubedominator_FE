@@ -72,7 +72,7 @@ const PreviewKeyword = ({ keywordd, setDisplayPreviewKeyword }) => {
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.REACT_APP_X_API_KEY,
-          Authorization: `Bearer ${decryptedFullData.token}`,
+          // Authorization: `Bearer ${decryptedFullData.token}`,
         },
         params: {
           keyword: keywordd ?? "Football",

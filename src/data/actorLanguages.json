@@ -1,0 +1,707 @@
+[
+  {
+    "Language": "Afrikaans",
+    "Locale": "ZA",
+    "LanguageCode": "af-ZA"
+  },
+  {
+    "Language": "Albanian",
+    "Locale": "AL",
+    "LanguageCode": "sq-AL"
+  },
+  {
+    "Language": "Amharic",
+    "Locale": "ET",
+    "LanguageCode": "am-ET"
+  },
+  {
+    "Language": "Arabic",
+    "Locale": "AE",
+    "LanguageCode": "ar-AE"
+  },
+  {
+    "Language": "Arabic",
+    "Locale": "BH",
+    "LanguageCode": "ar-BH"
+  },
+  {
+    "Language": "Arabic",
+    "Locale": "DZ",
+    "LanguageCode": "ar-DZ"
+  },
+  {
+    "Language": "Arabic",
+    "Locale": "EG",
+    "LanguageCode": "ar-EG"
+  },
+  {
+    "Language": "Arabic",
+    "Locale": "IQ",
+    "LanguageCode": "ar-IQ"
+  },
+  {
+    "Language": "Arabic",
+    "Locale": "JO",
+    "LanguageCode": "ar-JO"
+  },
+  {
+    "Language": "Arabic",
+    "Locale": "KW",
+    "LanguageCode": "ar-KW"
+  },
+  {
+    "Language": "Arabic",
+    "Locale": "LB",
+    "LanguageCode": "ar-LB"
+  },
+  {
+    "Language": "Arabic",
+    "Locale": "LY",
+    "LanguageCode": "ar-LY"
+  },
+  {
+    "Language": "Arabic",
+    "Locale": "MA",
+    "LanguageCode": "ar-MA"
+  },
+  {
+    "Language": "Arabic",
+    "Locale": "OM",
+    "LanguageCode": "ar-OM"
+  },
+  {
+    "Language": "Arabic",
+    "Locale": "QA",
+    "LanguageCode": "ar-QA"
+  },
+  {
+    "Language": "Arabic",
+    "Locale": "SA",
+    "LanguageCode": "ar-SA"
+  },
+  {
+    "Language": "Arabic",
+    "Locale": "SY",
+    "LanguageCode": "ar-SY"
+  },
+  {
+    "Language": "Arabic",
+    "Locale": "TN",
+    "LanguageCode": "ar-TN"
+  },
+  {
+    "Language": "Arabic",
+    "Locale": "YE",
+    "LanguageCode": "ar-YE"
+  },
+  {
+    "Language": "Armenian",
+    "Locale": "AM",
+    "LanguageCode": "hy-AM"
+  },
+  {
+    "Language": "Azerbaijani",
+    "Locale": "AZ",
+    "LanguageCode": "az-AZ"
+  },
+  {
+    "Language": "Bangla",
+    "Locale": "BD",
+    "LanguageCode": "bn-BD"
+  },
+  {
+    "Language": "Basque",
+    "Locale": "ES",
+    "LanguageCode": "eu-ES"
+  },
+  {
+    "Language": "Bengali",
+    "Locale": "IN",
+    "LanguageCode": "bn-IN"
+  },
+  {
+    "Language": "Bosnian",
+    "Locale": "BA",
+    "LanguageCode": "bs-BA"
+  },
+  {
+    "Language": "Bulgarian",
+    "Locale": "BG",
+    "LanguageCode": "bg-BG"
+  },
+  {
+    "Language": "Burmese",
+    "Locale": "MM",
+    "LanguageCode": "my-MM"
+  },
+  {
+    "Language": "Catalan",
+    "Locale": "ES",
+    "LanguageCode": "ca-ES"
+  },
+  {
+    "Language": "Catalan",
+    "Locale": "CN",
+    "LanguageCode": "zh-CN"
+  },
+  {
+    "Language": "Chinese",
+    "Locale": "HK",
+    "LanguageCode": "zh-HK"
+  },
+  {
+    "Language": "Chinese",
+    "Locale": "TW",
+    "LanguageCode": "zh-TW"
+  },
+  {
+    "Language": "Croatian",
+    "Locale": "HR",
+    "LanguageCode": "hr-HR"
+  },
+  {
+    "Language": "Czech",
+    "Locale": "CZ",
+    "LanguageCode": "cs-CZ"
+  },
+  {
+    "Language": "Danish",
+    "Locale": "DK",
+    "LanguageCode": "da-DK"
+  },
+  {
+    "Language": "Dutch",
+    "Locale": "BE",
+    "LanguageCode": "nl-BE"
+  },
+  {
+    "Language": "Dutch",
+    "Locale": "NL",
+    "LanguageCode": "nl-NL"
+  },
+  {
+    "Language": "English",
+    "Locale": "AU",
+    "LanguageCode": "en-AU"
+  },
+  {
+    "Language": "English",
+    "Locale": "CA",
+    "LanguageCode": "en-CA"
+  },
+  {
+    "Language": "English",
+    "Locale": "GB",
+    "LanguageCode": "en-GB"
+  },
+  {
+    "Language": "English",
+    "Locale": "HK",
+    "LanguageCode": "en-HK"
+  },
+  {
+    "Language": "English",
+    "Locale": "IE",
+    "LanguageCode": "en-IE"
+  },
+  {
+    "Language": "English",
+    "Locale": "IN",
+    "LanguageCode": "en-IN"
+  },
+  {
+    "Language": "English",
+    "Locale": "KE",
+    "LanguageCode": "en-KE"
+  },
+  {
+    "Language": "English",
+    "Locale": "MX",
+    "LanguageCode": "en-MX"
+  },
+  {
+    "Language": "English",
+    "Locale": "NG",
+    "LanguageCode": "en-NG"
+  },
+  {
+    "Language": "English",
+    "Locale": "NZ",
+    "LanguageCode": "en-NZ"
+  },
+  {
+    "Language": "English",
+    "Locale": "PH",
+    "LanguageCode": "en-PH"
+  },
+  {
+    "Language": "English",
+    "Locale": "SG",
+    "LanguageCode": "en-SG"
+  },
+  {
+    "Language": "English",
+    "Locale": "TZ",
+    "LanguageCode": "en-TZ"
+  },
+  {
+    "Language": "English",
+    "Locale": "US",
+    "LanguageCode": "en-US"
+  },
+  {
+    "Language": "English",
+    "Locale": "ZA",
+    "LanguageCode": "en-ZA"
+  },
+  {
+    "Language": "Estonian",
+    "Locale": "EE",
+    "LanguageCode": "et-EE"
+  },
+  {
+    "Language": "Filipino",
+    "Locale": "PH",
+    "LanguageCode": "fil-PH"
+  },
+  {
+    "Language": "Finnish",
+    "Locale": "FI",
+    "LanguageCode": "fi-FI"
+  },
+  {
+    "Language": "French",
+    "Locale": "BE",
+    "LanguageCode": "fr-BE"
+  },
+  {
+    "Language": "French",
+    "Locale": "CA",
+    "LanguageCode": "fr-CA"
+  },
+  {
+    "Language": "French",
+    "Locale": "CH",
+    "LanguageCode": "fr-CH"
+  },
+  {
+    "Language": "French",
+    "Locale": "FR",
+    "LanguageCode": "fr-FR"
+  },
+  {
+    "Language": "Galician",
+    "Locale": "ES",
+    "LanguageCode": "gl-ES"
+  },
+  {
+    "Language": "Georgian",
+    "Locale": "GE",
+    "LanguageCode": "ka-GE"
+  },
+  {
+    "Language": "German",
+    "Locale": "AT",
+    "LanguageCode": "de-AT"
+  },
+  {
+    "Language": "German",
+    "Locale": "CH",
+    "LanguageCode": "de-CH"
+  },
+  {
+    "Language": "German",
+    "Locale": "DE",
+    "LanguageCode": "de-DE"
+  },
+  {
+    "Language": "Greek",
+    "Locale": "GR",
+    "LanguageCode": "el-GR"
+  },
+  {
+    "Language": "Gujarati",
+    "Locale": "IN",
+    "LanguageCode": "gu-IN"
+  },
+  {
+    "Language": "Hebrew",
+    "Locale": "IL",
+    "LanguageCode": "he-IL"
+  },
+  {
+    "Language": "Hindi",
+    "Locale": "IN",
+    "LanguageCode": "hi-IN"
+  },
+  {
+    "Language": "Hungarian",
+    "Locale": "HU",
+    "LanguageCode": "hu-HU"
+  },
+  {
+    "Language": "Icelandic",
+    "Locale": "IS",
+    "LanguageCode": "is-IS"
+  },
+  {
+    "Language": "Indonesian",
+    "Locale": "ID",
+    "LanguageCode": "id-ID"
+  },
+  {
+    "Language": "Irish",
+    "Locale": "IE",
+    "LanguageCode": "ga-IE"
+  },
+  {
+    "Language": "Italian",
+    "Locale": "IT",
+    "LanguageCode": "it-IT"
+  },
+  {
+    "Language": "Japanese",
+    "Locale": "JP",
+    "LanguageCode": "ja-JP"
+  },
+  {
+    "Language": "Javanese",
+    "Locale": "ID",
+    "LanguageCode": "jv-ID"
+  },
+  {
+    "Language": "Kannada",
+    "Locale": "IN",
+    "LanguageCode": "kn-IN"
+  },
+  {
+    "Language": "Kazakh",
+    "Locale": "KZ",
+    "LanguageCode": "kk-KZ"
+  },
+  {
+    "Language": "Khmer",
+    "Locale": "KH",
+    "LanguageCode": "km-KH"
+  },
+  {
+    "Language": "Korean",
+    "Locale": "KR",
+    "LanguageCode": "ko-KR"
+  },
+  {
+    "Language": "Lao",
+    "Locale": "LA",
+    "LanguageCode": "lo-LA"
+  },
+  {
+    "Language": "Latvian",
+    "Locale": "LV",
+    "LanguageCode": "lv-LV"
+  },
+  {
+    "Language": "Lithuanian",
+    "Locale": "LT",
+    "LanguageCode": "lt-LT"
+  },
+  {
+    "Language": "Macedonian",
+    "Locale": "MK",
+    "LanguageCode": "mk-MK"
+  },
+  {
+    "Language": "Malay",
+    "Locale": "MY",
+    "LanguageCode": "ms-MY"
+  },
+  {
+    "Language": "Malayalam",
+    "Locale": "IN",
+    "LanguageCode": "ml-IN"
+  },
+  {
+    "Language": "Maltese",
+    "Locale": "MT",
+    "LanguageCode": "mt-MT"
+  },
+  {
+    "Language": "Marathi",
+    "Locale": "IN",
+    "LanguageCode": "mr-IN"
+  },
+  {
+    "Language": "Mongolian",
+    "Locale": "MN",
+    "LanguageCode": "mn-MN"
+  },
+  {
+    "Language": "Nepali",
+    "Locale": "NP",
+    "LanguageCode": "ne-NP"
+  },
+  {
+    "Language": "Norwegian",
+    "Locale": "NO",
+    "LanguageCode": "nb-NO"
+  },
+  {
+    "Language": "Pashto",
+    "Locale": "AF",
+    "LanguageCode": "ps-AF"
+  },
+  {
+    "Language": "Persian",
+    "Locale": "IR",
+    "LanguageCode": "fa-IR"
+  },
+  {
+    "Language": "Polish",
+    "Locale": "PL",
+    "LanguageCode": "pl-PL"
+  },
+  {
+    "Language": "Portuguese",
+    "Locale": "BR",
+    "LanguageCode": "pt-BR"
+  },
+  {
+    "Language": "Portuguese",
+    "Locale": "PT",
+    "LanguageCode": "pt-PT"
+  },
+  {
+    "Language": "Romanian",
+    "Locale": "RO",
+    "LanguageCode": "ro-RO"
+  },
+  {
+    "Language": "Russian",
+    "Locale": "RU",
+    "LanguageCode": "ru-RU"
+  },
+  {
+    "Language": "Serbian",
+    "Locale": "RS",
+    "LanguageCode": "sr-RS"
+  },
+  {
+    "Language": "Sinhala",
+    "Locale": "LK",
+    "LanguageCode": "si-LK"
+  },
+  {
+    "Language": "Slovak",
+    "Locale": "SK",
+    "LanguageCode": "sk-SK"
+  },
+  {
+    "Language": "Slovenian",
+    "Locale": "SI",
+    "LanguageCode": "sl-SI"
+  },
+  {
+    "Language": "Somali",
+    "Locale": "SO",
+    "LanguageCode": "so-SO"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "AR",
+    "LanguageCode": "es-AR"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "BO",
+    "LanguageCode": "es-BO"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "CL",
+    "LanguageCode": "es-CL"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "CO",
+    "LanguageCode": "es-CO"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "CR",
+    "LanguageCode": "es-CR"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "CU",
+    "LanguageCode": "es-CU"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "DO",
+    "LanguageCode": "es-DO"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "EC",
+    "LanguageCode": "es-EC"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "ES",
+    "LanguageCode": "es-ES"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "GQ",
+    "LanguageCode": "es-GQ"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "GT",
+    "LanguageCode": "es-GT"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "HN",
+    "LanguageCode": "es-HN"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "MX",
+    "LanguageCode": "es-MX"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "NI",
+    "LanguageCode": "es-NI"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "PA",
+    "LanguageCode": "es-PA"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "PE",
+    "LanguageCode": "es-PE"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "PR",
+    "LanguageCode": "es-PR"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "PY",
+    "LanguageCode": "es-PY"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "SV",
+    "LanguageCode": "es-SV"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "US",
+    "LanguageCode": "es-US"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "UY",
+    "LanguageCode": "es-UY"
+  },
+  {
+    "Language": "Spanish",
+    "Locale": "VE",
+    "LanguageCode": "es-VE"
+  },
+  {
+    "Language": "Sundanese",
+    "Locale": "ID",
+    "LanguageCode": "su-ID"
+  },
+  {
+    "Language": "Swahili",
+    "Locale": "KE",
+    "LanguageCode": "sw-KE"
+  },
+  {
+    "Language": "Swahili",
+    "Locale": "TZ",
+    "LanguageCode": "sw-TZ"
+  },
+  {
+    "Language": "Swedish",
+    "Locale": "SE",
+    "LanguageCode": "sv-SE"
+  },
+  {
+    "Language": "Tamil",
+    "Locale": "IN",
+    "LanguageCode": "ta-IN"
+  },
+  {
+    "Language": "Tamil",
+    "Locale": "LK",
+    "LanguageCode": "ta-LK"
+  },
+  {
+    "Language": "Tamil",
+    "Locale": "MY",
+    "LanguageCode": "ta-MY"
+  },
+  {
+    "Language": "Tamil",
+    "Locale": "SG",
+    "LanguageCode": "ta-SG"
+  },
+  {
+    "Language": "Telugu",
+    "Locale": "IN",
+    "LanguageCode": "te-IN"
+  },
+  {
+    "Language": "Thai",
+    "Locale": "TH",
+    "LanguageCode": "th-TH"
+  },
+  {
+    "Language": "Turkish",
+    "Locale": "TR",
+    "LanguageCode": "tr-TR"
+  },
+  {
+    "Language": "Ukrainian",
+    "Locale": "UA",
+    "LanguageCode": "uk-UA"
+  },
+  {
+    "Language": "Urdu",
+    "Locale": "IN",
+    "LanguageCode": "ur-IN"
+  },
+  {
+    "Language": "Urdu",
+    "Locale": "PK",
+    "LanguageCode": "ur-PK"
+  },
+  {
+    "Language": "Uzbek",
+    "Locale": "UZ",
+    "LanguageCode": "uz-UZ"
+  },
+  {
+    "Language": "Vietnamese",
+    "Locale": "VN",
+    "LanguageCode": "vi-VN"
+  },
+  {
+    "Language": "Welsh",
+    "Locale": "GB",
+    "LanguageCode": "cy-GB"
+  },
+  {
+    "Language": "Zulu",
+    "Locale": "ZA",
+    "LanguageCode": "zu-ZA"
+  }
+]

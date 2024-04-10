@@ -175,6 +175,8 @@ function Insights({
     };
 
     const fetchSerpYoutubeVideos = async () => {
+      const userRegEmail = localStorage.getItem("userRegEmail");
+
       // localStorage.removeItem('fetchSerpYoutubeVideos');
       // setSerpYoutubeVideosInfo({});
       // let fetchSerpYoutubeVideosLS = JSON.parse(
@@ -217,7 +219,7 @@ function Insights({
       } else {
         try {
           const response = await axios.get(
-            `${process.env.REACT_APP_API_BASE_URL}/fetchSerpYoutubeVideos`,
+            `${process.env.REACT_APP_API_BASE_URL}/fetchSerpYoutubeVideos?email=${userRegEmail}`,
             {
               headers: {
                 "Content-Type": "application/json",
