@@ -66,6 +66,8 @@ import AffilliateMarketingCoaching from "./pages/bundle/AffilliateMarketingCoach
 import DFYCampaigns from "./pages/bundle/25DFYCampaigns";
 import UnlimitedTraffic from "./pages/bundle/UnlimitedTraffic";
 import Training from "./pages/Training";
+import theme from "./themes/theme.js";
+import ThemeContext from "./themes/ThemeContext"
 // import AICoach from "./pages/AiCoach/AiCoach"; 
 import {
   AllUsers,
@@ -405,7 +407,7 @@ const App = () => {
   // };
 
   return (
-    <div className={currentMode === "Dark" ? "dark" : ""}>
+    <ThemeContext.Provider value={theme}>
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -496,7 +498,7 @@ const App = () => {
           <Footer />
         </div>
       </BrowserRouter>
-    </div>
+    </ThemeContext.Provider>
   );
 };
 

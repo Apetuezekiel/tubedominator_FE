@@ -62,6 +62,7 @@ import Insights from "./keywords/Insights";
 import Competition from "./keywords/Competition";
 import Loader from "../components/Loader";
 import GenerateIdeasPanel from "../components/GenerateIdeasPanel";
+import ThemeContext from "../themes/ThemeContext";
 // import { PotentialViewsTitleTemplate, TrendsTitleTemplate, VideoIconTitleTemplate, VolumeTitleTemplate, keywordDiffTitleTemplate } from "../data/api/tableHelper";
 
 const Ideation = () => {
@@ -806,6 +807,8 @@ const Ideation = () => {
 
   const isSearchEmpty = searchQuery.trim() === "";
 
+  const theme = React.useContext(ThemeContext);
+
   return (
     <section>
       <div
@@ -828,7 +831,7 @@ const Ideation = () => {
             }}
             // disabled={isSearchEmpty}
             style={{
-              background: "var(--special-background)",
+              background: theme.colors.buttonBg,
             }}
           >
             <BsLightningChargeFill className="mr-2" color="white" />
